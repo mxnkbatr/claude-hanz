@@ -952,7 +952,6 @@ i {
 }
 
 @media (max-width: 899px) {
-  .hero-title-row .hero-flag,
   .hero-title-row .seal-mark {
     display: none;
   }
