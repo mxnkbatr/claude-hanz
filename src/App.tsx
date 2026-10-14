@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { Home } from "./pages/Home";
 import { About } from "./pages/About";
@@ -20,6 +20,8 @@ export default function App() {
           <Route path="about" element={<About />} />
           <Route path="medee" element={<News />} />
           <Route path="medee/:id" element={<NewsDetail />} />
+          <Route path="news" element={<Navigate to="/medee" replace />} />
+          <Route path="news/:id" element={<NewsDetail />} />
           <Route path="university" element={<University />} />
           <Route path="university/:id" element={<UniversityDetail />} />
           <Route path="shop" element={<Shop />} />
