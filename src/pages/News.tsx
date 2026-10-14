@@ -84,7 +84,7 @@ export function News() {
             {featured ? (
               <>
                 <Reveal>
-                  <TiltCard max={5}>
+                  <TiltCard>
                     <Link to={`/medee/${featured.id}`} className="news-featured">
                       <div className="news-featured-media">
                         <SafeImage
@@ -98,7 +98,10 @@ export function News() {
                       <div className="news-featured-body">
                         <div className="news-meta">
                           <span>{t(featured.tagKey)}</span>
-                          <time dateTime={toDateTime(featured.date)}>
+                          <time
+                            className="date-badge"
+                            dateTime={toDateTime(featured.date)}
+                          >
                             {featured.date}
                           </time>
                         </div>
@@ -115,7 +118,7 @@ export function News() {
                 <Stagger className="news-grid">
                   {rest.map((item) => (
                     <StaggerItem key={item.id}>
-                      <TiltCard max={7}>
+                      <TiltCard>
                         <Link to={`/medee/${item.id}`} className="news-card">
                           <div className="news-card-media">
                             <SafeImage
@@ -129,7 +132,10 @@ export function News() {
                           <div className="news-card-body">
                             <div className="news-meta">
                               <span>{t(item.tagKey)}</span>
-                              <time dateTime={toDateTime(item.date)}>
+                              <time
+                                className="date-badge"
+                                dateTime={toDateTime(item.date)}
+                              >
                                 {item.date}
                               </time>
                             </div>

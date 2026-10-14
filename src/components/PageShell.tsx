@@ -26,7 +26,7 @@ export function Reveal({
   children,
   delay = 0,
   className = "",
-  y = 40,
+  y = 24,
 }: {
   children: ReactNode;
   delay?: number;
@@ -69,7 +69,7 @@ export function Stagger({
         hidden: {},
         show: {
           transition: {
-            staggerChildren: reduce ? 0 : 0.1,
+            staggerChildren: reduce ? 0 : 0.08,
             delayChildren: reduce ? 0 : 0.04,
           },
         },
@@ -92,7 +92,7 @@ export function StaggerItem({
     <motion.div
       className={className}
       variants={{
-        hidden: reduce ? { opacity: 1 } : { opacity: 0, y: 28 },
+        hidden: reduce ? { opacity: 1 } : { opacity: 0, y: 24 },
         show: {
           opacity: 1,
           y: 0,

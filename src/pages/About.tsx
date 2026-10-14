@@ -44,6 +44,9 @@ export function About() {
           {coursesMeta.map((c) => (
             <StaggerItem key={c.id}>
               <article className="home-course-card">
+                <span className="home-course-icon" aria-hidden>
+                  {c.icon}
+                </span>
                 <span className="home-course-tag">{t(c.tagKey)}</span>
                 <h3>{t(c.titleKey)}</h3>
                 <p>{t(c.descKey)}</p>

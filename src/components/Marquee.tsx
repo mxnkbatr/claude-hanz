@@ -22,7 +22,7 @@ export function Marquee() {
         transition={
           reduce
             ? undefined
-            : { duration: 28, ease: "linear", repeat: Infinity }
+            : { duration: 40, ease: "linear", repeat: Infinity }
         }
       >
         {row.map((item, i) => (

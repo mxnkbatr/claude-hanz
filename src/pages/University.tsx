@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { universitiesMeta } from "../data/content";
 import { ConsultForm } from "../components/ConsultForm";
+import { ChinaMap } from "../components/ChinaMap";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
 import { TiltCard } from "../components/TiltCard";
@@ -40,18 +41,22 @@ export function University() {
         </Reveal>
       </header>
 
+      <Reveal>
+        <ChinaMap />
+      </Reveal>
+
       <section className="section tight">
         <Stagger className="uni-stack">
           {universitiesMeta.map((u) => (
             <StaggerItem key={u.id}>
-              <TiltCard max={5}>
+              <TiltCard>
                 <Link to={`/university/${u.id}`} className="uni-card">
                   <div className="uni-media">
                     <SafeImage src={u.image} alt={t(u.titleKey)} />
                     <span>{t(u.countryKey)}</span>
+                    <h2 className="uni-title">{t(u.titleKey)}</h2>
                   </div>
                   <div className="uni-body">
-                    <h2>{t(u.titleKey)}</h2>
                     <p>{t(u.descKey)}</p>
                     <ul>
                       {u.points.map((p) => (

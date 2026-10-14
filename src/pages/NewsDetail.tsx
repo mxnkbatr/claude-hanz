@@ -75,7 +75,7 @@ export function NewsDetail() {
             <Stagger className="news-grid related-grid">
               {related.map((n) => (
                 <StaggerItem key={n.id}>
-                  <TiltCard max={6}>
+                  <TiltCard>
                     <Link to={`/medee/${n.id}`} className="news-card news-card-compact">
                       <div className="news-card-media">
                         <SafeImage src={n.image} alt={t(n.titleKey)} />

@@ -99,8 +99,11 @@ export function Shop() {
               <Stagger className="shop-grid">
                 {list.map((p) => (
                   <StaggerItem key={p.id}>
-                    <TiltCard max={8}>
-                <Link to={`/shop/${p.id}`} className="shop-card">
+                    <TiltCard>
+                <Link
+                  to={`/shop/${p.id}`}
+                  className={`shop-card${!p.inStock ? " is-soldout" : ""}`}
+                >
                   <div className="shop-media">
                     <SafeImage src={p.image} alt={t(p.titleKey)} />
                     <span className="tag">{t(p.tagKey)}</span>

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   academy,
   formatPrice,
@@ -12,6 +12,10 @@ import { SealMark } from "../components/SealMark";
 import { Marquee } from "../components/Marquee";
 import { SafeImage } from "../components/SafeImage";
 import { TiltCard } from "../components/TiltCard";
+import { HeroIntro, shouldPlayHeroIntro } from "../components/HeroIntro";
+import { LearnScroll } from "../components/LearnScroll";
+import { StatsStrip } from "../components/StatsStrip";
+import { MagneticButton } from "../components/MagneticButton";
 import { useI18n } from "../i18n/I18nContext";
 import { useDesktop } from "../hooks/useDesktop";
 import { toDateTime } from "../lib/date";
@@ -21,6 +25,9 @@ export function Home() {
   const { t, lang } = useI18n();
   const isDesktop = useDesktop();
   const heroRef = useRef<HTMLElement>(null);
+  const [introDone, setIntroDone] = useState(() => !shouldPlayHeroIntro());
+  const playIntro = !introDone;
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -30,8 +37,12 @@ export function Home() {
   const contentY = useTransform(scrollYProgress, [0, 0.55], [0, -28]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
 
+  const heroReady = introDone;
+
   return (
     <PageShell className="page-home">
+      {playIntro && <HeroIntro onComplete={() => setIntroDone(true)} />}
+
       <section className="hero-cinema" ref={heroRef}>
         <div className="hero-cinema-media">
           <motion.img
@@ -57,8 +68,8 @@ export function Home() {
           <motion.p
             className="hero-eyebrow"
             initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12, duration: 0.65, ease }}
+            animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+            transition={{ delay: 0.05, duration: 0.65, ease }}
           >
             <span>{t("brand")}</span>
             <em>{t("hero_eyebrow")}</em>
@@ -67,8 +78,8 @@ export function Home() {
           <motion.div
             className="hero-chip"
             initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.22, duration: 0.65, ease }}
+            animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+            transition={{ delay: 0.12, duration: 0.65, ease }}
           >
             <strong>{t("hero_chip")}</strong>
             <span>{t("hero_chip_meta")}</span>
@@ -77,8 +88,8 @@ export function Home() {
           <motion.h1
             className="hero-cinema-title"
             initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.85, ease }}
+            animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+            transition={{ delay: 0.18, duration: 0.85, ease }}
           >
             <span>
               {t("hero_headline")}{" "}
@@ -91,8 +102,8 @@ export function Home() {
           <motion.p
             className="hero-cinema-sub"
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45, duration: 0.7, ease }}
+            animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ delay: 0.28, duration: 0.7, ease }}
           >
             {t("hero_kicker")}
           </motion.p>
@@ -100,10 +111,10 @@ export function Home() {
           <motion.div
             className="hero-cta-row"
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55, duration: 0.7, ease }}
+            animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ delay: 0.36, duration: 0.7, ease }}
           >
-            <a
+            <MagneticButton
               href={academy.registerUrl}
               className="btn btn-seal"
               target="_blank"
@@ -111,7 +122,7 @@ export function Home() {
             >
               <span>{t("register_cta")}</span>
               <i aria-hidden>→</i>
-            </a>
+            </MagneticButton>
             <Link to="/about" className="btn btn-glass">
               <span>{t("about_title")}</span>
             </Link>
@@ -124,10 +135,14 @@ export function Home() {
           <Marquee />
         </Reveal>
 
+        <StatsStrip />
+
+        <LearnScroll />
+
         <section className="section">
           <Stagger className="split-promo">
             <StaggerItem>
-              <TiltCard max={7}>
+              <TiltCard>
                 <Link to="/about" className="promo-panel">
                   <img
                     src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80"
@@ -144,7 +159,7 @@ export function Home() {
               </TiltCard>
             </StaggerItem>
             <StaggerItem>
-              <TiltCard max={7}>
+              <TiltCard>
                 <Link to="/university" className="promo-panel">
                   <img
                     src="https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1200&q=80"
@@ -212,7 +227,7 @@ export function Home() {
           <Stagger className="shop-grid home-shop">
             {shopProductsMeta.slice(0, 2).map((p) => (
               <StaggerItem key={p.id}>
-                <TiltCard max={7}>
+                <TiltCard>
                   <Link to={`/shop/${p.id}`} className="shop-card">
                     <div className="shop-media">
                       <SafeImage src={p.image} alt={t(p.titleKey)} />

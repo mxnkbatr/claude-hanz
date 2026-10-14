@@ -10,7 +10,7 @@ import {
 export function TiltCard({
   children,
   className = "",
-  max = 8,
+  max = 4,
 }: {
   children: ReactNode;
   className?: string;

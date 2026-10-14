@@ -24,24 +24,28 @@ export const coursesMeta = [
     titleKey: "course_hsk_t",
     descKey: "course_hsk_d",
     tagKey: "tag_course",
+    icon: "汉",
   },
   {
     id: "csca",
     titleKey: "course_csca_t",
     descKey: "course_csca_d",
     tagKey: "tag_course",
+    icon: "学",
   },
   {
     id: "speak",
     titleKey: "course_speak_t",
     descKey: "course_speak_d",
     tagKey: "tag_course",
+    icon: "说",
   },
   {
     id: "year",
     titleKey: "course_year_t",
     descKey: "course_year_d",
     tagKey: "tag_academy",
+    icon: "年",
   },
 ] as const;
 

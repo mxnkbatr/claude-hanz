@@ -100,7 +100,7 @@ export function ProductDetail() {
           <Stagger className="shop-grid home-shop">
             {related.map((item) => (
               <StaggerItem key={item.id}>
-                <TiltCard max={7}>
+                <TiltCard>
                 <Link to={`/shop/${item.id}`} className="shop-card">
                   <div className="shop-media">
                     <SafeImage src={item.image} alt={t(item.titleKey)} />
