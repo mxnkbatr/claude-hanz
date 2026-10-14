@@ -951,9 +951,10 @@ i {
   min-width: 0;
 }
 
-@media (max-width: 520px) {
-  .hero-title-row {
-    flex-wrap: wrap;
+@media (max-width: 899px) {
+  .hero-title-row .hero-flag,
+  .hero-title-row .seal-mark {
+    display: none;
   }
 }
 
@@ -1885,8 +1886,8 @@ i {
 
 .shop-card.is-soldout .shop-media img,
 .shop-card.is-soldout .shop-media .img-fallback {
-  filter: grayscale(1);
-  opacity: 0.72;
+  filter: grayscale(0.55);
+  opacity: 0.82;
 }
 
 .shop-card.is-soldout .price {
@@ -1917,21 +1918,54 @@ i {
     overflow: hidden;
   }
 
+  .shop-grid {
+    gap: 0.7rem;
+  }
+
+  .shop-media .tag {
+    top: 0.5rem;
+    left: 0.5rem;
+    max-width: calc(100% - 4.5rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.62rem;
+    padding: 0.28rem 0.5rem;
+  }
+
+  .shop-media .badge-stock {
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 0.62rem;
+    padding: 0.26rem 0.5rem;
+  }
+
   .shop-body {
-    padding: 0.85rem 0.9rem 0.95rem;
+    padding: 0.75rem 0.8rem 0.85rem;
+    gap: 0.2rem;
   }
 
   .shop-body h3 {
-    font-size: 0.98rem;
+    font-size: 0.92rem;
     min-height: 0;
+    -webkit-line-clamp: 3;
+  }
+
+  .shop-body .muted {
+    font-size: 0.78rem;
   }
 
   .price {
-    font-size: 1.02rem;
+    font-size: 1.05rem;
+  }
+
+  /* Whole card is a link — drop cramped CTA on narrow cards */
+  .shop-foot {
+    padding-top: 0.55rem;
   }
 
   .shop-foot .card-cta {
-    font-size: 0.75rem;
+    display: none;
   }
 }
 
