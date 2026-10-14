@@ -12,7 +12,10 @@ export function SafeImage({ src, alt, className, loading = "lazy" }: Props) {
 
   if (failed) {
     return (
-      <div className={`img-fallback${className ? ` ${className}` : ""}`} aria-hidden>
+      <div
+        className={`img-fallback img-fallback-han${className ? ` ${className}` : ""}`}
+        aria-hidden
+      >
         <span>汉</span>
       </div>
     );

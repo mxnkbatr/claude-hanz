@@ -1,21 +1,16 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  formatPrice,
-  shopProductsMeta,
-  type ShopCat,
-} from "../data/content";
+import { shopProductsMeta, type ShopCat } from "../data/content";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
+import { ProductCard } from "../components/ProductCard";
 import { SafeImage } from "../components/SafeImage";
-import { TiltCard } from "../components/TiltCard";
 import { useI18n } from "../i18n/I18nContext";
 import { ease } from "../lib/motion";
 
 const cats: ShopCat[] = ["all", "porcelain", "books"];
 
 export function Shop() {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const [cat, setCat] = useState<ShopCat>("all");
 
   const counts = useMemo(() => {
@@ -99,40 +94,7 @@ export function Shop() {
               <Stagger className="shop-grid">
                 {list.map((p) => (
                   <StaggerItem key={p.id}>
-                    <TiltCard>
-                <Link
-                  to={`/shop/${p.id}`}
-                  className={`shop-card${!p.inStock ? " is-soldout" : ""}`}
-                >
-                  <div className="shop-media">
-                    <SafeImage src={p.image} alt={t(p.titleKey)} />
-                    <span className="tag">{t(p.tagKey)}</span>
-                    <span className="price-badge">
-                      {formatPrice(p.price, lang)}
-                    </span>
-                    {!p.inStock && (
-                      <em className="badge-stock">{t("out_stock")}</em>
-                    )}
-                  </div>
-                  <div className="shop-body">
-                    <p className="shop-cat">
-                      {t(
-                        p.cat === "porcelain"
-                          ? "cat_porcelain"
-                          : "cat_books",
-                      )}
-                    </p>
-                    <h3>{t(p.titleKey)}</h3>
-                    <p className="muted">{t(p.unitKey)}</p>
-                    <div className="shop-foot">
-                      <p className="price">{formatPrice(p.price, lang)}</p>
-                      <em className="card-cta">
-                        {t("view_detail")} <i aria-hidden>→</i>
-                      </em>
-                    </div>
-                  </div>
-                </Link>
-                    </TiltCard>
+                    <ProductCard product={p} />
                   </StaggerItem>
                 ))}
               </Stagger>

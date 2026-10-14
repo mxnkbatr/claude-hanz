@@ -1,29 +1,25 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
-import {
-  academy,
-  formatPrice,
-  newsIds,
-  shopProductsMeta,
-} from "../data/content";
+import { academy, newsIds, shopProductsMeta } from "../data/content";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { SealMark } from "../components/SealMark";
 import { Marquee } from "../components/Marquee";
 import { SafeImage } from "../components/SafeImage";
 import { TiltCard } from "../components/TiltCard";
+import { ProductCard } from "../components/ProductCard";
 import { HeroIntro, shouldPlayHeroIntro } from "../components/HeroIntro";
 import { LearnScroll } from "../components/LearnScroll";
 import { StatsStrip } from "../components/StatsStrip";
 import { MagneticButton } from "../components/MagneticButton";
 import { useI18n } from "../i18n/I18nContext";
-import { useDesktop } from "../hooks/useDesktop";
 import { toDateTime } from "../lib/date";
 import { ease } from "../lib/motion";
 
+const HERO_IMG = "/images/hero-wall.jpg";
+
 export function Home() {
-  const { t, lang } = useI18n();
-  const isDesktop = useDesktop();
+  const { t } = useI18n();
   const heroRef = useRef<HTMLElement>(null);
   const [introDone, setIntroDone] = useState(() => !shouldPlayHeroIntro());
   const playIntro = !introDone;
@@ -32,8 +28,7 @@ export function Home() {
     target: heroRef,
     offset: ["start start", "end start"],
   });
-  const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
-  const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
+  const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
   const contentY = useTransform(scrollYProgress, [0, 0.55], [0, -28]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
 
@@ -44,21 +39,25 @@ export function Home() {
       {playIntro && <HeroIntro onComplete={() => setIntroDone(true)} />}
 
       <section className="hero-cinema" ref={heroRef}>
-        <div className="hero-cinema-media">
+        <div
+          className="hero-cinema-media"
+          style={{ backgroundImage: `url(${HERO_IMG})` }}
+        >
           <motion.img
-            src="/images/hero-wall.jpg"
+            src={HERO_IMG}
             alt={t("hero_headline")}
             width={1600}
             height={900}
             fetchPriority="high"
             decoding="async"
-            style={{ y: imgY, scale: imgScale }}
-            initial={{ scale: 1.12 }}
+            loading="eager"
+            draggable={false}
+            style={{ y: imgY }}
+            initial={{ scale: 1.06 }}
             animate={{ scale: 1 }}
-            transition={{ duration: 2.1, ease }}
+            transition={{ duration: 1.6, ease }}
           />
           <div className="hero-cinema-shade" />
-          {isDesktop && <SealMark className="hero-seal" />}
         </div>
 
         <motion.div
@@ -85,19 +84,20 @@ export function Home() {
             <span>{t("hero_chip_meta")}</span>
           </motion.div>
 
-          <motion.h1
-            className="hero-cinema-title"
+          <motion.div
+            className="hero-title-row"
             initial={{ opacity: 0, y: 40 }}
             animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
             transition={{ delay: 0.18, duration: 0.85, ease }}
           >
-            <span>
+            <h1 className="hero-cinema-title">
               {t("hero_headline")}{" "}
               <span className="hero-flag" aria-hidden>
                 🇨🇳
               </span>
-            </span>
-          </motion.h1>
+            </h1>
+            <SealMark className="hero-seal-inline" />
+          </motion.div>
 
           <motion.p
             className="hero-cinema-sub"
@@ -116,14 +116,14 @@ export function Home() {
           >
             <MagneticButton
               href={academy.registerUrl}
-              className="btn btn-seal"
+              className="btn btn-seal btn-hero-primary"
               target="_blank"
               rel="noopener noreferrer"
             >
               <span>{t("register_cta")}</span>
               <i aria-hidden>→</i>
             </MagneticButton>
-            <Link to="/about" className="btn btn-glass">
+            <Link to="/about" className="btn btn-glass btn-hero-secondary">
               <span>{t("about_title")}</span>
             </Link>
           </motion.div>
@@ -227,26 +227,7 @@ export function Home() {
           <Stagger className="shop-grid home-shop">
             {shopProductsMeta.slice(0, 2).map((p) => (
               <StaggerItem key={p.id}>
-                <TiltCard>
-                  <Link to={`/shop/${p.id}`} className="shop-card">
-                    <div className="shop-media">
-                      <SafeImage src={p.image} alt={t(p.titleKey)} />
-                      <span className="tag">{t(p.tagKey)}</span>
-                      <span className="price-badge">
-                        {formatPrice(p.price, lang)}
-                      </span>
-                    </div>
-                    <div className="shop-body">
-                      <h3>{t(p.titleKey)}</h3>
-                      <div className="shop-foot">
-                        <p className="price">{formatPrice(p.price, lang)}</p>
-                        <em className="card-cta">
-                          {t("view_detail")} <i aria-hidden>→</i>
-                        </em>
-                      </div>
-                    </div>
-                  </Link>
-                </TiltCard>
+                <ProductCard product={p} />
               </StaggerItem>
             ))}
           </Stagger>

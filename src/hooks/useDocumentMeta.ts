@@ -1,5 +1,10 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { matchPath, useLocation } from "react-router-dom";
+import {
+  getNewsById,
+  getProductById,
+  getUniversityById,
+} from "../data/content";
 import { useI18n } from "../i18n/I18nContext";
 
 const routeMetaKey: Record<string, string> = {
@@ -11,19 +16,42 @@ const routeMetaKey: Record<string, string> = {
   "/contact": "meta_contact",
 };
 
+const BRAND = "Ханз Академи";
+
 export function useDocumentMeta() {
   const { pathname } = useLocation();
   const { t, lang } = useI18n();
 
   useEffect(() => {
-    const title = t("meta_title");
-    const known = routeMetaKey[pathname];
-    if (!known) {
-      document.title = `${t("not_found_title")} · ${title}`;
-    } else if (pathname === "/") {
-      document.title = title;
+    const siteTitle = t("meta_title");
+    const newsMatch = matchPath("/medee/:id", pathname);
+    const shopMatch = matchPath("/shop/:id", pathname);
+    const uniMatch = matchPath("/university/:id", pathname);
+
+    if (newsMatch?.params.id) {
+      const item = getNewsById(newsMatch.params.id);
+      document.title = item
+        ? `${t(item.titleKey)} · ${BRAND}`
+        : `${t("not_found_title")} · ${BRAND}`;
+    } else if (shopMatch?.params.id) {
+      const item = getProductById(shopMatch.params.id);
+      document.title = item
+        ? `${t(item.titleKey)} · ${BRAND}`
+        : `${t("not_found_title")} · ${BRAND}`;
+    } else if (uniMatch?.params.id) {
+      const item = getUniversityById(uniMatch.params.id);
+      document.title = item
+        ? `${t(item.titleKey)} · ${BRAND}`
+        : `${t("not_found_title")} · ${BRAND}`;
     } else {
-      document.title = `${t(known)} · ${title}`;
+      const known = routeMetaKey[pathname];
+      if (!known) {
+        document.title = `${t("not_found_title")} · ${BRAND}`;
+      } else if (pathname === "/") {
+        document.title = siteTitle;
+      } else {
+        document.title = `${t(known)} · ${BRAND}`;
+      }
     }
 
     const desc =

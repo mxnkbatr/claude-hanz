@@ -36,13 +36,13 @@ export function Reveal({
   const reduce = useReducedMotion();
   return (
     <motion.div
-      className={className}
+      className={`reveal-block ${className}`}
       initial={reduce ? false : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2, margin: "0px 0px -40px 0px" }}
+      viewport={{ once: true, amount: 0.1 }}
       transition={{
         delay: reduce ? 0 : delay,
-        duration: 0.75,
+        duration: 0.55,
         ease,
       }}
     >
@@ -58,26 +58,7 @@ export function Stagger({
   children: ReactNode;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      className={className}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.15 }}
-      variants={{
-        hidden: {},
-        show: {
-          transition: {
-            staggerChildren: reduce ? 0 : 0.08,
-            delayChildren: reduce ? 0 : 0.04,
-          },
-        },
-      }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 export function StaggerItem({
@@ -90,15 +71,11 @@ export function StaggerItem({
   const reduce = useReducedMotion();
   return (
     <motion.div
-      className={className}
-      variants={{
-        hidden: reduce ? { opacity: 1 } : { opacity: 0, y: 24 },
-        show: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.55, ease },
-        },
-      }}
+      className={`stagger-item ${className}`}
+      initial={reduce ? false : { opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.45, ease }}
     >
       {children}
     </motion.div>

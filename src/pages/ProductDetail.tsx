@@ -1,8 +1,8 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import { formatPrice, getProductById, shopProductsMeta } from "../data/content";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
+import { ProductCard } from "../components/ProductCard";
 import { SafeImage } from "../components/SafeImage";
-import { TiltCard } from "../components/TiltCard";
 import { useI18n } from "../i18n/I18nContext";
 
 export function ProductDetail() {
@@ -100,26 +100,7 @@ export function ProductDetail() {
           <Stagger className="shop-grid home-shop">
             {related.map((item) => (
               <StaggerItem key={item.id}>
-                <TiltCard>
-                <Link to={`/shop/${item.id}`} className="shop-card">
-                  <div className="shop-media">
-                    <SafeImage src={item.image} alt={t(item.titleKey)} />
-                    <span className="tag">{t(item.tagKey)}</span>
-                    <span className="price-badge">
-                      {formatPrice(item.price, lang)}
-                    </span>
-                  </div>
-                  <div className="shop-body">
-                    <h3>{t(item.titleKey)}</h3>
-                    <div className="shop-foot">
-                      <p className="price">{formatPrice(item.price, lang)}</p>
-                      <em className="card-cta">
-                        {t("view_detail")} <i aria-hidden>→</i>
-                      </em>
-                    </div>
-                  </div>
-                </Link>
-                </TiltCard>
+                <ProductCard product={item} />
               </StaggerItem>
             ))}
           </Stagger>

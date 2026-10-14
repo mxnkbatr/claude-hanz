@@ -4,6 +4,7 @@ import {
   branchesMeta,
   chinaProgramsMeta,
   coursesMeta,
+  whyHanzMeta,
 } from "../data/content";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { useI18n } from "../i18n/I18nContext";
@@ -58,24 +59,18 @@ export function About() {
 
       <section className="section">
         <Reveal>
-          <div className="section-row">
-            <div>
-              <p className="eyebrow">{t("nav_uni")}</p>
-              <h2 className="h2">{t("china_home_title")}</h2>
-              <p className="lead">{t("china_home_lead")}</p>
-            </div>
-            <Link to="/university/china" className="text-link">
-              {t("uni_more")}
-              <i aria-hidden>→</i>
-            </Link>
-          </div>
+          <p className="eyebrow">{t("why_title")}</p>
+          <h2 className="h2">{t("why_title")}</h2>
         </Reveal>
-        <Stagger className="home-prog-grid">
-          {chinaProgramsMeta.map((p) => (
-            <StaggerItem key={p.id}>
-              <article className="home-prog-card">
-                <h3>{t(p.titleKey)}</h3>
-                <p>{t(p.descKey)}</p>
+        <Stagger className="why-grid">
+          {whyHanzMeta.map((w) => (
+            <StaggerItem key={w.id}>
+              <article className="why-card">
+                <span className="why-icon" aria-hidden>
+                  {w.icon}
+                </span>
+                <h3>{t(w.titleKey)}</h3>
+                <p>{t(w.descKey)}</p>
               </article>
             </StaggerItem>
           ))}
@@ -83,19 +78,6 @@ export function About() {
       </section>
 
       <section className="section">
-        <Reveal>
-          <div className="home-service">
-            <p className="eyebrow">{t("service_title")}</p>
-            <h2 className="h2">{t("service_title")}</h2>
-            <p className="lead">{t("service_body")}</p>
-            <a href={`mailto:${academy.email}`} className="btn btn-seal">
-              <span>{academy.email}</span>
-            </a>
-          </div>
-        </Reveal>
-      </section>
-
-      <section className="section section-last">
         <Reveal>
           <div className="section-row">
             <div>
@@ -125,6 +107,45 @@ export function About() {
             </StaggerItem>
           ))}
         </Stagger>
+      </section>
+
+      <section className="section">
+        <Reveal>
+          <div className="section-row">
+            <div>
+              <p className="eyebrow">{t("nav_uni")}</p>
+              <h2 className="h2">{t("china_home_title")}</h2>
+              <p className="lead">{t("china_home_lead")}</p>
+            </div>
+            <Link to="/university/china" className="text-link">
+              {t("uni_more")}
+              <i aria-hidden>→</i>
+            </Link>
+          </div>
+        </Reveal>
+        <Stagger className="home-prog-grid">
+          {chinaProgramsMeta.map((p) => (
+            <StaggerItem key={p.id}>
+              <article className="home-prog-card">
+                <h3>{t(p.titleKey)}</h3>
+                <p>{t(p.descKey)}</p>
+              </article>
+            </StaggerItem>
+          ))}
+        </Stagger>
+      </section>
+
+      <section className="section section-last">
+        <Reveal>
+          <div className="home-service">
+            <p className="eyebrow">{t("service_title")}</p>
+            <h2 className="h2">{t("service_title")}</h2>
+            <p className="lead">{t("service_body")}</p>
+            <a href={`mailto:${academy.email}`} className="btn btn-seal">
+              <span>{academy.email}</span>
+            </a>
+          </div>
+        </Reveal>
       </section>
     </PageShell>
   );

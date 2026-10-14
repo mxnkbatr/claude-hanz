@@ -54,21 +54,63 @@ export const chinaProgramsMeta = [
     id: "bjfu",
     titleKey: "prog_bjfu_t",
     descKey: "prog_bjfu_d",
+    nameMnKey: "prog_bjfu_mn",
+    nameZhKey: "prog_bjfu_zh",
+    cityKey: "map_beijing" as const,
+    image:
+      "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80",
   },
   {
     id: "cq",
     titleKey: "prog_cq_t",
     descKey: "prog_cq_d",
+    nameMnKey: "prog_cq_mn",
+    nameZhKey: "prog_cq_zh",
+    cityKey: "map_chongqing" as const,
+    image:
+      "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1200&q=80",
   },
   {
     id: "nuaa",
     titleKey: "prog_nuaa_t",
     descKey: "prog_nuaa_d",
+    nameMnKey: "prog_nuaa_mn",
+    nameZhKey: "prog_nuaa_zh",
+    cityKey: "map_nanjing" as const,
+    image:
+      "https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?auto=format&fit=crop&w=1200&q=80",
   },
   {
     id: "sc",
     titleKey: "prog_sc_t",
     descKey: "prog_sc_d",
+    nameMnKey: "prog_sc_mn",
+    nameZhKey: "prog_sc_zh",
+    cityKey: "map_chengdu" as const,
+    image:
+      "https://images.unsplash.com/photo-1537531383496-f4749b8032eb?auto=format&fit=crop&w=1200&q=80",
+  },
+] as const;
+
+/** Why Hanz — copy keys must exist in featureKeys; missing = TODO. */
+export const whyHanzMeta = [
+  {
+    id: "why1",
+    icon: "汉",
+    titleKey: "why_1_t",
+    descKey: "why_1_d",
+  },
+  {
+    id: "why2",
+    icon: "学",
+    titleKey: "why_2_t",
+    descKey: "why_2_d",
+  },
+  {
+    id: "why3",
+    icon: "校",
+    titleKey: "why_3_t",
+    descKey: "why_3_d",
   },
 ] as const;
 
@@ -230,8 +272,7 @@ export const shopProductsMeta = [
     tagKey: "tag_course",
     cat: "books" as const,
     price: 25000,
-    image:
-      "https://images.unsplash.com/photo-1456513080080-7e9acb7aa9c2?auto=format&fit=crop&w=800&q=80",
+    image: "/images/hanzi-placeholder.svg",
     href: "https://www.facebook.com/HanzAcademy",
     descKey: "prod4_d",
     bodyKey: "prod4_b",

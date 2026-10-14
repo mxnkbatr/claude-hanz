@@ -187,6 +187,36 @@ export function Layout() {
           <div className="site-footer-brand">
             <Logo size="sm" />
             <p>{t("footer_tag")}</p>
+            <div className="footer-social">
+              <a
+                className="footer-social-btn"
+                href={academy.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+                  <path
+                    fill="currentColor"
+                    d="M14 8h3V4h-3c-2.2 0-4 1.8-4 4v2H7v4h3v8h4v-8h3l1-4h-4V8c0-.6.4-1 1-1z"
+                  />
+                </svg>
+              </a>
+              <a
+                className="footer-social-btn"
+                href={academy.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+                  <path
+                    fill="currentColor"
+                    d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm10 2H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-5 3.5A4.5 4.5 0 1 1 7.5 13 4.5 4.5 0 0 1 12 8.5zm0 2A2.5 2.5 0 1 0 14.5 13 2.5 2.5 0 0 0 12 10.5zM17.2 7.3a1 1 0 1 1-1 1 1 1 0 0 1 1-1z"
+                  />
+                </svg>
+              </a>
+            </div>
           </div>
           <div className="site-footer-cols">
             <div>
@@ -199,16 +229,6 @@ export function Layout() {
               <h3>{t("footer_links")}</h3>
               <NavLink to="/about">{t("nav_about")}</NavLink>
               <NavLink to="/contact">{t("nav_contact")}</NavLink>
-              <a href={academy.facebook} target="_blank" rel="noopener noreferrer">
-                Facebook · Khanz academy
-              </a>
-              <a
-                href={academy.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Instagram · @khanzacademy
-              </a>
               <a
                 href={academy.registerUrl}
                 target="_blank"
