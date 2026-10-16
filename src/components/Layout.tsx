@@ -44,8 +44,8 @@ export function Layout() {
   useDocumentMeta();
 
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    // Instant reset — smooth scroll + overlapping route exits felt like double-scroll.
+    window.scrollTo(0, 0);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -372,7 +372,8 @@ export function Layout() {
 
       <main id="main" className="main">
         <LayoutGroup id="shared-routes">
-          <AnimatePresence mode="sync" initial={false}>
+          {/* popLayout: exit out of flow so old+new pages don't stack scroll height */}
+          <AnimatePresence mode="popLayout" initial={false}>
             <Outlet key={location.pathname} />
           </AnimatePresence>
         </LayoutGroup>

@@ -1,44 +1,185 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { kidsLevels, kidsSchedules } from "../data/content";
+import {
+  courseFilters,
+  filterKeyLabel,
+  resolveMatch,
+  type CourseFilter,
+  type MatchAnswer,
+  type MatchResult,
+} from "../data/courseMatch";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { SuccessBurst } from "../components/SuccessBurst";
 import { useI18n } from "../i18n/I18nContext";
 import { useSiteContent } from "../lib/SiteContentContext";
 import { supabase } from "../lib/supabase";
 import { hapticLight } from "../lib/native";
+import { ease } from "../lib/motion";
 
-type Step = "levels" | "enroll";
+type Step = "browse" | "enroll";
+type MatchPhase = "intro" | "ask" | "done";
+
+type CourseCard =
+  | {
+      kind: "kids";
+      id: string;
+      titleKey: string;
+      descKey: string;
+      metaKey: string;
+      mark: string;
+      filter: "kids";
+    }
+  | {
+      kind: "course";
+      id: string;
+      titleKey: string;
+      descKey: string;
+      metaKey: string;
+      mark: string;
+      filter: CourseFilter;
+    };
+
+const emptyMatch: MatchAnswer = {
+  who: "",
+  goal: "",
+  when: "",
+  age: "",
+};
 
 export function Courses() {
   const { t } = useI18n();
   const { coursesLive } = useSiteContent();
-  const otherCourses = coursesLive.filter((c) => c.id !== "kids");
 
-  const [step, setStep] = useState<Step>("levels");
-  const [level, setLevel] = useState<string>("");
-  const [schedule, setSchedule] = useState<string>(kidsSchedules[0].id);
+  const [step, setStep] = useState<Step>("browse");
+  const [level, setLevel] = useState("");
+  const [schedule, setSchedule] = useState(kidsSchedules[0].id);
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">(
     "idle",
   );
 
+  const [q, setQ] = useState("");
+  const [filter, setFilter] = useState<CourseFilter>("all");
+
+  const [matchPhase, setMatchPhase] = useState<MatchPhase>("intro");
+  const [matchStep, setMatchStep] = useState(0);
+  const [answers, setAnswers] = useState<MatchAnswer>(emptyMatch);
+  const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
+
   const levelMeta = kidsLevels.find((l) => l.id === level);
 
-  function pickLevel(id: string) {
-    setLevel(id);
-    setSchedule(kidsSchedules[0].id);
+  const catalog = useMemo<CourseCard[]>(() => {
+    const kids: CourseCard[] = kidsLevels.map((l) => ({
+      kind: "kids",
+      id: l.id,
+      titleKey: l.labelKey,
+      descKey: l.descKey,
+      metaKey: l.ageKey,
+      mark: l.mark,
+      filter: "kids",
+    }));
+    const rest: CourseCard[] = coursesLive
+      .filter((c) => c.id !== "kids")
+      .map((c) => ({
+        kind: "course",
+        id: c.id,
+        titleKey: c.titleKey,
+        descKey: c.descKey,
+        metaKey: c.tagKey,
+        mark: c.icon,
+        filter: c.id as CourseFilter,
+      }));
+    return [...kids, ...rest];
+  }, [coursesLive]);
+
+  const counts = useMemo(() => {
+    const map: Record<string, number> = { all: catalog.length };
+    for (const c of catalog) {
+      map[c.filter] = (map[c.filter] || 0) + 1;
+    }
+    return map;
+  }, [catalog]);
+
+  const list = useMemo(() => {
+    const base =
+      filter === "all" ? catalog : catalog.filter((c) => c.filter === filter);
+    const query = q.trim().toLowerCase();
+    if (!query) return base;
+    return base.filter((c) => {
+      const hay = `${t(c.titleKey)} ${t(c.descKey)} ${t(c.metaKey)}`.toLowerCase();
+      return hay.includes(query);
+    });
+  }, [catalog, filter, q, t]);
+
+  const hasQuery = q.trim().length > 0;
+  const isFiltered = filter !== "all" || hasQuery;
+
+  function openEnroll(kidsLevelId: string, scheduleHint?: string) {
+    setLevel(kidsLevelId);
+    setSchedule(scheduleHint || kidsSchedules[0].id);
     setStep("enroll");
     setStatus("idle");
     void hapticLight();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function backToLevels() {
-    setStep("levels");
+  function backToBrowse() {
+    setStep("browse");
     setStatus("idle");
     void hapticLight();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+
+  function startMatch() {
+    setMatchPhase("ask");
+    setMatchStep(0);
+    setAnswers(emptyMatch);
+    setMatchResult(null);
+    void hapticLight();
+  }
+
+  function resetMatch() {
+    setMatchPhase("intro");
+    setMatchStep(0);
+    setAnswers(emptyMatch);
+    setMatchResult(null);
+    void hapticLight();
+  }
+
+  function answerMatch(field: keyof MatchAnswer, value: string) {
+    const next = { ...answers, [field]: value } as MatchAnswer;
+    // reset dependent fields
+    if (field === "who") {
+      next.goal = "";
+      next.age = "";
+    }
+    setAnswers(next);
+    void hapticLight();
+
+    const who = field === "who" ? value : next.who;
+    const steps =
+      who === "child"
+        ? (["who", "when", "age"] as const)
+        : (["who", "goal", "when"] as const);
+
+    const idx = steps.indexOf(field as (typeof steps)[number]);
+    if (idx >= 0 && idx < steps.length - 1) {
+      setMatchStep(idx + 1);
+      return;
+    }
+
+    // finalize
+    if (who === "child") next.goal = "kids";
+    const result = resolveMatch(next);
+    setMatchResult(result);
+    setMatchPhase("done");
+  }
+
+  const askField =
+    answers.who === "child"
+      ? (["who", "when", "age"] as const)[matchStep]
+      : (["who", "goal", "when"] as const)[matchStep];
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -89,20 +230,20 @@ export function Courses() {
             <button
               type="button"
               className="text-link back-link kids-back-link"
-              onClick={backToLevels}
+              onClick={backToBrowse}
             >
               ← {t("kids_back_levels")}
             </button>
           ) : null}
           <h1 className="h1">
-            {step === "levels"
-              ? t("kids_enroll_title")
+            {step === "browse"
+              ? t("courses_title")
               : levelMeta
                 ? t(levelMeta.labelKey)
                 : t("kids_enroll_title")}
           </h1>
           <p className="lead desk-only">
-            {step === "levels" ? t("kids_levels_lead") : t("kids_enroll_lead")}
+            {step === "browse" ? t("courses_lead") : t("kids_enroll_lead")}
           </p>
         </Reveal>
       </header>
@@ -116,154 +257,337 @@ export function Courses() {
               doneLabel={t("kids_enroll_again")}
               onDone={() => {
                 setStatus("idle");
-                setStep("levels");
+                setStep("browse");
                 setLevel("");
               }}
             />
           </div>
         </Reveal>
-      ) : step === "levels" ? (
+      ) : step === "browse" ? (
         <>
-          {/* Mobile iOS list */}
-          <section className="section tight app-mobile">
-            <Reveal>
-              <h2 className="ios-label">{t("kids_pick_level")}</h2>
-            </Reveal>
-            <div className="ios-list kids-ios-list">
-              {kidsLevels.map((l) => (
-                <button
-                  key={l.id}
-                  type="button"
-                  className="ios-row"
-                  onClick={() => pickLevel(l.id)}
-                >
-                  <span className="ios-row-icon" aria-hidden>
-                    {l.mark}
-                  </span>
-                  <span className="ios-row-body">
-                    <strong>{t(l.labelKey)}</strong>
-                    <em>
-                      {t(l.ageKey)} · {t(l.descKey)}
-                    </em>
-                  </span>
-                  <span className="ios-row-chevron" aria-hidden>
-                    ›
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            <Reveal>
-              <Link to="/quiz" className="app-row app-related courses-quiz-teaser">
-                <span className="app-row-icon" aria-hidden>
+          {/* Course matcher */}
+          <Reveal>
+            <section className="course-match glass-panel">
+              <div className="course-match-head">
+                <span className="course-match-mark" aria-hidden>
                   测
                 </span>
-                <span className="app-row-body">
-                  <strong>{t("quiz_title")}</strong>
-                  <em>{t("quiz_lead")}</em>
-                </span>
-                <span className="app-row-chevron" aria-hidden>
-                  ›
-                </span>
-              </Link>
-            </Reveal>
-
-            {otherCourses.length > 0 && (
-              <>
-                <Reveal>
-                  <h2 className="ios-label">{t("kids_other_courses")}</h2>
-                </Reveal>
-                <div className="ios-list kids-ios-list">
-                  {otherCourses.map((c) => (
-                    <Link
-                      key={c.id}
-                      to={`/enroll?interest=${c.id}`}
-                      className="ios-row"
-                      onClick={() => void hapticLight()}
-                    >
-                      <span className="ios-row-icon" aria-hidden>
-                        {c.icon}
-                      </span>
-                      <span className="ios-row-body">
-                        <strong>{t(c.titleKey)}</strong>
-                        <em>{t(c.descKey)}</em>
-                      </span>
-                      <span className="ios-row-chevron" aria-hidden>
-                        ›
-                      </span>
-                    </Link>
-                  ))}
+                <div>
+                  <strong>{t("cmatch_title")}</strong>
+                  <em>{t("cmatch_lead")}</em>
                 </div>
-              </>
-            )}
-          </section>
-
-          {/* Desktop cards */}
-          <section className="section tight desk-only">
-            <Reveal>
-              <div className="ios-section-head kids-levels-head">
-                <h2>{t("kids_pick_level")}</h2>
-                <em>{kidsLevels.length}</em>
               </div>
-            </Reveal>
-            <Stagger className="kids-catalog">
-              {kidsLevels.map((l) => (
-                <StaggerItem key={l.id}>
+
+              <AnimatePresence mode="wait">
+                {matchPhase === "intro" && (
+                  <motion.div
+                    key="intro"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.28, ease }}
+                  >
+                    <button
+                      type="button"
+                      className="btn btn-seal course-match-start"
+                      onClick={startMatch}
+                    >
+                      <span>{t("cmatch_start")}</span>
+                    </button>
+                  </motion.div>
+                )}
+
+                {matchPhase === "ask" && askField && (
+                  <motion.div
+                    key={`ask-${askField}-${matchStep}`}
+                    className="course-match-ask"
+                    initial={{ opacity: 0, x: 16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -12 }}
+                    transition={{ duration: 0.28, ease }}
+                  >
+                    <p className="course-match-q">
+                      {askField === "who" && t("cmatch_q_who")}
+                      {askField === "goal" && t("cmatch_q_goal")}
+                      {askField === "when" && t("cmatch_q_when")}
+                      {askField === "age" && t("cmatch_q_age")}
+                    </p>
+                    <div className="course-match-options">
+                      {askField === "who" &&
+                        (
+                          [
+                            ["child", "cmatch_a_child"],
+                            ["adult", "cmatch_a_adult"],
+                          ] as const
+                        ).map(([value, key]) => (
+                          <button
+                            key={value}
+                            type="button"
+                            className="course-match-opt"
+                            onClick={() => answerMatch("who", value)}
+                          >
+                            {t(key)}
+                          </button>
+                        ))}
+                      {askField === "goal" &&
+                        (
+                          [
+                            ["speak", "cmatch_a_speak"],
+                            ["hsk", "cmatch_a_hsk"],
+                            ["csca", "cmatch_a_csca"],
+                            ["year", "cmatch_a_year"],
+                          ] as const
+                        ).map(([value, key]) => (
+                          <button
+                            key={value}
+                            type="button"
+                            className="course-match-opt"
+                            onClick={() => answerMatch("goal", value)}
+                          >
+                            {t(key)}
+                          </button>
+                        ))}
+                      {askField === "when" &&
+                        (
+                          [
+                            ["weekday", "cmatch_a_weekday"],
+                            ["weekend", "cmatch_a_weekend"],
+                          ] as const
+                        ).map(([value, key]) => (
+                          <button
+                            key={value}
+                            type="button"
+                            className="course-match-opt"
+                            onClick={() => answerMatch("when", value)}
+                          >
+                            {t(key)}
+                          </button>
+                        ))}
+                      {askField === "age" &&
+                        (
+                          [
+                            ["7-8", "kids_lvl_beginner_age"],
+                            ["9-11", "kids_lvl_elementary_age"],
+                            ["12-14", "kids_lvl_intermediate_age"],
+                          ] as const
+                        ).map(([value, key]) => (
+                          <button
+                            key={value}
+                            type="button"
+                            className="course-match-opt"
+                            onClick={() => answerMatch("age", value)}
+                          >
+                            {t(key)}
+                          </button>
+                        ))}
+                    </div>
+                    <button
+                      type="button"
+                      className="course-match-reset"
+                      onClick={resetMatch}
+                    >
+                      {t("cmatch_restart")}
+                    </button>
+                  </motion.div>
+                )}
+
+                {matchPhase === "done" && matchResult && (
+                  <motion.div
+                    key="done"
+                    className="course-match-result"
+                    initial={{ opacity: 0, scale: 0.97 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 360, damping: 28 }}
+                  >
+                    <p className="course-match-reason">{t(matchResult.reasonKey)}</p>
+                    <div className="course-match-pick">
+                      <strong>{t(matchResult.titleKey)}</strong>
+                      <em>{t(matchResult.descKey)}</em>
+                    </div>
+                    <div className="course-match-actions">
+                      {matchResult.courseId === "kids" &&
+                      matchResult.kidsLevelId ? (
+                        <button
+                          type="button"
+                          className="btn btn-seal"
+                          onClick={() =>
+                            openEnroll(
+                              matchResult.kidsLevelId!,
+                              matchResult.scheduleHint,
+                            )
+                          }
+                        >
+                          <span>{t("kids_enroll_cta")}</span>
+                        </button>
+                      ) : (
+                        <Link
+                          to={`/enroll?interest=${matchResult.courseId}`}
+                          className="btn btn-seal"
+                          onClick={() => void hapticLight()}
+                        >
+                          <span>{t("register_cta")}</span>
+                        </Link>
+                      )}
+                      <button
+                        type="button"
+                        className="course-match-reset"
+                        onClick={resetMatch}
+                      >
+                        {t("cmatch_restart")}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </section>
+          </Reveal>
+
+          {/* Search + filter */}
+          <Reveal>
+            <div className="news-toolbar course-toolbar">
+              <label className="ios-search news-search">
+                <span aria-hidden>⌕</span>
+                <input
+                  type="search"
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder={t("cmatch_search")}
+                  autoComplete="off"
+                />
+                {hasQuery && (
                   <button
                     type="button"
-                    className="kids-catalog-card"
-                    onClick={() => pickLevel(l.id)}
+                    className="news-search-clear"
+                    onClick={() => setQ("")}
+                    aria-label={t("news_clear")}
                   >
-                    <em className="kids-level-mark" aria-hidden>
-                      {l.mark}
-                    </em>
-                    <span className="kids-catalog-body">
-                      <strong>{t(l.labelKey)}</strong>
-                      <span className="kids-level-age">{t(l.ageKey)}</span>
-                      <p>{t(l.descKey)}</p>
-                      <span className="kids-catalog-cta">
-                        {t("kids_choose_level")} <i aria-hidden>→</i>
-                      </span>
-                    </span>
+                    ×
                   </button>
-                </StaggerItem>
-              ))}
-            </Stagger>
-          </section>
+                )}
+              </label>
 
-          {otherCourses.length > 0 && (
-            <section className="section tight section-last desk-only">
-              <Reveal>
-                <h2 className="app-section-title">{t("kids_other_courses")}</h2>
-                <p className="lead kids-other-lead">{t("courses_lead")}</p>
-              </Reveal>
-              <Stagger className="kids-other-grid">
-                {otherCourses.map((c) => (
-                  <StaggerItem key={c.id}>
-                    <Link
-                      to={`/enroll?interest=${c.id}`}
-                      className="kids-other-card"
-                      onClick={() => void hapticLight()}
-                    >
-                      <span className="kids-other-icon" aria-hidden>
-                        {c.icon}
-                      </span>
-                      <span className="kids-other-tag">{t(c.tagKey)}</span>
-                      <h3>{t(c.titleKey)}</h3>
-                      <p>{t(c.descKey)}</p>
-                      <span className="card-cta">
-                        {t("register_cta")} <i aria-hidden>→</i>
-                      </span>
-                    </Link>
+              <div className="news-filter-bar">
+                <LayoutGroup id="course-seg">
+                  <div
+                    className="news-filters"
+                    role="tablist"
+                    aria-label={t("cmatch_filter_label")}
+                  >
+                    {courseFilters.map((f) => {
+                      const active = filter === f;
+                      const count = counts[f] ?? 0;
+                      return (
+                        <button
+                          key={f}
+                          type="button"
+                          role="tab"
+                          aria-selected={active}
+                          className={`news-chip${active ? " is-active" : ""}`}
+                          onClick={() => {
+                            setFilter(f);
+                            void hapticLight();
+                          }}
+                        >
+                          {active && (
+                            <motion.span
+                              className="news-chip-pill"
+                              layoutId="course-chip-pill"
+                              transition={{
+                                type: "spring",
+                                stiffness: 480,
+                                damping: 36,
+                              }}
+                            />
+                          )}
+                          <span className="news-chip-label">
+                            {t(filterKeyLabel(f))}
+                          </span>
+                          <em>{count}</em>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </LayoutGroup>
+
+                {isFiltered && (
+                  <button
+                    type="button"
+                    className="news-reset"
+                    onClick={() => {
+                      setFilter("all");
+                      setQ("");
+                      void hapticLight();
+                    }}
+                  >
+                    {t("news_clear")}
+                  </button>
+                )}
+              </div>
+            </div>
+          </Reveal>
+
+          {/* Cards */}
+          <section className="section tight section-last">
+            {list.length === 0 ? (
+              <p className="ios-empty">{t("cmatch_empty")}</p>
+            ) : (
+              <Stagger className="ios-feed ios-feed-stack course-card-feed">
+                {list.map((c) => (
+                  <StaggerItem key={`${c.kind}-${c.id}`}>
+                    {c.kind === "kids" ? (
+                      <button
+                        type="button"
+                        className="ios-card course-card"
+                        onClick={() => openEnroll(c.id)}
+                      >
+                        <div className="course-card-top">
+                          <span className="course-card-mark" aria-hidden>
+                            {c.mark}
+                          </span>
+                          <span className="ios-badge ios-badge-soft">
+                            {t(c.metaKey)}
+                          </span>
+                        </div>
+                        <div className="ios-card-body">
+                          <h3>{t(c.titleKey)}</h3>
+                          <p className="ios-card-desc">{t(c.descKey)}</p>
+                          <span className="ios-card-cta">
+                            {t("kids_choose_level")} <i aria-hidden>→</i>
+                          </span>
+                        </div>
+                      </button>
+                    ) : (
+                      <Link
+                        to={`/enroll?interest=${c.id}`}
+                        className="ios-card course-card"
+                        onClick={() => void hapticLight()}
+                      >
+                        <div className="course-card-top">
+                          <span className="course-card-mark" aria-hidden>
+                            {c.mark}
+                          </span>
+                          <span className="ios-badge ios-badge-soft">
+                            {t(c.metaKey)}
+                          </span>
+                        </div>
+                        <div className="ios-card-body">
+                          <h3>{t(c.titleKey)}</h3>
+                          <p className="ios-card-desc">{t(c.descKey)}</p>
+                          <span className="ios-card-cta">
+                            {t("register_cta")} <i aria-hidden>→</i>
+                          </span>
+                        </div>
+                      </Link>
+                    )}
                   </StaggerItem>
                 ))}
               </Stagger>
-            </section>
-          )}
+            )}
+          </section>
         </>
       ) : (
         <section className="section tight section-last kids-enroll">
-          {/* Mobile iOS enroll */}
           <div className="app-mobile kids-ios-enroll">
             {levelMeta && (
               <Reveal>
@@ -341,9 +665,7 @@ export function Courses() {
                     />
                   </label>
                 </div>
-
                 {status === "err" && <p className="form-err">{t("form_err")}</p>}
-
                 <button
                   type="submit"
                   className="btn btn-seal kids-enroll-submit"
@@ -360,7 +682,6 @@ export function Courses() {
             </Reveal>
           </div>
 
-          {/* Desktop enroll panel */}
           <Reveal className="desk-only">
             <div className="kids-enroll-panel">
               {levelMeta && (
@@ -374,7 +695,6 @@ export function Courses() {
                   </div>
                 </div>
               )}
-
               <div className="kids-enroll-step">
                 <p className="kids-enroll-label">
                   <span>1</span>
@@ -402,7 +722,6 @@ export function Courses() {
                   })}
                 </div>
               </div>
-
               <form className="kids-enroll-form" onSubmit={onSubmit}>
                 <p className="kids-enroll-label">
                   <span>2</span>
@@ -451,7 +770,6 @@ export function Courses() {
                       : t("kids_enroll_cta")}
                   </span>
                 </button>
-                <p className="kids-enroll-note">{t("kids_enroll_note")}</p>
               </form>
             </div>
           </Reveal>

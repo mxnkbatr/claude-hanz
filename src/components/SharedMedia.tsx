@@ -21,7 +21,8 @@ export function SharedMedia({
     <motion.div
       className={`shared-media${className ? ` ${className}` : ""}`}
       layoutId={`shared-media-${id}`}
-      transition={{ type: "spring", stiffness: 340, damping: 34 }}
+      layout
+      transition={{ type: "spring", stiffness: 380, damping: 36, mass: 0.85 }}
     >
       <SafeImage src={src} alt={alt} loading={loading} />
     </motion.div>
