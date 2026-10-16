@@ -1642,13 +1642,21 @@
   }
 
   .page-quiz.is-playing {
+    display: flex;
+    flex-direction: column;
     min-height: calc(100svh - var(--tab));
+    padding-bottom: 0.15rem;
   }
 
   .page-quiz.is-playing .quiz-shell {
-    flex: 1;
+    flex: 1 1 auto;
     min-height: calc(100svh - var(--top) - var(--tab) - 0.35rem);
     max-height: calc(100svh - var(--top) - var(--tab) - 0.25rem);
+  }
+
+  .page-quiz.is-playing .quiz-shell > .quiz-panel {
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   .page-quiz .quiz-topbar {
