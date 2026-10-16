@@ -13,8 +13,8 @@ export function About() {
   const { t } = useI18n();
 
   return (
-    <PageShell className="page-about">
-      <header className="page-head">
+    <PageShell className="page-about is-app">
+      <header className="page-head app-head">
         <Reveal>
           <p className="eyebrow">{t("about_title")}</p>
           <h1 className="h1">{t("about_title")}</h1>
@@ -22,7 +22,134 @@ export function About() {
         </Reveal>
       </header>
 
-      <section className="section">
+      {/* Mobile */}
+      <section className="section tight app-mobile">
+        <Reveal>
+          <div className="section-row app-section-row">
+            <h2 className="app-section-title">{t("courses_title")}</h2>
+            <Link to="/courses" className="text-link">
+              {t("see_all")} <i aria-hidden>→</i>
+            </Link>
+          </div>
+        </Reveal>
+        <Stagger className="app-list">
+          {coursesMeta.slice(0, 4).map((c) => (
+            <StaggerItem key={c.id}>
+              <Link to={`/enroll?interest=${c.id}`} className="app-row">
+                <span className="app-row-icon" aria-hidden>
+                  {c.icon}
+                </span>
+                <span className="app-row-body">
+                  <strong>{t(c.titleKey)}</strong>
+                  <em>{t(c.tagKey)}</em>
+                </span>
+                <span className="app-row-chevron" aria-hidden>
+                  ›
+                </span>
+              </Link>
+            </StaggerItem>
+          ))}
+        </Stagger>
+      </section>
+
+      <section className="section tight app-mobile">
+        <Reveal>
+          <h2 className="app-section-title">{t("why_title")}</h2>
+        </Reveal>
+        <Stagger className="app-list">
+          {whyHanzMeta.map((w) => (
+            <StaggerItem key={w.id}>
+              <div className="app-row app-row-static">
+                <span className="app-row-icon" aria-hidden>
+                  {w.icon}
+                </span>
+                <span className="app-row-body">
+                  <strong>{t(w.titleKey)}</strong>
+                  <em>{t(w.descKey)}</em>
+                </span>
+              </div>
+            </StaggerItem>
+          ))}
+        </Stagger>
+      </section>
+
+      <section className="section tight app-mobile">
+        <Reveal>
+          <div className="section-row app-section-row">
+            <h2 className="app-section-title">{t("branches_title")}</h2>
+            <Link to="/contact" className="text-link">
+              {t("nav_contact")} <i aria-hidden>→</i>
+            </Link>
+          </div>
+        </Reveal>
+        <Stagger className="app-list">
+          {branchesMeta.map((b) => (
+            <StaggerItem key={b.id}>
+              <a href={`tel:${b.phones[0]}`} className="app-row">
+                <span className="app-row-icon" aria-hidden>
+                  地
+                </span>
+                <span className="app-row-body">
+                  <strong>{t(b.titleKey)}</strong>
+                  <em>{b.phoneDisplay.join(" · ")}</em>
+                </span>
+                <span className="app-row-chevron" aria-hidden>
+                  ›
+                </span>
+              </a>
+            </StaggerItem>
+          ))}
+        </Stagger>
+      </section>
+
+      <section className="section tight app-mobile">
+        <Reveal>
+          <div className="section-row app-section-row">
+            <h2 className="app-section-title">{t("china_home_title")}</h2>
+            <Link to="/university" className="text-link">
+              {t("see_all")} <i aria-hidden>→</i>
+            </Link>
+          </div>
+        </Reveal>
+        <Stagger className="app-list">
+          {chinaProgramsMeta.map((p) => (
+            <StaggerItem key={p.id}>
+              <Link to="/university/china" className="app-row">
+                <span className="app-row-icon" aria-hidden>
+                  校
+                </span>
+                <span className="app-row-body">
+                  <strong>{t(p.nameMnKey)}</strong>
+                  <em>{t(p.cityKey)}</em>
+                </span>
+                <span className="app-row-chevron" aria-hidden>
+                  ›
+                </span>
+              </Link>
+            </StaggerItem>
+          ))}
+        </Stagger>
+      </section>
+
+      <section className="section tight section-last app-mobile">
+        <Reveal>
+          <a href={`mailto:${academy.email}`} className="app-row app-related">
+            <span className="app-row-icon" aria-hidden>
+              @
+            </span>
+            <span className="app-row-body">
+              <strong>{t("service_title")}</strong>
+              <em>{academy.email}</em>
+            </span>
+            <span className="app-row-chevron" aria-hidden>
+              ›
+            </span>
+          </a>
+        </Reveal>
+      </section>
+
+      {/* Desktop classic */}
+      <section className="section desk-only">
         <Reveal>
           <div className="section-row">
             <div>
@@ -30,15 +157,10 @@ export function About() {
               <h2 className="h2">{t("courses_title")}</h2>
               <p className="lead">{t("courses_lead")}</p>
             </div>
-            <a
-              href={academy.registerUrl}
-              className="text-link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <Link to="/courses" className="text-link">
               {t("register_cta")}
               <i aria-hidden>→</i>
-            </a>
+            </Link>
           </div>
         </Reveal>
         <Stagger className="home-course-grid">
@@ -57,7 +179,7 @@ export function About() {
         </Stagger>
       </section>
 
-      <section className="section">
+      <section className="section desk-only">
         <Reveal>
           <p className="eyebrow">{t("why_title")}</p>
           <h2 className="h2">{t("why_title")}</h2>
@@ -77,7 +199,7 @@ export function About() {
         </Stagger>
       </section>
 
-      <section className="section">
+      <section className="section desk-only">
         <Reveal>
           <div className="section-row">
             <div>
@@ -109,7 +231,7 @@ export function About() {
         </Stagger>
       </section>
 
-      <section className="section">
+      <section className="section desk-only">
         <Reveal>
           <div className="section-row">
             <div>
@@ -135,7 +257,7 @@ export function About() {
         </Stagger>
       </section>
 
-      <section className="section section-last">
+      <section className="section section-last desk-only">
         <Reveal>
           <div className="home-service">
             <p className="eyebrow">{t("service_title")}</p>

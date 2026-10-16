@@ -1,19 +1,42 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
-import { academy } from "../data/content";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import { navKeys } from "../i18n/translations";
 import { useI18n } from "../i18n/I18nContext";
-import { NavIcon } from "./Icons";
+import { BottomSheet } from "./BottomSheet";
+import { IconClose, IconMenu, IconProfile, NavIcon } from "./Icons";
 import { Logo } from "./Logo";
+import { Onboard } from "./Onboard";
 import { Snowfall } from "./Snowfall";
+import { useAuth } from "../lib/AuthContext";
+import { useSiteContent } from "../lib/SiteContentContext";
+import { hapticLight } from "../lib/native";
 import { ease } from "../lib/motion";
+
+const EXPLORE_PATHS = new Set([
+  "/courses",
+  "/medee",
+  "/university",
+  "/travel",
+  "/shop",
+  "/quiz",
+]);
+const ACCOUNT_PATHS = new Set([
+  "/about",
+  "/contact",
+  "/enroll",
+  "/profile",
+  "/auth",
+]);
 
 export function Layout() {
   const location = useLocation();
   const { t, lang, setLang, langs } = useI18n();
+  const { user } = useAuth();
+  const { academyLive: academy } = useSiteContent();
   const [langOpen, setLangOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
   const isHome = location.pathname === "/";
@@ -27,10 +50,20 @@ export function Layout() {
 
   useEffect(() => {
     setLangOpen(false);
+    setMenuOpen(false);
   }, [location.pathname, lang]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const mq = window.matchMedia("(min-width: 900px)");
+    const onChange = () => {
+      if (mq.matches) setMenuOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -54,8 +87,17 @@ export function Layout() {
     };
   }, [langOpen]);
 
+  const menuExplore = navKeys.filter((item) => EXPLORE_PATHS.has(item.to));
+  const menuAccount = navKeys.filter((item) => {
+    if (!ACCOUNT_PATHS.has(item.to)) return false;
+    if (item.to === "/auth" && user) return false;
+    if (item.to === "/profile" && !user) return false;
+    return true;
+  });
+  const topItems = navKeys.filter((item) => item.top);
+
   return (
-    <div className={`app-shell${isHome ? " is-home" : ""}`}>
+    <div className={`app-shell liquid-shell${isHome ? " is-home" : ""}`}>
       <a className="skip-link" href="#main">
         {t("skip_content")}
       </a>
@@ -76,7 +118,7 @@ export function Layout() {
 
             <LayoutGroup id="topnav">
               <nav className="topnav" aria-label={t("nav_main")}>
-                {navKeys.map((item) => (
+                {topItems.map((item) => (
                   <NavLink
                     key={item.to}
                     to={item.to}
@@ -107,6 +149,31 @@ export function Layout() {
             </LayoutGroup>
 
             <div className="topbar-actions">
+              <NavLink
+                to={user ? "/profile" : "/auth?mode=login"}
+                className={({ isActive }) =>
+                  `topbar-icon-btn${isActive ? " is-active" : ""}`
+                }
+                aria-label={user ? t("nav_profile") : t("auth_login")}
+                onClick={() => void hapticLight()}
+              >
+                <IconProfile />
+              </NavLink>
+
+              <button
+                type="button"
+                className={`topbar-icon-btn desk-hide${menuOpen ? " is-active" : ""}`}
+                aria-label={t("nav_menu")}
+                aria-expanded={menuOpen}
+                aria-controls="site-menu"
+                onClick={() => {
+                  setMenuOpen((v) => !v);
+                  void hapticLight();
+                }}
+              >
+                {menuOpen ? <IconClose /> : <IconMenu />}
+              </button>
+
               <div
                 ref={langRef}
                 className={`lang-switch${langOpen ? " is-open" : ""}`}
@@ -169,17 +236,146 @@ export function Layout() {
               </a>
             </div>
           </div>
-
-          <p className="winter-ribbon">
-            <span>{t("winter_note")}</span>
-          </p>
         </div>
       </header>
 
+      <BottomSheet
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        title={t("menu_title")}
+        ariaLabel={t("menu_title")}
+        className="site-menu"
+      >
+        <motion.div
+          className="site-menu-app"
+          id="site-menu"
+          initial="hidden"
+          animate="show"
+          variants={{
+            hidden: {},
+            show: {
+              transition: { staggerChildren: 0.042, delayChildren: 0.14 },
+            },
+          }}
+        >
+          <motion.p
+            className="site-menu-section"
+            variants={{
+              hidden: { opacity: 0, y: 10 },
+              show: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.34, ease },
+              },
+            }}
+          >
+            {t("menu_explore")}
+          </motion.p>
+          <nav className="site-menu-grid" aria-label={t("menu_explore")}>
+            {menuExplore.map((item) => (
+              <motion.div
+                key={item.to}
+                variants={{
+                  hidden: { opacity: 0, y: 22, scale: 0.88 },
+                  show: {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    transition: {
+                      type: "spring",
+                      stiffness: 420,
+                      damping: 26,
+                      mass: 0.7,
+                    },
+                  },
+                }}
+              >
+                <NavLink
+                  to={item.to}
+                  end={item.to === "/"}
+                  className={({ isActive }) =>
+                    `site-menu-app-link${isActive ? " is-active" : ""}`
+                  }
+                  onClick={() => {
+                    setMenuOpen(false);
+                    void hapticLight();
+                  }}
+                >
+                  <span className="site-menu-app-icon" aria-hidden>
+                    <NavIcon name={item.icon} />
+                  </span>
+                  <span className="site-menu-app-label">
+                    {"tabKey" in item && item.tabKey
+                      ? t(item.tabKey)
+                      : t(item.key)}
+                  </span>
+                </NavLink>
+              </motion.div>
+            ))}
+          </nav>
+
+          <motion.p
+            className="site-menu-section"
+            variants={{
+              hidden: { opacity: 0, y: 10 },
+              show: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.34, ease },
+              },
+            }}
+          >
+            {t("menu_account")}
+          </motion.p>
+          <nav className="site-menu-list" aria-label={t("menu_account")}>
+            {menuAccount.map((item) => (
+              <motion.div
+                key={item.to}
+                variants={{
+                  hidden: { opacity: 0, y: 16, x: -6 },
+                  show: {
+                    opacity: 1,
+                    y: 0,
+                    x: 0,
+                    transition: {
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 28,
+                      mass: 0.72,
+                    },
+                  },
+                }}
+              >
+                <NavLink
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `site-menu-row${isActive ? " is-active" : ""}`
+                  }
+                  onClick={() => {
+                    setMenuOpen(false);
+                    void hapticLight();
+                  }}
+                >
+                  <span className="site-menu-row-icon" aria-hidden>
+                    <NavIcon name={item.icon} />
+                  </span>
+                  <span>{t(item.key)}</span>
+                  <span className="site-menu-row-chevron" aria-hidden>
+                    ›
+                  </span>
+                </NavLink>
+              </motion.div>
+            ))}
+          </nav>
+        </motion.div>
+      </BottomSheet>
+
       <main id="main" className="main">
-        <AnimatePresence mode="wait">
-          <Outlet key={location.pathname} />
-        </AnimatePresence>
+        <LayoutGroup id="shared-routes">
+          <AnimatePresence mode="sync" initial={false}>
+            <Outlet key={location.pathname} />
+          </AnimatePresence>
+        </LayoutGroup>
       </main>
 
       <footer className="site-footer">
@@ -228,14 +424,10 @@ export function Layout() {
             <div>
               <h3>{t("footer_links")}</h3>
               <NavLink to="/about">{t("nav_about")}</NavLink>
+              <NavLink to="/courses">{t("nav_courses")}</NavLink>
+              <NavLink to="/travel">{t("nav_travel")}</NavLink>
               <NavLink to="/contact">{t("nav_contact")}</NavLink>
-              <a
-                href={academy.registerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t("register_cta")}
-              </a>
+              <NavLink to="/enroll">{t("register_cta")}</NavLink>
               <a href={academy.shopUrl} target="_blank" rel="noopener noreferrer">
                 bumtankhanz.mn
               </a>
@@ -244,9 +436,9 @@ export function Layout() {
         </div>
       </footer>
 
-      <nav className="tabbar" aria-label={t("nav_mobile")}>
+      <nav className="tabbar glass-dock" aria-label={t("nav_mobile")}>
         {navKeys
-          .filter((item) => item.to !== "/about")
+          .filter((item) => item.tab)
           .map((item) => (
             <NavLink
               key={item.to}
@@ -255,14 +447,21 @@ export function Layout() {
               className={({ isActive }) =>
                 `tabbar-item${isActive ? " is-active" : ""}`
               }
+              onClick={() => void hapticLight()}
             >
               <span className="tabbar-icon">
                 <NavIcon name={item.icon} />
               </span>
-              <span className="tabbar-label">{t(item.key)}</span>
+              <span className="tabbar-label">
+                {t(
+                  "tabKey" in item && item.tabKey ? item.tabKey : item.key,
+                )}
+              </span>
             </NavLink>
           ))}
       </nav>
+
+      <Onboard />
     </div>
   );
 }

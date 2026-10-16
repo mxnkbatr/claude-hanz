@@ -20,6 +20,13 @@ export const academy = {
 
 export const coursesMeta = [
   {
+    id: "kids",
+    titleKey: "course_kids_t",
+    descKey: "course_kids_d",
+    tagKey: "tag_kids",
+    icon: "童",
+  },
+  {
     id: "hsk",
     titleKey: "course_hsk_t",
     descKey: "course_hsk_d",
@@ -47,6 +54,101 @@ export const coursesMeta = [
     tagKey: "tag_academy",
     icon: "年",
   },
+] as const;
+
+/** Kids course levels for online enrollment cards */
+export const kidsLevels = [
+  {
+    id: "beginner",
+    labelKey: "kids_lvl_beginner",
+    ageKey: "kids_lvl_beginner_age",
+    descKey: "kids_lvl_beginner_d",
+    mark: "①",
+  },
+  {
+    id: "elementary",
+    labelKey: "kids_lvl_elementary",
+    ageKey: "kids_lvl_elementary_age",
+    descKey: "kids_lvl_elementary_d",
+    mark: "②",
+  },
+  {
+    id: "intermediate",
+    labelKey: "kids_lvl_intermediate",
+    ageKey: "kids_lvl_intermediate_age",
+    descKey: "kids_lvl_intermediate_d",
+    mark: "③",
+  },
+] as const;
+
+/** Weekly schedule options for kids classes */
+export const kidsSchedules = [
+  {
+    id: "wd_afternoon",
+    labelKey: "kids_sch_wd_afternoon",
+    metaKey: "kids_sch_wd_afternoon_m",
+  },
+  {
+    id: "wd_evening",
+    labelKey: "kids_sch_wd_evening",
+    metaKey: "kids_sch_wd_evening_m",
+  },
+  {
+    id: "weekend_am",
+    labelKey: "kids_sch_weekend_am",
+    metaKey: "kids_sch_weekend_am_m",
+  },
+  {
+    id: "weekend_pm",
+    labelKey: "kids_sch_weekend_pm",
+    metaKey: "kids_sch_weekend_pm_m",
+  },
+] as const;
+
+export const travelPackagesMeta = [
+  {
+    id: "china",
+    titleKey: "travel_china_t",
+    descKey: "travel_china_d",
+    bodyKey: "travel_china_b",
+    tagKey: "travel_tag_tour",
+    highlights: [
+      "travel_china_h1",
+      "travel_china_h2",
+      "travel_china_h3",
+    ] as const,
+    image:
+      "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1400&q=80",
+  },
+  {
+    id: "poland",
+    titleKey: "travel_poland_t",
+    descKey: "travel_poland_d",
+    bodyKey: "travel_poland_b",
+    tagKey: "travel_tag_europe",
+    highlights: [
+      "travel_poland_h1",
+      "travel_poland_h2",
+      "travel_poland_h3",
+    ] as const,
+    image:
+      "https://images.unsplash.com/photo-1467269204594-59904b4cbaba?auto=format&fit=crop&w=1400&q=80",
+  },
+] as const;
+
+export function getTravelById(id: string) {
+  return travelPackagesMeta.find((p) => p.id === id);
+}
+
+export const enrollInterests = [
+  { id: "kids", kind: "course" as const, labelKey: "course_kids_t" },
+  { id: "hsk", kind: "course" as const, labelKey: "course_hsk_t" },
+  { id: "csca", kind: "course" as const, labelKey: "course_csca_t" },
+  { id: "speak", kind: "course" as const, labelKey: "course_speak_t" },
+  { id: "year", kind: "course" as const, labelKey: "course_year_t" },
+  { id: "travel_china", kind: "travel" as const, labelKey: "travel_china_t" },
+  { id: "travel_poland", kind: "travel" as const, labelKey: "travel_poland_t" },
+  { id: "consult", kind: "consult" as const, labelKey: "enroll_interest_consult" },
 ] as const;
 
 export const chinaProgramsMeta = [

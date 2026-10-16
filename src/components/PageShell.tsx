@@ -39,10 +39,10 @@ export function Reveal({
       className={`reveal-block ${className}`}
       initial={reduce ? false : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.1 }}
+      viewport={{ once: true, amount: 0.05, margin: "0px 0px 160px 0px" }}
       transition={{
         delay: reduce ? 0 : delay,
-        duration: 0.55,
+        duration: 0.5,
         ease,
       }}
     >
@@ -72,10 +72,10 @@ export function StaggerItem({
   return (
     <motion.div
       className={`stagger-item ${className}`}
-      initial={reduce ? false : { opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.1 }}
-      transition={{ duration: 0.45, ease }}
+      initial={reduce ? false : { opacity: 0, y: 18, scale: 0.98 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.05, margin: "0px 0px 200px 0px" }}
+      transition={{ type: "spring", stiffness: 360, damping: 30 }}
     >
       {children}
     </motion.div>

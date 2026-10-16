@@ -1,8 +1,5 @@
 import { Link, Navigate, useParams } from "react-router-dom";
-import {
-  getUniversityById,
-  universitiesMeta,
-} from "../data/content";
+import { getUniversityById, universitiesMeta } from "../data/content";
 import { PageShell, Reveal } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
 import { useI18n } from "../i18n/I18nContext";
@@ -15,54 +12,37 @@ export function UniversityDetail() {
   if (!u) return <Navigate to="/university" replace />;
 
   const other = universitiesMeta.find((x) => x.id !== u.id);
-  const paragraphs = t(u.bodyKey).split("\n").filter(Boolean);
 
   return (
-    <PageShell className="page-detail page-uni">
+    <PageShell className="page-detail page-uni is-app">
       <Reveal>
         <Link to="/university" className="text-link back-link">
           ← {t("back")}
         </Link>
       </Reveal>
 
-      <article className="uni-detail">
+      <article className="app-detail">
         <Reveal>
-          <div className="uni-detail-hero">
+          <div className="app-detail-hero">
             <SafeImage src={u.image} alt={t(u.titleKey)} loading="eager" />
-            <div className="uni-detail-hero-copy">
-              <span className="uni-flag">{t(u.countryKey)}</span>
-              <h1 className="h1">{t(u.titleKey)}</h1>
-              <p className="lead">{t(u.descKey)}</p>
-            </div>
           </div>
         </Reveal>
 
-        <Reveal delay={0.06}>
-          <div className="uni-detail-body">
-            <div className="detail-panel">
-              <p className="eyebrow">{t("detail_more")}</p>
-              {paragraphs.map((p) => (
-                <p key={p.slice(0, 24)} className="detail-copy">
-                  {p}
-                </p>
-              ))}
-            </div>
+        <Reveal delay={0.05}>
+          <div className="app-detail-body">
+            <p className="app-pill">{t(u.countryKey)}</p>
+            <h1 className="h1">{t(u.titleKey)}</h1>
+            <p className="app-sub">{t(u.descKey)}</p>
 
-            <ul className="uni-points">
+            <ul className="app-chips">
               {u.points.map((p) => (
-                <li key={p}>
-                  <i aria-hidden>◇</i>
-                  <span>{t(p)}</span>
-                </li>
+                <li key={p}>{t(p)}</li>
               ))}
             </ul>
 
-            <div className="article-actions">
-              <Link to="/contact" className="btn btn-seal">
+            <div className="app-sticky-actions">
+              <Link to="/enroll?interest=consult" className="btn btn-seal">
                 <span>{t("uni_cta")}</span>
-              </Link>
-              <Link to="/university" className="btn btn-ink">
-                <span>{t("nav_uni")}</span>
               </Link>
             </div>
           </div>
@@ -70,23 +50,22 @@ export function UniversityDetail() {
       </article>
 
       {other && (
-        <Reveal delay={0.1}>
-          <section className="related-block">
-            <h2 className="h2">{t("related")}</h2>
-            <Link to={`/university/${other.id}`} className="uni-card uni-card-mini">
-              <div className="uni-media">
-                <SafeImage src={other.image} alt={t(other.titleKey)} />
-                <span>{t(other.countryKey)}</span>
-              </div>
-              <div className="uni-body">
-                <h3>{t(other.titleKey)}</h3>
-                <p>{t(other.descKey)}</p>
-                <em className="card-cta">
-                  {t("view_detail")} <i aria-hidden>→</i>
-                </em>
-              </div>
-            </Link>
-          </section>
+        <Reveal delay={0.08}>
+          <Link
+            to={`/university/${other.id}`}
+            className="app-row app-row-media app-related"
+          >
+            <span className="app-row-thumb">
+              <SafeImage src={other.image} alt="" />
+            </span>
+            <span className="app-row-body">
+              <strong>{t(other.titleKey)}</strong>
+              <em>{t("related")}</em>
+            </span>
+            <span className="app-row-chevron" aria-hidden>
+              ›
+            </span>
+          </Link>
         </Reveal>
       )}
     </PageShell>

@@ -1,31 +1,68 @@
 import { useState, type FormEvent } from "react";
-import { academy } from "../data/content";
+import { SuccessBurst } from "./SuccessBurst";
+import { supabase } from "../lib/supabase";
 import { useI18n } from "../i18n/I18nContext";
 
 export function ConsultForm({ compact = false }: { compact?: boolean }) {
   const { t } = useI18n();
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">(
+    "idle",
+  );
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
-    const name = String(data.get("name") || "");
-    const phone = String(data.get("phone") || "");
+    const name = String(data.get("name") || "").trim();
+    const phone = String(data.get("phone") || "").trim();
     const country = String(data.get("country") || "");
-    const msg = String(data.get("msg") || "");
-    const body = encodeURIComponent(
-      `${t("form_name")}: ${name}\n${t("form_phone")}: ${phone}\n${t("form_country")}: ${country}\n${t("form_msg")}: ${msg}`,
-    );
-    window.location.href = `mailto:${academy.email}?subject=${encodeURIComponent(t("form_title"))}&body=${body}`;
-    setSent(true);
+    const msg = String(data.get("msg") || "").trim();
+
+    if (!name || !phone) return;
+
+    const interest =
+      country === "china"
+        ? "travel_china"
+        : country === "poland"
+          ? "travel_poland"
+          : "consult";
+
+    setStatus("sending");
+    const { error } = await supabase.from("enrollments").insert({
+      name,
+      phone,
+      kind: "consult",
+      interest,
+      child_age: null,
+      message: msg
+        ? `${t("form_country")}: ${country}\n${msg}`
+        : `${t("form_country")}: ${country}`,
+    });
+
+    if (error) {
+      console.error("[consult]", error);
+      setStatus("err");
+      return;
+    }
+    setStatus("ok");
+    e.currentTarget.reset();
   };
 
-  if (sent) {
-    return <p className="form-ok">{t("form_ok")}</p>;
+  if (status === "ok") {
+    return (
+      <SuccessBurst
+        title={t("form_success_title")}
+        message={t("form_ok")}
+        doneLabel={t("back")}
+        onDone={() => setStatus("idle")}
+      />
+    );
   }
 
   return (
-    <form className={`consult-form${compact ? " is-compact" : ""}`} onSubmit={onSubmit}>
+    <form
+      className={`consult-form${compact ? " is-compact" : ""}`}
+      onSubmit={onSubmit}
+    >
       <h3>{t("form_title")}</h3>
       <label>
         <span>{t("form_name")}</span>
@@ -50,8 +87,15 @@ export function ConsultForm({ compact = false }: { compact?: boolean }) {
         <span>{t("form_msg")}</span>
         <textarea name="msg" rows={compact ? 3 : 4} />
       </label>
-      <button type="submit" className="btn btn-seal">
-        <span>{t("form_send")}</span>
+      {status === "err" && <p className="form-err">{t("form_err")}</p>}
+      <button
+        type="submit"
+        className="btn btn-seal"
+        disabled={status === "sending"}
+      >
+        <span>
+          {status === "sending" ? t("form_sending") : t("form_send")}
+        </span>
       </button>
     </form>
   );

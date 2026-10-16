@@ -19,10 +19,12 @@ const Ctx = createContext<I18nCtx | null>(null);
 const STORAGE = "hanz-lang";
 
 function lookup(lang: Lang, key: string) {
+  const features = featureKeys[lang] as Record<string, string>;
+  const fallback = featureKeys.mn as Record<string, string>;
   return (
-    featureKeys[lang][key as keyof (typeof featureKeys)["mn"]] ??
+    features[key] ??
     dictionaries[lang][key] ??
-    featureKeys.mn[key as keyof (typeof featureKeys)["mn"]] ??
+    fallback[key] ??
     dictionaries.mn[key] ??
     key
   );

@@ -1,7 +1,8 @@
 export const ease = [0.22, 1, 0.36, 1] as const;
 
+/** Shared page enter/exit — soft exit so shared-element media can morph. */
 export const pageTransition = {
-  initial: { opacity: 0, y: 14 },
+  initial: { opacity: 0, y: 12 },
   animate: {
     opacity: 1,
     y: 0,
@@ -9,7 +10,7 @@ export const pageTransition = {
   },
   exit: {
     opacity: 0,
-    y: -10,
-    transition: { duration: 0.3, ease },
+    y: -6,
+    transition: { duration: 0.18, ease },
   },
 };

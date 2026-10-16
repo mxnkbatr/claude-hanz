@@ -1,20 +1,14 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { newsIds, type NewsTag } from "../data/content";
+import { LayoutGroup, motion } from "framer-motion";
+import { type NewsTag } from "../data/content";
+import { AppLink } from "../components/AppLink";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
-import { SafeImage } from "../components/SafeImage";
-import { TiltCard } from "../components/TiltCard";
+import { SharedMedia } from "../components/SharedMedia";
 import { useI18n } from "../i18n/I18nContext";
-import { toDateTime } from "../lib/date";
-import { ease } from "../lib/motion";
+import { useSiteContent } from "../lib/SiteContentContext";
+import { hapticLight } from "../lib/native";
 
-const filters: NewsTag[] = [
-  "all",
-  "tag_study",
-  "tag_course",
-  "tag_academy",
-];
+const filters: NewsTag[] = ["all", "tag_study", "tag_course", "tag_academy"];
 
 function isNew(date: string) {
   return date.startsWith("2026");
@@ -22,26 +16,35 @@ function isNew(date: string) {
 
 export function News() {
   const { t } = useI18n();
+  const { newsLive } = useSiteContent();
   const [filter, setFilter] = useState<NewsTag>("all");
+  const [q, setQ] = useState("");
 
   const counts = useMemo(() => {
-    const map: Record<string, number> = { all: newsIds.length };
-    for (const n of newsIds) {
+    const map: Record<string, number> = { all: newsLive.length };
+    for (const n of newsLive) {
       map[n.tagKey] = (map[n.tagKey] || 0) + 1;
     }
     return map;
-  }, []);
+  }, [newsLive]);
 
-  const list = useMemo(
-    () =>
-      filter === "all" ? newsIds : newsIds.filter((n) => n.tagKey === filter),
-    [filter],
-  );
-  const [featured, ...rest] = list;
+  const list = useMemo(() => {
+    const base =
+      filter === "all" ? newsLive : newsLive.filter((n) => n.tagKey === filter);
+    const query = q.trim().toLowerCase();
+    if (!query) return base;
+    return base.filter((n) => {
+      const hay = `${t(n.titleKey)} ${t(n.excerptKey)} ${t(n.tagKey)}`.toLowerCase();
+      return hay.includes(query);
+    });
+  }, [filter, q, t, newsLive]);
+
+  const hasQuery = q.trim().length > 0;
+  const isFiltered = filter !== "all" || hasQuery;
 
   return (
-    <PageShell className="page-news">
-      <header className="page-head">
+    <PageShell className="page-news is-app ios-app">
+      <header className="page-head app-head">
         <Reveal>
           <p className="eyebrow">{t("nav_news")}</p>
           <h1 className="h1">{t("news_title")}</h1>
@@ -50,112 +53,118 @@ export function News() {
       </header>
 
       <Reveal>
-        <div className="filter-bar">
-          <div className="filter-row" role="tablist" aria-label={t("nav_news")}>
-            {filters.map((f) => (
+        <div className="news-toolbar">
+          <label className="ios-search news-search">
+            <span aria-hidden>⌕</span>
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t("search_news")}
+              autoComplete="off"
+            />
+            {hasQuery && (
               <button
-                key={f}
                 type="button"
-                role="tab"
-                aria-selected={filter === f}
-                className={`filter-chip${filter === f ? " is-active" : ""}`}
-                onClick={() => setFilter(f)}
+                className="news-search-clear"
+                onClick={() => setQ("")}
+                aria-label={t("news_clear")}
               >
-                <span>{f === "all" ? t("filter_all") : t(f)}</span>
-                <em>{counts[f] ?? 0}</em>
+                ×
               </button>
-            ))}
+            )}
+          </label>
+
+          <div className="news-filter-bar">
+            <LayoutGroup id="news-seg">
+              <div
+                className="news-filters"
+                role="tablist"
+                aria-label={t("news_filter_label")}
+              >
+                {filters.map((f) => {
+                  const active = filter === f;
+                  const count = counts[f] ?? 0;
+                  return (
+                    <button
+                      key={f}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      className={`news-chip${active ? " is-active" : ""}`}
+                      onClick={() => {
+                        setFilter(f);
+                        void hapticLight();
+                      }}
+                    >
+                      {active && (
+                        <motion.span
+                          className="news-chip-pill"
+                          layoutId="news-chip-pill"
+                          transition={{ type: "spring", stiffness: 480, damping: 36 }}
+                        />
+                      )}
+                      <span className="news-chip-label">
+                        {f === "all" ? t("filter_all") : t(f)}
+                      </span>
+                      <em>{count}</em>
+                    </button>
+                  );
+                })}
+              </div>
+            </LayoutGroup>
+
+            {isFiltered && (
+              <button
+                type="button"
+                className="news-reset"
+                onClick={() => {
+                  setFilter("all");
+                  setQ("");
+                  void hapticLight();
+                }}
+              >
+                {t("news_clear")}
+              </button>
+            )}
           </div>
-          <p className="filter-meta">
+
+          <p className="news-result-meta desk-only">
             {t("results_count")}: <strong>{list.length}</strong>
           </p>
         </div>
       </Reveal>
 
       <section className="section tight section-last">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={filter}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.35, ease }}
-          >
-            {featured ? (
-              <>
-                <Reveal>
-                  <TiltCard>
-                    <Link to={`/medee/${featured.id}`} className="news-featured">
-                      <div className="news-featured-media">
-                        <SafeImage
-                          src={featured.image}
-                          alt={t(featured.titleKey)}
-                        />
-                        {isNew(featured.date) && (
-                          <em className="badge-new">{t("badge_new")}</em>
-                        )}
-                      </div>
-                      <div className="news-featured-body">
-                        <div className="news-meta">
-                          <span>{t(featured.tagKey)}</span>
-                          <time
-                            className="date-badge"
-                            dateTime={toDateTime(featured.date)}
-                          >
-                            {featured.date}
-                          </time>
-                        </div>
-                        <h2>{t(featured.titleKey)}</h2>
-                        <p>{t(featured.excerptKey)}</p>
-                        <em className="card-cta">
-                          {t("read_on_site")} <i aria-hidden>→</i>
-                        </em>
-                      </div>
-                    </Link>
-                  </TiltCard>
-                </Reveal>
-
-                <Stagger className="news-grid">
-                  {rest.map((item) => (
-                    <StaggerItem key={item.id}>
-                      <TiltCard>
-                        <Link to={`/medee/${item.id}`} className="news-card">
-                          <div className="news-card-media">
-                            <SafeImage
-                              src={item.image}
-                              alt={t(item.titleKey)}
-                            />
-                            {isNew(item.date) && (
-                              <em className="badge-new">{t("badge_new")}</em>
-                            )}
-                          </div>
-                          <div className="news-card-body">
-                            <div className="news-meta">
-                              <span>{t(item.tagKey)}</span>
-                              <time
-                                className="date-badge"
-                                dateTime={toDateTime(item.date)}
-                              >
-                                {item.date}
-                              </time>
-                            </div>
-                            <h3>{t(item.titleKey)}</h3>
-                            <p>{t(item.excerptKey)}</p>
-                            <em className="card-cta">
-                              {t("read_on_site")} <i aria-hidden>→</i>
-                            </em>
-                          </div>
-                        </Link>
-                      </TiltCard>
-                    </StaggerItem>
-                  ))}
-                </Stagger>
-              </>
-            ) : (
-              <p className="empty-state">{t("empty_filter")}</p>
-            )}
-          </motion.div>
-        </AnimatePresence>
+        {list.length === 0 ? (
+          <p className="ios-empty">{t("empty_filter")}</p>
+        ) : (
+          <Stagger className="ios-feed ios-feed-news">
+            {list.map((item) => (
+              <StaggerItem key={item.id}>
+                <AppLink to={`/medee/${item.id}`} className="ios-card">
+                  <div className="ios-card-media">
+                    <SharedMedia
+                      id={`news-${item.id}`}
+                      src={item.image}
+                      alt={t(item.titleKey)}
+                    />
+                    {isNew(item.date) && (
+                      <em className="ios-badge">{t("badge_new")}</em>
+                    )}
+                  </div>
+                  <div className="ios-card-body">
+                    <span className="ios-meta">
+                      {t(item.tagKey)} · {item.date}
+                    </span>
+                    <h3>{t(item.titleKey)}</h3>
+                    <p className="ios-card-desc">{t(item.excerptKey)}</p>
+                  </div>
+                </AppLink>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        )}
       </section>
     </PageShell>
   );

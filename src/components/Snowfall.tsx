@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useReducedMotion } from "framer-motion";
 
-const COUNT = 36;
+const COUNT = 42;
 
 export function Snowfall() {
   const reduce = useReducedMotion();
@@ -9,11 +9,11 @@ export function Snowfall() {
     () =>
       Array.from({ length: COUNT }, (_, i) => ({
         id: i,
-        left: `${(i * 37) % 100}%`,
-        delay: `${(i % 14) * 0.4}s`,
-        duration: `${8 + (i % 8)}s`,
-        size: 3 + (i % 5),
-        opacity: 0.4 + (i % 5) * 0.1,
+        left: `${(i * 41 + 7) % 100}%`,
+        delay: `${(i % 16) * 0.35}s`,
+        duration: `${7 + (i % 9)}s`,
+        size: 4 + (i % 6),
+        opacity: 0.55 + (i % 5) * 0.08,
       })),
     [],
   );

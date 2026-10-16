@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
-import { academy, newsIds, shopProductsMeta } from "../data/content";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { SealMark } from "../components/SealMark";
 import { Marquee } from "../components/Marquee";
@@ -13,6 +12,7 @@ import { LearnScroll } from "../components/LearnScroll";
 import { StatsStrip } from "../components/StatsStrip";
 import { MagneticButton } from "../components/MagneticButton";
 import { useI18n } from "../i18n/I18nContext";
+import { useSiteContent } from "../lib/SiteContentContext";
 import { toDateTime } from "../lib/date";
 import { ease } from "../lib/motion";
 
@@ -20,6 +20,7 @@ const HERO_IMG = "/images/hero-wall.jpg";
 
 export function Home() {
   const { t } = useI18n();
+  const { academyLive: academy, newsLive, productsLive } = useSiteContent();
   const heroRef = useRef<HTMLElement>(null);
   const [introDone, setIntroDone] = useState(() => !shouldPlayHeroIntro());
   const playIntro = !introDone;
@@ -192,7 +193,7 @@ export function Home() {
             </div>
           </Reveal>
           <Stagger className="news-grid home-news">
-            {newsIds.slice(0, 3).map((item) => (
+            {newsLive.slice(0, 3).map((item) => (
               <StaggerItem key={item.id}>
                 <Link to={`/medee/${item.id}`} className="news-card">
                   <div className="news-card-media">
@@ -225,7 +226,7 @@ export function Home() {
             </div>
           </Reveal>
           <Stagger className="shop-grid home-shop">
-            {shopProductsMeta.slice(0, 2).map((p) => (
+            {productsLive.slice(0, 2).map((p) => (
               <StaggerItem key={p.id}>
                 <ProductCard product={p} />
               </StaggerItem>

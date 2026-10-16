@@ -1,10 +1,9 @@
-import { Link } from "react-router-dom";
-import { universitiesMeta } from "../data/content";
+import { useMemo, useState } from "react";
+import { chinaProgramsMeta } from "../data/content";
+import { AppLink } from "../components/AppLink";
 import { ConsultForm } from "../components/ConsultForm";
-import { ChinaMap } from "../components/ChinaMap";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
-import { TiltCard } from "../components/TiltCard";
 import { useI18n } from "../i18n/I18nContext";
 
 const steps = [
@@ -30,53 +29,81 @@ const compareRows = [
 
 export function University() {
   const { t } = useI18n();
+  const [q, setQ] = useState("");
+
+  const schools = useMemo(() => {
+    const query = q.trim().toLowerCase();
+    if (!query) return chinaProgramsMeta;
+    return chinaProgramsMeta.filter((p) => {
+      const hay =
+        `${t(p.titleKey)} ${t(p.nameMnKey)} ${t(p.nameZhKey)} ${t(p.cityKey)} ${t(p.descKey)}`.toLowerCase();
+      return hay.includes(query);
+    });
+  }, [q, t]);
 
   return (
-    <PageShell className="page-uni">
-      <header className="page-head">
+    <PageShell className="page-uni is-app ios-app">
+      <header className="page-head app-head">
         <Reveal>
-          <p className="eyebrow">{t("nav_uni")}</p>
-          <h1 className="h1">{t("uni_page")}</h1>
-          <p className="lead">{t("uni_lead")}</p>
+          <h1 className="h1">{t("nav_uni")}</h1>
+          <p className="lead desk-only">{t("uni_lead")}</p>
         </Reveal>
       </header>
 
-      <Reveal>
-        <ChinaMap />
-      </Reveal>
+      <section className="section tight uni-schools-section">
+        <Reveal>
+          <label className="ios-search">
+            <span aria-hidden>⌕</span>
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t("search_uni")}
+              autoComplete="off"
+            />
+          </label>
+        </Reveal>
 
-      <section className="section tight">
-        <Stagger className="uni-stack">
-          {universitiesMeta.map((u) => (
-            <StaggerItem key={u.id}>
-              <TiltCard>
-                <Link to={`/university/${u.id}`} className="uni-card">
-                  <div className="uni-media">
-                    <SafeImage src={u.image} alt={t(u.titleKey)} />
-                    <span>{t(u.countryKey)}</span>
-                    <h2 className="uni-title">{t(u.titleKey)}</h2>
+        <Reveal>
+          <div className="ios-section-head">
+            <h2>{t("uni_schools")}</h2>
+            <em>{schools.length}</em>
+          </div>
+        </Reveal>
+
+        {schools.length === 0 ? (
+          <p className="ios-empty">{t("empty_uni")}</p>
+        ) : (
+          <Stagger className="ios-feed ios-feed-schools">
+            {schools.map((p) => (
+              <StaggerItem key={p.id}>
+                <AppLink to="/university/china" className="ios-card">
+                  <div className="ios-card-media">
+                    <SafeImage src={p.image} alt={t(p.nameMnKey)} />
+                    <span className="ios-badge ios-badge-soft">{t(p.cityKey)}</span>
                   </div>
-                  <div className="uni-body">
-                    <p>{t(u.descKey)}</p>
-                    <ul>
-                      {u.points.map((p) => (
-                        <li key={p}>{t(p)}</li>
-                      ))}
-                    </ul>
-                    <em className="card-cta">
-                      {t("view_detail")} <i aria-hidden>→</i>
-                    </em>
+                  <div className="ios-card-body">
+                    <h3>{t(p.nameMnKey)}</h3>
+                    <p className="ios-card-sub">{t(p.titleKey)}</p>
+                    <p className="ios-card-desc">{t(p.descKey)}</p>
                   </div>
-                </Link>
-              </TiltCard>
-            </StaggerItem>
-          ))}
-        </Stagger>
+                </AppLink>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        )}
       </section>
 
-      <section className="section">
+      <section className="section tight section-last app-mobile">
         <Reveal>
-          <p className="eyebrow">{t("steps_title")}</p>
+          <AppLink to="/enroll?interest=consult" className="ios-cta">
+            {t("uni_cta")}
+          </AppLink>
+        </Reveal>
+      </section>
+
+      <section className="section desk-only">
+        <Reveal>
           <h2 className="h2">{t("steps_title")}</h2>
         </Reveal>
         <Stagger className="steps-grid">
@@ -92,9 +119,8 @@ export function University() {
         </Stagger>
       </section>
 
-      <section className="section">
+      <section className="section desk-only">
         <Reveal>
-          <p className="eyebrow">{t("compare_title")}</p>
           <h2 className="h2">{t("compare_title")}</h2>
         </Reveal>
         <Reveal delay={0.05}>
@@ -115,16 +141,15 @@ export function University() {
         </Reveal>
       </section>
 
-      <section className="section">
+      <section className="section desk-only">
         <Reveal>
-          <p className="eyebrow">{t("faq_title")}</p>
           <h2 className="h2">{t("faq_title")}</h2>
         </Reveal>
         <Stagger className="faq-list">
-          {faqs.map(([q, a]) => (
-            <StaggerItem key={q}>
+          {faqs.map(([qKey, a]) => (
+            <StaggerItem key={qKey}>
               <details className="faq-item">
-                <summary>{t(q)}</summary>
+                <summary>{t(qKey)}</summary>
                 <p>{t(a)}</p>
               </details>
             </StaggerItem>
@@ -132,7 +157,7 @@ export function University() {
         </Stagger>
       </section>
 
-      <section className="section section-last uni-form-wrap">
+      <section className="section section-last uni-form-wrap desk-only">
         <Reveal>
           <ConsultForm />
         </Reveal>

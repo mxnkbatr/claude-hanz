@@ -149,6 +149,10 @@ export function shouldPlayHeroIntro() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     return false;
   }
+  /* Mobile uses the dedicated onboard screen instead. */
+  if (window.matchMedia("(max-width: 899px)").matches) {
+    return false;
+  }
   try {
     return sessionStorage.getItem(STORAGE_KEY) !== "1";
   } catch {

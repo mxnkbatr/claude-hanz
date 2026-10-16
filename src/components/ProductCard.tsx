@@ -1,10 +1,19 @@
 import { Link } from "react-router-dom";
-import { formatPrice, shopProductsMeta } from "../data/content";
+import { formatPrice } from "../data/content";
 import { useI18n } from "../i18n/I18nContext";
-import { SafeImage } from "./SafeImage";
+import { SharedMedia } from "./SharedMedia";
 import { TiltCard } from "./TiltCard";
 
-type Product = (typeof shopProductsMeta)[number];
+type Product = {
+  id: string;
+  titleKey: string;
+  unitKey: string;
+  tagKey: string;
+  cat: "porcelain" | "books";
+  price: number;
+  image: string;
+  inStock: boolean;
+};
 
 export function ProductCard({ product }: { product: Product }) {
   const { t, lang } = useI18n();
@@ -18,7 +27,8 @@ export function ProductCard({ product }: { product: Product }) {
         className={`shop-card${!product.inStock ? " is-soldout" : ""}`}
       >
         <div className="shop-media">
-          <SafeImage
+          <SharedMedia
+            id={`shop-${product.id}`}
             src={product.image}
             alt={t(product.titleKey)}
             loading="lazy"

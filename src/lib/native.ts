@@ -1,0 +1,47 @@
+import { Capacitor } from "@capacitor/core";
+
+export function isNativeApp() {
+  return Capacitor.isNativePlatform();
+}
+
+/** Status bar, keyboard, back button — no-op on web. */
+export async function initNativeShell() {
+  if (!Capacitor.isNativePlatform()) return;
+
+  document.documentElement.classList.add("is-native");
+
+  try {
+    const { StatusBar, Style } = await import("@capacitor/status-bar");
+    await StatusBar.setOverlaysWebView({ overlay: true });
+    await StatusBar.setStyle({ style: Style.Light });
+  } catch {
+    /* plugin unavailable */
+  }
+
+  try {
+    const { Keyboard } = await import("@capacitor/keyboard");
+    await Keyboard.setAccessoryBarVisible({ isVisible: true });
+  } catch {
+    /* plugin unavailable */
+  }
+
+  try {
+    const { App } = await import("@capacitor/app");
+    App.addListener("backButton", ({ canGoBack }) => {
+      if (canGoBack) window.history.back();
+      else void App.exitApp();
+    });
+  } catch {
+    /* plugin unavailable */
+  }
+}
+
+export async function hapticLight() {
+  if (!Capacitor.isNativePlatform()) return;
+  try {
+    const { Haptics, ImpactStyle } = await import("@capacitor/haptics");
+    await Haptics.impact({ style: ImpactStyle.Light });
+  } catch {
+    /* ignore */
+  }
+}
