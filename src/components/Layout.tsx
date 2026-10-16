@@ -45,6 +45,10 @@ export function Layout() {
   useDocumentMeta();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  useEffect(() => {
     setLangOpen(false);
     setMenuOpen(false);
   }, [location.pathname, lang]);

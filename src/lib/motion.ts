@@ -1,21 +1,19 @@
 export const ease = [0.22, 1, 0.36, 1] as const;
 
 /**
- * Soft fade + scale page switch (keyed AnimatedOutlet keeps this stable).
- * Exit stays mostly opacity so shared-element media can morph.
+ * Snappy page switch — short fade/slide.
+ * Paired with AnimatePresence popLayout so enter doesn’t wait on exit.
  */
 export const pageTransition = {
-  initial: { opacity: 0, y: 14, scale: 0.985 },
+  initial: { opacity: 0, y: 6 },
   animate: {
     opacity: 1,
     y: 0,
-    scale: 1,
-    transition: { duration: 0.32, ease },
+    transition: { duration: 0.16, ease },
   },
   exit: {
     opacity: 0,
-    y: -8,
-    transition: { duration: 0.18, ease },
+    transition: { duration: 0.1, ease },
   },
 };
 

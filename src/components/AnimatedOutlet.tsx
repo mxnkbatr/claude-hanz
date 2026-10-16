@@ -11,13 +11,7 @@ export function AnimatedOutlet() {
   const outlet = useOutlet();
 
   return (
-    <AnimatePresence
-      mode="wait"
-      initial={false}
-      onExitComplete={() => {
-        if ((window.scrollY || 0) > 0) window.scrollTo(0, 0);
-      }}
-    >
+    <AnimatePresence mode="popLayout" initial={false}>
       {outlet && isValidElement(outlet)
         ? cloneElement(outlet as ReactElement, { key: location.pathname })
         : null}
