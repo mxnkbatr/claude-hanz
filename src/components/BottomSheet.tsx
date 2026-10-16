@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { hapticLight } from "../lib/native";
-import { sheetEase } from "../lib/motion";
+import { ease, sheetEase } from "../lib/motion";
 import { lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 
 type Props = {
@@ -11,6 +11,13 @@ type Props = {
   ariaLabel: string;
   children: ReactNode;
   className?: string;
+};
+
+const panelSpring = {
+  type: "spring" as const,
+  stiffness: 380,
+  damping: 34,
+  mass: 0.82,
 };
 
 export function BottomSheet({
@@ -47,7 +54,7 @@ export function BottomSheet({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: reduce ? 0.1 : 0.2, ease: sheetEase }}
+          transition={{ duration: reduce ? 0.1 : 0.28, ease }}
         >
           <motion.button
             type="button"
@@ -56,7 +63,7 @@ export function BottomSheet({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: reduce ? 0.08 : 0.18, ease: sheetEase }}
+            transition={{ duration: reduce ? 0.08 : 0.28, ease }}
             onClick={() => {
               void hapticLight();
               onClose();
@@ -64,18 +71,30 @@ export function BottomSheet({
           />
           <motion.div
             className="bottom-sheet-panel"
-            initial={reduce ? { opacity: 1 } : { y: "100%" }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={reduce ? { opacity: 0 } : { y: "100%" }}
+            initial={
+              reduce
+                ? { opacity: 1 }
+                : { y: "108%", scale: 0.96, opacity: 0.96 }
+            }
+            animate={{ y: 0, scale: 1, opacity: 1 }}
+            exit={
+              reduce
+                ? { opacity: 0 }
+                : { y: "108%", scale: 0.98, opacity: 0.94 }
+            }
             transition={
               reduce
                 ? { duration: 0.14 }
-                : { duration: 0.34, ease: sheetEase }
+                : {
+                    y: panelSpring,
+                    scale: panelSpring,
+                    opacity: { duration: 0.28, ease: sheetEase },
+                  }
             }
             drag={reduce ? false : "y"}
             dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0.02, bottom: 0.55 }}
-            dragTransition={{ bounceStiffness: 480, bounceDamping: 36 }}
+            dragElastic={{ top: 0.03, bottom: 0.55 }}
+            dragTransition={{ bounceStiffness: 460, bounceDamping: 34 }}
             onDragEnd={(_, info) => {
               if (info.offset.y > 88 || info.velocity.y > 620) {
                 void hapticLight();
@@ -85,9 +104,14 @@ export function BottomSheet({
           >
             <div className="bottom-sheet-grab" aria-hidden />
             {title && (
-              <div className="bottom-sheet-head">
+              <motion.div
+                className="bottom-sheet-head"
+                initial={reduce ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.08, duration: 0.32, ease }}
+              >
                 <strong>{title}</strong>
-              </div>
+              </motion.div>
             )}
             <div className="bottom-sheet-body">{children}</div>
           </motion.div>

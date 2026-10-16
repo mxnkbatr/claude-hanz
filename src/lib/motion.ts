@@ -1,15 +1,21 @@
 export const ease = [0.22, 1, 0.36, 1] as const;
 
-/** Soft fade page switch — no scale (scale felt like scroll jank on Safari). */
+/**
+ * Soft fade + scale page switch (keyed AnimatedOutlet keeps this stable).
+ * Exit stays mostly opacity so shared-element media can morph.
+ */
 export const pageTransition = {
-  initial: { opacity: 0 },
+  initial: { opacity: 0, y: 14, scale: 0.985 },
   animate: {
     opacity: 1,
-    transition: { duration: 0.22, ease },
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.32, ease },
   },
   exit: {
     opacity: 0,
-    transition: { duration: 0.14, ease },
+    y: -8,
+    transition: { duration: 0.18, ease },
   },
 };
 

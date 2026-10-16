@@ -119,14 +119,18 @@ export function Quiz() {
   const levelMeta = quizLevels.find((l) => l.id === level);
 
   return (
-    <PageShell className="page-quiz is-app ios-app">
-      <header className="page-head app-head">
-        <Reveal>
-          <p className="eyebrow">{t("nav_quiz")}</p>
-          <h1 className="h1">{t("quiz_title")}</h1>
-          <p className="lead">{t("quiz_lead")}</p>
-        </Reveal>
-      </header>
+    <PageShell
+      className={`page-quiz is-app ios-app${phase !== "pick" ? " is-playing" : ""}`}
+    >
+      {phase === "pick" && (
+        <header className="page-head app-head">
+          <Reveal>
+            <p className="eyebrow desk-only">{t("nav_quiz")}</p>
+            <h1 className="h1">{t("quiz_title")}</h1>
+            <p className="lead desk-only">{t("quiz_lead")}</p>
+          </Reveal>
+        </header>
+      )}
 
       <div className="quiz-shell">
         {(phase === "play" || phase === "done") && (
@@ -183,10 +187,11 @@ export function Quiz() {
             <motion.div
               key={question.id}
               className="quiz-panel quiz-play"
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.28, ease }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ duration: 0.24, ease }}
+              style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}
             >
               <div className="quiz-meta">
                 <span>

@@ -92,12 +92,12 @@ export function Home() {
             transition={{ delay: 0.18, duration: 0.85, ease }}
           >
             <h1 className="hero-cinema-title">
-              {t("hero_headline")}{" "}
-              <span className="hero-flag" aria-hidden>
-                🇨🇳
+              <span className="hero-title-text">{t("hero_headline")}</span>
+              <span className="hero-cn" aria-hidden>
+                CN
               </span>
             </h1>
-            <SealMark className="hero-seal-inline" />
+            <SealMark className="hero-seal-inline desk-only" />
           </motion.div>
 
           <motion.p

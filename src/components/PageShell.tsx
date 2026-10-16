@@ -16,8 +16,8 @@ export function PageShell({
       initial={reduce ? false : pageTransition.initial}
       animate={pageTransition.animate}
       exit={reduce ? undefined : pageTransition.exit}
-      // Avoid layout projection fighting route fades (site-wide flicker).
       layout={false}
+      style={{ transformOrigin: "50% 10%" }}
     >
       {children}
     </motion.div>

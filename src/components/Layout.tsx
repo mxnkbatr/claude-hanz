@@ -250,18 +250,18 @@ export function Layout() {
           variants={{
             hidden: {},
             show: {
-              transition: { staggerChildren: 0.028, delayChildren: 0.04 },
+              transition: { staggerChildren: 0.048, delayChildren: 0.1 },
             },
           }}
         >
           <motion.p
             className="site-menu-section"
             variants={{
-              hidden: { opacity: 0, y: 6 },
+              hidden: { opacity: 0, y: 12 },
               show: {
                 opacity: 1,
                 y: 0,
-                transition: { duration: 0.22, ease },
+                transition: { duration: 0.3, ease },
               },
             }}
           >
@@ -272,11 +272,17 @@ export function Layout() {
               <motion.div
                 key={item.to}
                 variants={{
-                  hidden: { opacity: 0, y: 8 },
+                  hidden: { opacity: 0, y: 18, scale: 0.92 },
                   show: {
                     opacity: 1,
                     y: 0,
-                    transition: { duration: 0.22, ease },
+                    scale: 1,
+                    transition: {
+                      type: "spring",
+                      stiffness: 420,
+                      damping: 26,
+                      mass: 0.7,
+                    },
                   },
                 }}
               >
@@ -307,11 +313,11 @@ export function Layout() {
           <motion.p
             className="site-menu-section"
             variants={{
-              hidden: { opacity: 0, y: 6 },
+              hidden: { opacity: 0, y: 12 },
               show: {
                 opacity: 1,
                 y: 0,
-                transition: { duration: 0.22, ease },
+                transition: { duration: 0.3, ease },
               },
             }}
           >
@@ -322,11 +328,17 @@ export function Layout() {
               <motion.div
                 key={item.to}
                 variants={{
-                  hidden: { opacity: 0, y: 6 },
+                  hidden: { opacity: 0, y: 14, x: -8 },
                   show: {
                     opacity: 1,
                     y: 0,
-                    transition: { duration: 0.2, ease },
+                    x: 0,
+                    transition: {
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 28,
+                      mass: 0.72,
+                    },
                   },
                 }}
               >
