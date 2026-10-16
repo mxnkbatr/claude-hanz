@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useI18n } from "../i18n/I18nContext";
 import { ease } from "../lib/motion";
+import { lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 
 const STORAGE_KEY = "hanz-intro-seen";
 
@@ -32,13 +33,12 @@ export function HeroIntro({
       onComplete();
       return;
     }
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    lockBodyScroll();
     const t1 = window.setTimeout(() => setPhase("seal"), 1600);
     const t2 = window.setTimeout(() => setPhase("title"), 2300);
     const t3 = window.setTimeout(() => finish(), 3400);
     return () => {
-      document.body.style.overflow = prev;
+      unlockBodyScroll();
       window.clearTimeout(t1);
       window.clearTimeout(t2);
       window.clearTimeout(t3);
@@ -51,7 +51,6 @@ export function HeroIntro({
     } catch {
       /* ignore */
     }
-    document.body.style.overflow = "";
     setPhase("done");
     setVisible(false);
     onComplete();

@@ -336,7 +336,7 @@
   }
 
   .is-app .app-head .h1 {
-    font-size: clamp(1.75rem, 6vw, 2rem);
+    font-size: 1.85rem;
     font-weight: 800;
     letter-spacing: -0.04em;
     margin-bottom: 0.85rem;
@@ -617,7 +617,7 @@
   }
 
   .is-app .app-head .h1 {
-    font-size: clamp(1.65rem, 5.5vw, 1.95rem);
+    font-size: 1.8rem;
     letter-spacing: -0.035em;
   }
 
@@ -737,7 +737,7 @@
 
   .ios-app .app-head .h1 {
     margin: 0 0 0.55rem;
-    font-size: clamp(1.9rem, 7vw, 2.25rem);
+    font-size: 2rem;
     font-weight: 820;
     letter-spacing: -0.05em;
     line-height: 1.08;
@@ -3349,7 +3349,11 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* auto — smooth scroll fights route changes / sheets and feels laggy on Safari */
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-size: 16px;
 }
 
 body {
@@ -3360,6 +3364,32 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  touch-action: manipulation;
+}
+
+/* Phone viewport lock (width=390) — keep type/spacing stable like localhost */
+html.is-phone {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-size: 16px;
+}
+
+html.is-phone body {
+  font-size: 16px;
+}
+
+@media (max-width: 899px) {
+  .hero-cinema-title {
+    font-size: 2.75rem;
+  }
+
+  .hero-cinema-sub {
+    font-size: 1.05rem;
+  }
+
+  .learn-char {
+    font-size: 5.5rem;
+  }
 }
 
 img {
@@ -4064,6 +4094,10 @@ i {
   place-items: center;
   min-height: min(78svh, 720px);
   padding: 0.5rem 0 1.5rem;
+}
+
+.auth-stage-quiet {
+  min-height: min(60svh, 520px);
 }
 
 .auth-glow {
@@ -4903,7 +4937,7 @@ i {
 
 .hero-cinema-title {
   font-family: var(--font-d);
-  font-size: clamp(48px, 7vw, 96px);
+  font-size: clamp(2.75rem, 7vw, 6rem);
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.08;
@@ -6259,7 +6293,7 @@ i {
   }
 
   .is-app:not(.ios-app) .app-head .h1 {
-    font-size: clamp(1.55rem, 5vw, 1.85rem);
+    font-size: 1.7rem;
     margin-bottom: 0;
     letter-spacing: -0.03em;
   }
@@ -6276,7 +6310,7 @@ i {
 
   .ios-app.is-app .app-head .h1 {
     margin: 0 0 0.55rem;
-    font-size: clamp(1.9rem, 7vw, 2.25rem);
+    font-size: 2rem;
     font-weight: 820;
     letter-spacing: -0.05em;
   }
@@ -6287,7 +6321,7 @@ i {
 
   .page-news.ios-app .app-head .h1,
   .page-uni.ios-app .app-head .h1 {
-    font-size: clamp(1.9rem, 7vw, 2.25rem);
+    font-size: 2rem;
     font-weight: 820;
     letter-spacing: -0.05em;
     line-height: 1.08;
@@ -6330,7 +6364,7 @@ i {
   }
 
   .page-courses.ios-app .app-head .h1 {
-    font-size: clamp(1.9rem, 7vw, 2.25rem);
+    font-size: 2rem;
     font-weight: 820;
     color: #141311;
   }

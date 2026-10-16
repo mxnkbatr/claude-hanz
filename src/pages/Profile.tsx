@@ -21,7 +21,17 @@ export function Profile() {
   const { user, loading, signOut, isAdmin } = useAuth();
   const { academyLive: academy } = useSiteContent();
 
-  if (!loading && !user) {
+  if (loading) {
+    return (
+      <PageShell className="page-profile is-app ios-app">
+        <header className="page-head app-head">
+          <h1 className="h1">{t("profile_title")}</h1>
+        </header>
+      </PageShell>
+    );
+  }
+
+  if (!user) {
     return <Navigate to="/auth?mode=login" replace />;
   }
 

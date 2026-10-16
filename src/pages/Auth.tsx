@@ -24,7 +24,15 @@ export function Auth() {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
 
-  if (!loading && user) {
+  if (loading) {
+    return (
+      <PageShell className="page-auth is-app ios-app">
+        <div className="auth-stage auth-stage-quiet" aria-busy="true" />
+      </PageShell>
+    );
+  }
+
+  if (user) {
     return <Navigate to="/profile" replace />;
   }
 
@@ -57,34 +65,23 @@ export function Auth() {
   return (
     <PageShell className="page-auth is-app ios-app">
       <div className="auth-stage">
-        <motion.div
-          className="auth-glow"
-          aria-hidden
-          animate={{ opacity: [0.45, 0.75, 0.45], scale: [1, 1.06, 1] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        />
+        <div className="auth-glow" aria-hidden />
 
         <motion.div
           className="auth-card"
-          initial={{ opacity: 0, y: 36, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: "spring", stiffness: 320, damping: 28 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, ease }}
         >
-          <motion.div
-            className="auth-brand"
-            aria-hidden
-            initial={{ opacity: 0, scale: 0.7, rotate: -8 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ delay: 0.08, type: "spring", stiffness: 380, damping: 22 }}
-          >
+          <div className="auth-brand" aria-hidden>
             <span>汉</span>
-          </motion.div>
+          </div>
 
           <motion.header
             className="auth-card-head"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12, duration: 0.4, ease }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.06, duration: 0.25, ease }}
           >
             <AnimatePresence mode="wait">
               <motion.h1
@@ -166,12 +163,7 @@ export function Auth() {
                 </LayoutGroup>
 
                 <form className="auth-form" onSubmit={onSubmit}>
-                  <motion.label
-                    className="auth-field"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05, duration: 0.3, ease }}
-                  >
+                  <label className="auth-field">
                     <span>{t("auth_email")}</span>
                     <input
                       type="email"
@@ -181,13 +173,8 @@ export function Auth() {
                       placeholder="name@email.com"
                       required
                     />
-                  </motion.label>
-                  <motion.label
-                    className="auth-field"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.12, duration: 0.3, ease }}
-                  >
+                  </label>
+                  <label className="auth-field">
                     <span>{t("auth_password")}</span>
                     <input
                       type="password"
@@ -200,7 +187,7 @@ export function Auth() {
                       minLength={6}
                       required
                     />
-                  </motion.label>
+                  </label>
 
                   <AnimatePresence>
                     {error && (
@@ -215,35 +202,25 @@ export function Auth() {
                     )}
                   </AnimatePresence>
 
-                  <motion.button
+                  <button
                     type="submit"
                     className="auth-submit"
                     disabled={busy || loading}
-                    whileTap={{ scale: 0.98 }}
-                    whileHover={{ y: -1 }}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.18, duration: 0.3, ease }}
                   >
                     {busy
                       ? t("auth_busy")
                       : mode === "login"
                         ? t("auth_login")
                         : t("auth_signup")}
-                  </motion.button>
+                  </button>
                 </form>
               </motion.div>
             )}
           </AnimatePresence>
 
-          <motion.p
-            className="auth-foot"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.28 }}
-          >
+          <p className="auth-foot">
             <Link to="/">{t("back")}</Link>
-          </motion.p>
+          </p>
         </motion.div>
       </div>
     </PageShell>

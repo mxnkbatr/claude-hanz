@@ -7,6 +7,7 @@ import {
 } from "framer-motion";
 import { useI18n } from "../i18n/I18nContext";
 import { hapticLight } from "../lib/native";
+import { lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 
 const STORAGE_KEY = "hanz-onboard-seen";
 const MOBILE_MQ = "(max-width: 899px)";
@@ -78,16 +79,12 @@ export function Onboard() {
 
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    lockBodyScroll();
+    return () => unlockBodyScroll();
   }, [open]);
 
   function close() {
     markOnboardSeen();
-    document.body.style.overflow = "";
     setOpen(false);
   }
 

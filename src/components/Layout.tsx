@@ -44,8 +44,9 @@ export function Layout() {
   useDocumentMeta();
 
   useEffect(() => {
-    // Instant reset — smooth scroll + overlapping route exits felt like double-scroll.
-    window.scrollTo(0, 0);
+    if ((window.scrollY || 0) > 0) {
+      window.scrollTo(0, 0);
+    }
   }, [location.pathname]);
 
   useEffect(() => {
@@ -254,18 +255,18 @@ export function Layout() {
           variants={{
             hidden: {},
             show: {
-              transition: { staggerChildren: 0.042, delayChildren: 0.14 },
+              transition: { staggerChildren: 0.028, delayChildren: 0.04 },
             },
           }}
         >
           <motion.p
             className="site-menu-section"
             variants={{
-              hidden: { opacity: 0, y: 10 },
+              hidden: { opacity: 0, y: 6 },
               show: {
                 opacity: 1,
                 y: 0,
-                transition: { duration: 0.34, ease },
+                transition: { duration: 0.22, ease },
               },
             }}
           >
@@ -276,17 +277,11 @@ export function Layout() {
               <motion.div
                 key={item.to}
                 variants={{
-                  hidden: { opacity: 0, y: 22, scale: 0.88 },
+                  hidden: { opacity: 0, y: 8 },
                   show: {
                     opacity: 1,
                     y: 0,
-                    scale: 1,
-                    transition: {
-                      type: "spring",
-                      stiffness: 420,
-                      damping: 26,
-                      mass: 0.7,
-                    },
+                    transition: { duration: 0.22, ease },
                   },
                 }}
               >
@@ -317,11 +312,11 @@ export function Layout() {
           <motion.p
             className="site-menu-section"
             variants={{
-              hidden: { opacity: 0, y: 10 },
+              hidden: { opacity: 0, y: 6 },
               show: {
                 opacity: 1,
                 y: 0,
-                transition: { duration: 0.34, ease },
+                transition: { duration: 0.22, ease },
               },
             }}
           >
@@ -332,17 +327,11 @@ export function Layout() {
               <motion.div
                 key={item.to}
                 variants={{
-                  hidden: { opacity: 0, y: 16, x: -6 },
+                  hidden: { opacity: 0, y: 6 },
                   show: {
                     opacity: 1,
                     y: 0,
-                    x: 0,
-                    transition: {
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 28,
-                      mass: 0.72,
-                    },
+                    transition: { duration: 0.2, ease },
                   },
                 }}
               >
@@ -372,8 +361,7 @@ export function Layout() {
 
       <main id="main" className="main">
         <LayoutGroup id="shared-routes">
-          {/* popLayout: exit out of flow so old+new pages don't stack scroll height */}
-          <AnimatePresence mode="popLayout" initial={false}>
+          <AnimatePresence mode="wait" initial={false}>
             <Outlet key={location.pathname} />
           </AnimatePresence>
         </LayoutGroup>

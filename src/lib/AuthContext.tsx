@@ -37,13 +37,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let alive = true;
-    void supabase.auth.getSession().then(({ data }) => {
-      if (!alive) return;
-      setSession(data.session ?? null);
-      setLoading(false);
-    });
+    let ready = false;
+    // Single source of truth — avoid getSession + INITIAL_SESSION double hop
+    // (that remounted Auth/Profile and felt like login scrolling in repeatedly).
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
+      if (!alive) return;
       setSession(next);
+      if (!ready) {
+        ready = true;
+        setLoading(false);
+      }
+    });
+    void supabase.auth.getSession().then(({ data }) => {
+      if (!alive || ready) return;
+      setSession(data.session ?? null);
+      ready = true;
       setLoading(false);
     });
     return () => {

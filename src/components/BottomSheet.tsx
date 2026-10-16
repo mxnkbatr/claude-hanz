@@ -1,7 +1,8 @@
 import { type ReactNode, useEffect } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { hapticLight } from "../lib/native";
-import { ease } from "../lib/motion";
+import { sheetEase } from "../lib/motion";
+import { lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 
 type Props = {
   open: boolean;
@@ -10,13 +11,6 @@ type Props = {
   ariaLabel: string;
   children: ReactNode;
   className?: string;
-};
-
-const panelSpring = {
-  type: "spring" as const,
-  stiffness: 320,
-  damping: 34,
-  mass: 0.86,
 };
 
 export function BottomSheet({
@@ -31,14 +25,13 @@ export function BottomSheet({
 
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    lockBodyScroll();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKey);
     return () => {
-      document.body.style.overflow = prev;
+      unlockBodyScroll();
       document.removeEventListener("keydown", onKey);
     };
   }, [open, onClose]);
@@ -54,7 +47,7 @@ export function BottomSheet({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: reduce ? 0.12 : 0.32, ease }}
+          transition={{ duration: reduce ? 0.1 : 0.2, ease: sheetEase }}
         >
           <motion.button
             type="button"
@@ -63,7 +56,7 @@ export function BottomSheet({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: reduce ? 0.1 : 0.28, ease }}
+            transition={{ duration: reduce ? 0.08 : 0.18, ease: sheetEase }}
             onClick={() => {
               void hapticLight();
               onClose();
@@ -71,48 +64,30 @@ export function BottomSheet({
           />
           <motion.div
             className="bottom-sheet-panel"
-            initial={
-              reduce
-                ? { opacity: 1 }
-                : { y: "108%", scale: 0.97, opacity: 0.92 }
-            }
-            animate={{ y: 0, scale: 1, opacity: 1 }}
-            exit={
-              reduce
-                ? { opacity: 0 }
-                : { y: "108%", scale: 0.985, opacity: 0.9 }
-            }
+            initial={reduce ? { opacity: 1 } : { y: "100%" }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={reduce ? { opacity: 0 } : { y: "100%" }}
             transition={
               reduce
-                ? { duration: 0.16 }
-                : {
-                    y: panelSpring,
-                    scale: panelSpring,
-                    opacity: { duration: 0.28, ease },
-                  }
+                ? { duration: 0.14 }
+                : { duration: 0.34, ease: sheetEase }
             }
             drag={reduce ? false : "y"}
             dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0.035, bottom: 0.62 }}
-            dragTransition={{ bounceStiffness: 420, bounceDamping: 32 }}
+            dragElastic={{ top: 0.02, bottom: 0.55 }}
+            dragTransition={{ bounceStiffness: 480, bounceDamping: 36 }}
             onDragEnd={(_, info) => {
               if (info.offset.y > 88 || info.velocity.y > 620) {
                 void hapticLight();
                 onClose();
               }
             }}
-            style={{ willChange: "transform" }}
           >
             <div className="bottom-sheet-grab" aria-hidden />
             {title && (
-              <motion.div
-                className="bottom-sheet-head"
-                initial={reduce ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.08, duration: 0.32, ease }}
-              >
+              <div className="bottom-sheet-head">
                 <strong>{title}</strong>
-              </motion.div>
+              </div>
             )}
             <div className="bottom-sheet-body">{children}</div>
           </motion.div>

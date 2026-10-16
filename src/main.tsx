@@ -7,7 +7,9 @@ import { AuthProvider } from "./lib/AuthContext.tsx";
 import { SiteContentProvider } from "./lib/SiteContentContext.tsx";
 import { I18nProvider } from "./i18n/I18nContext.tsx";
 import { initNativeShell } from "./lib/native";
+import { lockPhoneViewport } from "./lib/viewport";
 
+lockPhoneViewport();
 void initNativeShell();
 
 createRoot(document.getElementById("root")!).render(

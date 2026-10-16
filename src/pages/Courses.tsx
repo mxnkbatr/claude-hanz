@@ -121,14 +121,14 @@ export function Courses() {
     setStep("enroll");
     setStatus("idle");
     void hapticLight();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo(0, 0);
   }
 
   function backToBrowse() {
     setStep("browse");
     setStatus("idle");
     void hapticLight();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo(0, 0);
   }
 
   function startMatch() {
