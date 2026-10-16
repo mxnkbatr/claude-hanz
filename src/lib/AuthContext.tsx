@@ -38,21 +38,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let alive = true;
     let ready = false;
-    // Single source of truth — avoid getSession + INITIAL_SESSION double hop
-    // (that remounted Auth/Profile and felt like login scrolling in repeatedly).
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
+
+    const applySession = (next: Session | null) => {
       if (!alive) return;
-      setSession(next);
+      setSession((prev) => {
+        const sameUser = (prev?.user?.id ?? null) === (next?.user?.id ?? null);
+        const sameToken = (prev?.access_token ?? "") === (next?.access_token ?? "");
+        return sameUser && sameToken ? prev : next;
+      });
       if (!ready) {
         ready = true;
         setLoading(false);
       }
+    };
+
+    // Prefer onAuthStateChange; getSession is fallback if INITIAL_SESSION is slow.
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
+      applySession(next);
     });
     void supabase.auth.getSession().then(({ data }) => {
       if (!alive || ready) return;
-      setSession(data.session ?? null);
-      ready = true;
-      setLoading(false);
+      applySession(data.session ?? null);
     });
     return () => {
       alive = false;

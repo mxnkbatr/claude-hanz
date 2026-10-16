@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import { navKeys } from "../i18n/translations";
 import { useI18n } from "../i18n/I18nContext";
+import { AnimatedOutlet } from "./AnimatedOutlet";
 import { BottomSheet } from "./BottomSheet";
 import { IconClose, IconMenu, IconProfile, NavIcon } from "./Icons";
 import { Logo } from "./Logo";
@@ -42,12 +43,6 @@ export function Layout() {
   const isHome = location.pathname === "/";
 
   useDocumentMeta();
-
-  useEffect(() => {
-    if ((window.scrollY || 0) > 0) {
-      window.scrollTo(0, 0);
-    }
-  }, [location.pathname]);
 
   useEffect(() => {
     setLangOpen(false);
@@ -361,9 +356,7 @@ export function Layout() {
 
       <main id="main" className="main">
         <LayoutGroup id="shared-routes">
-          <AnimatePresence mode="wait" initial={false}>
-            <Outlet key={location.pathname} />
-          </AnimatePresence>
+          <AnimatedOutlet />
         </LayoutGroup>
       </main>
 
