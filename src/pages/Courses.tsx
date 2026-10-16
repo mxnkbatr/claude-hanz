@@ -20,6 +20,8 @@ import { ease } from "../lib/motion";
 
 type Step = "browse" | "enroll";
 type MatchPhase = "intro" | "ask" | "done";
+type ScheduleId = (typeof kidsSchedules)[number]["id"];
+type MatchField = keyof MatchAnswer;
 
 type CourseCard =
   | {
@@ -54,7 +56,7 @@ export function Courses() {
 
   const [step, setStep] = useState<Step>("browse");
   const [level, setLevel] = useState("");
-  const [schedule, setSchedule] = useState(kidsSchedules[0].id);
+  const [schedule, setSchedule] = useState<ScheduleId>(kidsSchedules[0].id);
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">(
     "idle",
   );
@@ -115,9 +117,13 @@ export function Courses() {
   const hasQuery = q.trim().length > 0;
   const isFiltered = filter !== "all" || hasQuery;
 
-  function openEnroll(kidsLevelId: string, scheduleHint?: string) {
+  function openEnroll(kidsLevelId: string, scheduleHint?: ScheduleId) {
     setLevel(kidsLevelId);
-    setSchedule(scheduleHint || kidsSchedules[0].id);
+    setSchedule(
+      scheduleHint && kidsSchedules.some((s) => s.id === scheduleHint)
+        ? scheduleHint
+        : kidsSchedules[0].id,
+    );
     setStep("enroll");
     setStatus("idle");
     void hapticLight();
@@ -147,7 +153,7 @@ export function Courses() {
     void hapticLight();
   }
 
-  function answerMatch(field: keyof MatchAnswer, value: string) {
+  function answerMatch(field: MatchField, value: string) {
     const next = { ...answers, [field]: value } as MatchAnswer;
     // reset dependent fields
     if (field === "who") {
@@ -158,12 +164,10 @@ export function Courses() {
     void hapticLight();
 
     const who = field === "who" ? value : next.who;
-    const steps =
-      who === "child"
-        ? (["who", "when", "age"] as const)
-        : (["who", "goal", "when"] as const);
+    const steps: MatchField[] =
+      who === "child" ? ["who", "when", "age"] : ["who", "goal", "when"];
 
-    const idx = steps.indexOf(field as (typeof steps)[number]);
+    const idx = steps.indexOf(field);
     if (idx >= 0 && idx < steps.length - 1) {
       setMatchStep(idx + 1);
       return;
