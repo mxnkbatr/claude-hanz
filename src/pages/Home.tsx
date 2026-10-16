@@ -93,8 +93,8 @@ export function Home() {
           >
             <h1 className="hero-cinema-title">
               <span className="hero-title-text">{t("hero_headline")}</span>
-              <span className="hero-cn" aria-hidden>
-                CN
+              <span className="hero-flag" aria-hidden>
+                🇨🇳
               </span>
             </h1>
             <SealMark className="hero-seal-inline desk-only" />
