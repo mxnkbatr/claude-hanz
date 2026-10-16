@@ -17,6 +17,7 @@ export function PageShell({
       animate={pageTransition.animate}
       exit={reduce ? undefined : pageTransition.exit}
       layout={false}
+      style={{ transformOrigin: "50% 10%" }}
     >
       {children}
     </motion.div>
