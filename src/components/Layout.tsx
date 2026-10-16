@@ -431,28 +431,48 @@ export function Layout() {
       </footer>
 
       <nav className="tabbar glass-dock" aria-label={t("nav_mobile")}>
-        {navKeys
-          .filter((item) => item.tab)
-          .map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                `tabbar-item${isActive ? " is-active" : ""}`
-              }
-              onClick={() => void hapticLight()}
-            >
-              <span className="tabbar-icon">
-                <NavIcon name={item.icon} />
-              </span>
-              <span className="tabbar-label">
-                {t(
-                  "tabKey" in item && item.tabKey ? item.tabKey : item.key,
+        <LayoutGroup id="tabbar-dock">
+          {navKeys
+            .filter((item) => item.tab)
+            .map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === "/"}
+                className={({ isActive }) =>
+                  `tabbar-item${isActive ? " is-active" : ""}`
+                }
+                onClick={() => void hapticLight()}
+              >
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <motion.span
+                        className="tabbar-pill"
+                        layoutId="tabbar-pill"
+                        transition={{
+                          type: "spring",
+                          stiffness: 480,
+                          damping: 34,
+                          mass: 0.7,
+                        }}
+                      />
+                    )}
+                    <span className="tabbar-icon">
+                      <NavIcon name={item.icon} />
+                    </span>
+                    <span className="tabbar-label">
+                      {t(
+                        "tabKey" in item && item.tabKey
+                          ? item.tabKey
+                          : item.key,
+                      )}
+                    </span>
+                  </>
                 )}
-              </span>
-            </NavLink>
-          ))}
+              </NavLink>
+            ))}
+        </LayoutGroup>
       </nav>
 
       <Onboard />

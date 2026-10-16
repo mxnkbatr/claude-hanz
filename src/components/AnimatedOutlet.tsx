@@ -15,7 +15,7 @@ export function AnimatedOutlet() {
       mode="wait"
       initial={false}
       onExitComplete={() => {
-        if ((window.scrollY || 0) > 0) window.scrollTo(0, 0);
+        window.scrollTo(0, 0);
       }}
     >
       {outlet && isValidElement(outlet)
