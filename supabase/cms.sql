@@ -36,6 +36,7 @@ create table if not exists public.products (
   title jsonb not null default '{}'::jsonb,
   body jsonb not null default '{}'::jsonb,
   tag jsonb not null default '{}'::jsonb,
+  filter_key text not null default 'porcelain',
   image_url text,
   price numeric(12, 2) not null default 0,
   in_stock boolean not null default true,
@@ -44,6 +45,10 @@ create table if not exists public.products (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Existing DBs created before filter_key existed
+alter table public.products
+  add column if not exists filter_key text not null default 'porcelain';
 
 -- ─── Courses ─────────────────────────────────────────────────
 create table if not exists public.courses (

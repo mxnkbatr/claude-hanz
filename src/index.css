@@ -6262,9 +6262,17 @@ i {
   gap: 0.55rem;
 }
 
-.btn-seal:hover {
+.btn-seal:hover:not(.magnetic-btn) {
   transform: translateY(-2px);
   box-shadow: 0 14px 32px rgba(225, 29, 56, 0.35);
+}
+
+.magnetic-btn:hover {
+  box-shadow: 0 14px 32px rgba(225, 29, 56, 0.35);
+}
+
+.magnetic-float {
+  display: inline-flex;
 }
 
 .btn-ink {
@@ -8665,13 +8673,14 @@ i {
 }
 
 @media (min-width: 900px) {
+  /* Portaled to body — stay fixed + centered (sticky would break) */
   .app-enroll-dock {
-    position: sticky;
-    left: auto;
-    right: auto;
-    bottom: 1rem;
+    position: fixed;
+    left: max(1rem, calc(50% - 260px));
+    right: max(1rem, calc(50% - 260px));
+    bottom: 1.25rem;
     max-width: 520px;
-    margin: 1rem auto 0;
+    margin: 0 auto;
   }
 
   .has-enroll-dock {
@@ -11392,6 +11401,12 @@ i {
 
 .magnetic-btn {
   display: inline-flex;
+}
+
+/* Clear page transform trap leftovers for portaled CTAs */
+body > .app-enroll-dock,
+body > .course-detail-sticky {
+  pointer-events: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

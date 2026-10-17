@@ -199,16 +199,26 @@ export function mergeProducts(
     return dbRows
       .filter((r) => !r.hidden)
       .sort((a, b) => a.sort_order - b.sort_order)
-      .map((r) => ({
-        id: r.slug || r.id,
-        title: r.title,
-        body: r.body,
-        tag: r.tag,
-        price: Number(r.price ?? 0),
-        inStock: r.in_stock ?? true,
-        image: r.image_url || "",
-        fromDb: true,
-      }));
+      .map((r) => {
+        const base = shopProductsMeta.find((p) => p.id === r.slug);
+        const cat = r.filter_key || base?.cat || "";
+        return {
+          id: r.slug || r.id,
+          title: r.title,
+          body: r.body,
+          tag: r.tag,
+          cat: cat || undefined,
+          price: Number(r.price ?? 0),
+          inStock: r.in_stock ?? true,
+          image: r.image_url || base?.image || "",
+          titleKey: base?.titleKey,
+          descKey: base?.descKey,
+          bodyKey: base?.bodyKey,
+          unitKey: base?.unitKey,
+          tagKey: base?.tagKey,
+          fromDb: true,
+        };
+      });
   }
 
   return shopProductsMeta

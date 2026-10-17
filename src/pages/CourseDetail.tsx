@@ -14,6 +14,7 @@ import {
 } from "../lib/courseComments";
 import { PageShell, Reveal } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
+import { StickyCta } from "../components/StickyCta";
 import { SuccessBurst } from "../components/SuccessBurst";
 import { useI18n } from "../i18n/I18nContext";
 import { supabase } from "../lib/supabase";
@@ -355,7 +356,7 @@ export function CourseDetail() {
         </Reveal>
       </article>
 
-      <div className="course-detail-sticky app-mobile">
+      <StickyCta className="course-detail-sticky app-mobile">
         <a
           href="#enroll"
           className="btn btn-seal"
@@ -363,7 +364,7 @@ export function CourseDetail() {
         >
           <span>{t("kids_detail_enroll")}</span>
         </a>
-      </div>
+      </StickyCta>
     </PageShell>
   );
 }

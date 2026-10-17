@@ -68,7 +68,13 @@ function blankDraft(): Draft {
   };
 }
 
-function rowToDraft(r: CmsRow): Draft {
+function rowToDraft(r: CmsRow, collection: CollectionKey = "news"): Draft {
+  const fallbackFilter =
+    collection === "products"
+      ? "porcelain"
+      : collection === "courses"
+        ? "classroom"
+        : "tag_academy";
   return {
     id: r.id,
     slug: r.slug,
@@ -78,7 +84,7 @@ function rowToDraft(r: CmsRow): Draft {
     tag: r.tag || emptyI18nText(),
     city: r.city || emptyI18nText(),
     duration: r.duration || emptyI18nText(),
-    filter_key: r.filter_key || "tag_academy",
+    filter_key: r.filter_key || fallbackFilter,
     image_url: r.image_url || "",
     price: String(r.price ?? 0),
     in_stock: r.in_stock ?? true,
@@ -130,6 +136,8 @@ export function AdminCollection({
   function openNew() {
     const d = blankDraft();
     d.sort_order = rows.length;
+    if (key === "products") d.filter_key = "porcelain";
+    if (key === "courses") d.filter_key = "classroom";
     setDraft(d);
   }
 
@@ -161,6 +169,7 @@ export function AdminCollection({
     if (key === "products") {
       Object.assign(base, {
         tag: draft.tag,
+        filter_key: draft.filter_key || "porcelain",
         price: Number(draft.price) || 0,
         in_stock: draft.in_stock,
       });
@@ -346,6 +355,21 @@ export function AdminCollection({
               </label>
             )}
 
+            {key === "products" && (
+              <label className="admin-field">
+                <span>{t("shop_filter_label")}</span>
+                <select
+                  value={draft.filter_key || "porcelain"}
+                  onChange={(e) =>
+                    setDraft({ ...draft, filter_key: e.target.value })
+                  }
+                >
+                  <option value="porcelain">{t("cat_porcelain")}</option>
+                  <option value="books">{t("cat_books")}</option>
+                </select>
+              </label>
+            )}
+
             {(key === "news" || key === "courses") && (
               <label className="admin-field">
                 <span>{t("admin_filter_key")}</span>
@@ -417,7 +441,7 @@ export function AdminCollection({
                       <button
                         type="button"
                         className="admin-btn"
-                        onClick={() => setDraft(rowToDraft(r))}
+                        onClick={() => setDraft(rowToDraft(r, key))}
                       >
                         {t("admin_edit")}
                       </button>

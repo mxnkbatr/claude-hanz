@@ -1,5 +1,10 @@
 import { useRef, type ReactNode } from "react";
-import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useReducedMotion,
+} from "framer-motion";
 
 export function MagneticButton({
   children,
@@ -30,29 +35,36 @@ export function MagneticButton({
   }
 
   return (
-    <motion.a
-      ref={ref}
-      href={href}
-      target={target}
-      rel={rel}
-      className={`magnetic-btn ${className}`}
-      style={{ x: sx, y: sy }}
-      whileTap={{ scale: 0.97 }}
-      onMouseMove={(e) => {
-        const el = ref.current;
-        if (!el || window.matchMedia("(pointer: fine)").matches === false) return;
-        const rect = el.getBoundingClientRect();
-        const dx = e.clientX - (rect.left + rect.width / 2);
-        const dy = e.clientY - (rect.top + rect.height / 2);
-        x.set(dx * 0.28);
-        y.set(dy * 0.28);
-      }}
-      onMouseLeave={() => {
-        x.set(0);
-        y.set(0);
-      }}
+    <motion.span
+      className="magnetic-float"
+      animate={{ y: [0, -6, 0] }}
+      transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
     >
-      {children}
-    </motion.a>
+      <motion.a
+        ref={ref}
+        href={href}
+        target={target}
+        rel={rel}
+        className={`magnetic-btn ${className}`}
+        style={{ x: sx, y: sy }}
+        whileTap={{ scale: 0.97 }}
+        onMouseMove={(e) => {
+          const el = ref.current;
+          if (!el || window.matchMedia("(pointer: fine)").matches === false)
+            return;
+          const rect = el.getBoundingClientRect();
+          const dx = e.clientX - (rect.left + rect.width / 2);
+          const dy = e.clientY - (rect.top + rect.height / 2);
+          x.set(dx * 0.28);
+          y.set(dy * 0.28);
+        }}
+        onMouseLeave={() => {
+          x.set(0);
+          y.set(0);
+        }}
+      >
+        {children}
+      </motion.a>
+    </motion.span>
   );
 }

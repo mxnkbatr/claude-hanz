@@ -3,7 +3,14 @@ import { SuccessBurst } from "./SuccessBurst";
 import { supabase } from "../lib/supabase";
 import { useI18n } from "../i18n/I18nContext";
 
-export function ConsultForm({ compact = false }: { compact?: boolean }) {
+export function ConsultForm({
+  compact = false,
+  presetInterest,
+}: {
+  compact?: boolean;
+  /** When set, skips country select and uses this interest (e.g. translation). */
+  presetInterest?: string;
+}) {
   const { t } = useI18n();
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">(
     "idle",
@@ -20,11 +27,18 @@ export function ConsultForm({ compact = false }: { compact?: boolean }) {
     if (!name || !phone) return;
 
     const interest =
-      country === "china"
+      presetInterest ||
+      (country === "china"
         ? "travel_china"
         : country === "poland"
           ? "travel_poland"
-          : "consult";
+          : "consult");
+
+    const message = presetInterest
+      ? msg || t("nav_translation")
+      : msg
+        ? `${t("form_country")}: ${country}\n${msg}`
+        : `${t("form_country")}: ${country}`;
 
     setStatus("sending");
     const { error } = await supabase.from("enrollments").insert({
@@ -33,9 +47,7 @@ export function ConsultForm({ compact = false }: { compact?: boolean }) {
       kind: "consult",
       interest,
       child_age: null,
-      message: msg
-        ? `${t("form_country")}: ${country}\n${msg}`
-        : `${t("form_country")}: ${country}`,
+      message,
     });
 
     if (error) {
@@ -72,20 +84,26 @@ export function ConsultForm({ compact = false }: { compact?: boolean }) {
         <span>{t("form_phone")}</span>
         <input name="phone" type="tel" required autoComplete="tel" />
       </label>
-      <label>
-        <span>{t("form_country")}</span>
-        <select name="country" required defaultValue="">
-          <option value="" disabled>
-            —
-          </option>
-          <option value="china">{t("form_country_china")}</option>
-          <option value="poland">{t("form_country_poland")}</option>
-          <option value="both">{t("form_country_both")}</option>
-        </select>
-      </label>
+      {!presetInterest && (
+        <label>
+          <span>{t("form_country")}</span>
+          <select name="country" required defaultValue="">
+            <option value="" disabled>
+              —
+            </option>
+            <option value="china">{t("form_country_china")}</option>
+            <option value="poland">{t("form_country_poland")}</option>
+            <option value="both">{t("form_country_both")}</option>
+          </select>
+        </label>
+      )}
       <label>
         <span>{t("form_msg")}</span>
-        <textarea name="msg" rows={compact ? 3 : 4} />
+        <textarea
+          name="msg"
+          rows={compact ? 3 : 4}
+          placeholder={presetInterest ? t("trans_msg_ph") : undefined}
+        />
       </label>
       {status === "err" && <p className="form-err">{t("form_err")}</p>}
       <button

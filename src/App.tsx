@@ -13,6 +13,7 @@ import { TravelDetail } from "./pages/TravelDetail";
 import { Enroll } from "./pages/Enroll";
 import { Shop } from "./pages/Shop";
 import { ProductDetail } from "./pages/ProductDetail";
+import { Translation } from "./pages/Translation";
 import { Contact } from "./pages/Contact";
 import { Profile } from "./pages/Profile";
 import { Auth } from "./pages/Auth";
@@ -91,6 +92,7 @@ export default function App() {
           <Route path="travel/:id" element={<TravelDetail />} />
           <Route path="shop" element={<Shop />} />
           <Route path="shop/:id" element={<ProductDetail />} />
+          <Route path="translation" element={<Translation />} />
           <Route path="contact" element={<Contact />} />
           <Route path="profile" element={<Profile />} />
           <Route path="auth" element={<Auth />} />

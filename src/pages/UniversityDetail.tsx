@@ -4,10 +4,10 @@ import {
   uniEnrollStatusKey,
   universitiesMeta,
 } from "../data/content";
+import { EnrollDock } from "../components/EnrollDock";
 import { PageShell, Reveal } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
 import { useI18n } from "../i18n/I18nContext";
-import { hapticLight } from "../lib/native";
 
 export function UniversityDetail() {
   const { id = "" } = useParams();
@@ -116,23 +116,12 @@ export function UniversityDetail() {
         </Reveal>
       )}
 
-      <div className="app-enroll-dock">
-        <div className="app-enroll-dock-copy">
-          <strong>
-            {hasOpen ? t("uni_enroll_cta") : t("uni_cta")}
-          </strong>
-          <em>
-            {hasOpen ? t("uni_status_open") : t("uni_status_soon")}
-          </em>
-        </div>
-        <Link
-          to={enrollTo}
-          className="btn btn-seal app-enroll-dock-btn"
-          onClick={() => void hapticLight()}
-        >
-          <span>{t("uni_enroll_cta")}</span>
-        </Link>
-      </div>
+      <EnrollDock
+        title={hasOpen ? t("uni_enroll_cta") : t("uni_cta")}
+        status={hasOpen ? t("uni_status_open") : t("uni_status_soon")}
+        to={enrollTo}
+        cta={t("uni_enroll_cta")}
+      />
     </PageShell>
   );
 }

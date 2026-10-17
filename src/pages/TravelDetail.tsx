@@ -1,10 +1,10 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import { getTravelById, uniEnrollStatusKey } from "../data/content";
+import { EnrollDock } from "../components/EnrollDock";
 import { PageShell, Reveal } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
 import { useI18n } from "../i18n/I18nContext";
 import { useSiteContent } from "../lib/SiteContentContext";
-import { hapticLight } from "../lib/native";
 
 export function TravelDetail() {
   const { id = "" } = useParams();
@@ -127,23 +127,12 @@ export function TravelDetail() {
         </Reveal>
       )}
 
-      <div className="app-enroll-dock">
-        <div className="app-enroll-dock-copy">
-          <strong>{t("travel_cta")}</strong>
-          <em>
-            {hasOpen
-              ? t("uni_status_open")
-              : t("uni_status_soon")}
-          </em>
-        </div>
-        <Link
-          to={enrollTo}
-          className="btn btn-seal app-enroll-dock-btn"
-          onClick={() => void hapticLight()}
-        >
-          <span>{t("uni_enroll_cta")}</span>
-        </Link>
-      </div>
+      <EnrollDock
+        title={t("travel_cta")}
+        status={hasOpen ? t("uni_status_open") : t("uni_status_soon")}
+        to={enrollTo}
+        cta={t("uni_enroll_cta")}
+      />
     </PageShell>
   );
 }
