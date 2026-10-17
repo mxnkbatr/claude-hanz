@@ -35,7 +35,7 @@ export function About() {
         <Stagger className="app-list">
           {coursesMeta.slice(0, 4).map((c) => (
             <StaggerItem key={c.id}>
-              <Link to={`/enroll?interest=${c.id}`} className="app-row">
+              <Link to={`/courses/${c.id}`} className="app-row">
                 <span className="app-row-icon" aria-hidden>
                   {c.icon}
                 </span>
@@ -131,20 +131,40 @@ export function About() {
         </Stagger>
       </section>
 
+      <section className="section tight app-mobile">
+        <Reveal>
+          <h2 className="app-section-title">{t("success_title")}</h2>
+        </Reveal>
+        <Stagger className="app-list">
+          {(["success_1", "success_2", "success_3"] as const).map((key) => (
+            <StaggerItem key={key}>
+              <div className="app-row app-row-static">
+                <span className="app-row-icon" aria-hidden>
+                  ✓
+                </span>
+                <span className="app-row-body">
+                  <strong>{t(key)}</strong>
+                </span>
+              </div>
+            </StaggerItem>
+          ))}
+        </Stagger>
+      </section>
+
       <section className="section tight section-last app-mobile">
         <Reveal>
-          <a href={`mailto:${academy.email}`} className="app-row app-related">
+          <Link to="/translation" className="app-row app-related">
             <span className="app-row-icon" aria-hidden>
-              @
+              译
             </span>
             <span className="app-row-body">
               <strong>{t("service_title")}</strong>
-              <em>{academy.email}</em>
+              <em>{t("nav_translation")}</em>
             </span>
             <span className="app-row-chevron" aria-hidden>
               ›
             </span>
-          </a>
+          </Link>
         </Reveal>
       </section>
 
@@ -166,14 +186,14 @@ export function About() {
         <Stagger className="home-course-grid">
           {coursesMeta.map((c) => (
             <StaggerItem key={c.id}>
-              <article className="home-course-card">
+              <Link to={`/courses/${c.id}`} className="home-course-card">
                 <span className="home-course-icon" aria-hidden>
                   {c.icon}
                 </span>
                 <span className="home-course-tag">{t(c.tagKey)}</span>
                 <h3>{t(c.titleKey)}</h3>
                 <p>{t(c.descKey)}</p>
-              </article>
+              </Link>
             </StaggerItem>
           ))}
         </Stagger>
@@ -257,15 +277,39 @@ export function About() {
         </Stagger>
       </section>
 
+      <section className="section desk-only">
+        <Reveal>
+          <p className="eyebrow">{t("partners_title")}</p>
+          <h2 className="h2">{t("success_title")}</h2>
+        </Reveal>
+        <Stagger className="why-grid">
+          {(["success_1", "success_2", "success_3"] as const).map((key) => (
+            <StaggerItem key={key}>
+              <article className="why-card">
+                <span className="why-icon" aria-hidden>
+                  ✓
+                </span>
+                <h3>{t(key)}</h3>
+              </article>
+            </StaggerItem>
+          ))}
+        </Stagger>
+      </section>
+
       <section className="section section-last desk-only">
         <Reveal>
           <div className="home-service">
-            <p className="eyebrow">{t("service_title")}</p>
+            <p className="eyebrow">{t("nav_translation")}</p>
             <h2 className="h2">{t("service_title")}</h2>
             <p className="lead">{t("service_body")}</p>
-            <a href={`mailto:${academy.email}`} className="btn btn-seal">
-              <span>{academy.email}</span>
-            </a>
+            <div className="hero-cta-row" style={{ marginTop: "1rem" }}>
+              <Link to="/translation" className="btn btn-seal">
+                <span>{t("nav_translation")}</span>
+              </Link>
+              <a href={`mailto:${academy.email}`} className="btn btn-ink">
+                <span>{academy.email}</span>
+              </a>
+            </div>
           </div>
         </Reveal>
       </section>

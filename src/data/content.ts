@@ -1,8 +1,11 @@
 export const academy = {
   brand: "ХАНЗ",
-  followers: "72K+",
-  recommend: "82%",
-  langs: "3",
+  /** From client deck — totals since founding */
+  graduates: "7300+",
+  scholarshipStudents: "1080+",
+  partnerUniversities: "300+",
+  colleges: "70+",
+  tianjinStudents: "250+",
   phone: ["9990-7748", "9999-1573"],
   phoneRaw: ["99907748", "99991573"],
   email: "hanzacademy1@gmail.com",
@@ -11,50 +14,160 @@ export const academy = {
   messenger: "https://m.me/HanzAcademy",
   shopUrl: "https://bumtankhanz.mn",
   registerUrl: "https://forms.gle/xFXQ1u7c6qnkJYhE8",
-  founded: "2016",
+  founded: "2014",
   address:
     "СБД, 1-р хороо, Замын цагдаагийн зүүн талд, Union Building, А блок, 12 давхар, 1204",
-  hours: "",
+  hours: "Даваа–Бямба · өдөр бүр 8 цагийн сургалт",
   whatsapp: "https://wa.me/97699907748",
 };
 
+/** Real programs from client deck (Taniltsuulga Hanz.pptx) */
 export const coursesMeta = [
   {
-    id: "kids",
-    titleKey: "course_kids_t",
-    descKey: "course_kids_d",
-    tagKey: "tag_kids",
-    icon: "童",
+    id: "classroom",
+    titleKey: "course_classroom_t",
+    descKey: "course_classroom_d",
+    bodyKey: "course_classroom_b",
+    tagKey: "tag_classroom",
+    unitKey: "course_classroom_u",
+    icon: "堂",
+    filter: "classroom" as const,
+    image: "/courses/image12.jpeg",
+    highlights: [
+      "course_classroom_h1",
+      "course_classroom_h2",
+      "course_classroom_h3",
+    ] as const,
   },
   {
-    id: "hsk",
-    titleKey: "course_hsk_t",
-    descKey: "course_hsk_d",
-    tagKey: "tag_course",
-    icon: "汉",
+    id: "online",
+    titleKey: "course_online_t",
+    descKey: "course_online_d",
+    bodyKey: "course_online_b",
+    tagKey: "tag_online",
+    unitKey: "course_online_u",
+    icon: "网",
+    filter: "online" as const,
+    image: "/courses/image14.png",
+    highlights: [
+      "course_online_h1",
+      "course_online_h2",
+      "course_online_h3",
+    ] as const,
   },
   {
-    id: "csca",
-    titleKey: "course_csca_t",
-    descKey: "course_csca_d",
-    tagKey: "tag_course",
-    icon: "学",
+    id: "corporate",
+    titleKey: "course_corporate_t",
+    descKey: "course_corporate_d",
+    bodyKey: "course_corporate_b",
+    tagKey: "tag_corporate",
+    unitKey: "course_corporate_u",
+    icon: "企",
+    filter: "corporate" as const,
+    image: "/courses/image15.jpg",
+    highlights: [
+      "course_corporate_h1",
+      "course_corporate_h2",
+      "course_corporate_h3",
+    ] as const,
   },
   {
-    id: "speak",
-    titleKey: "course_speak_t",
-    descKey: "course_speak_d",
-    tagKey: "tag_course",
-    icon: "说",
+    id: "short",
+    titleKey: "course_short_t",
+    descKey: "course_short_d",
+    bodyKey: "course_short_b",
+    tagKey: "tag_short",
+    unitKey: "course_short_u",
+    icon: "暑",
+    filter: "short" as const,
+    image: "/courses/image16.jpg",
+    highlights: [
+      "course_short_h1",
+      "course_short_h2",
+      "course_short_h3",
+    ] as const,
   },
   {
     id: "year",
     titleKey: "course_year_t",
     descKey: "course_year_d",
-    tagKey: "tag_academy",
+    bodyKey: "course_year_b",
+    tagKey: "tag_intensive",
+    unitKey: "course_year_u",
     icon: "年",
+    filter: "classroom" as const,
+    image: "/courses/image4.jpg",
+    highlights: ["course_year_h1", "course_year_h2", "course_year_h3"] as const,
+  },
+  {
+    id: "hsk",
+    titleKey: "course_hsk_t",
+    descKey: "course_hsk_d",
+    bodyKey: "course_hsk_b",
+    tagKey: "tag_hsk",
+    unitKey: "course_hsk_u",
+    icon: "汉",
+    filter: "classroom" as const,
+    image: "/courses/image8.png",
+    highlights: ["course_hsk_h1", "course_hsk_h2", "course_hsk_h3"] as const,
+  },
+  {
+    id: "speak",
+    titleKey: "course_speak_t",
+    descKey: "course_speak_d",
+    bodyKey: "course_speak_b",
+    tagKey: "tag_speak",
+    unitKey: "course_speak_u",
+    icon: "说",
+    filter: "classroom" as const,
+    image: "/courses/image11.jpeg",
+    highlights: [
+      "course_speak_h1",
+      "course_speak_h2",
+      "course_speak_h3",
+    ] as const,
+  },
+  {
+    id: "english",
+    titleKey: "course_english_t",
+    descKey: "course_english_d",
+    bodyKey: "course_english_b",
+    tagKey: "tag_english",
+    unitKey: "course_english_u",
+    icon: "英",
+    filter: "classroom" as const,
+    image: "/courses/image20.jpg",
+    highlights: [
+      "course_english_h1",
+      "course_english_h2",
+      "course_english_h3",
+    ] as const,
+  },
+  {
+    id: "kids",
+    titleKey: "course_kids_t",
+    descKey: "course_kids_d",
+    bodyKey: "course_kids_b",
+    tagKey: "tag_kids",
+    unitKey: "course_kids_u",
+    icon: "童",
+    filter: "kids" as const,
+    image: "/courses/image21.jpg",
+    highlights: [
+      "kids_detail_h1",
+      "kids_detail_h2",
+      "kids_detail_h3",
+      "kids_detail_h4",
+    ] as const,
   },
 ] as const;
+
+export type CourseProgram = (typeof coursesMeta)[number];
+export type CourseProgramFilter = CourseProgram["filter"] | "all";
+
+export function getCourseById(id: string) {
+  return coursesMeta.find((c) => c.id === id);
+}
 
 /** Kids course levels for online enrollment cards */
 export const kidsLevels = [
@@ -64,6 +177,7 @@ export const kidsLevels = [
     ageKey: "kids_lvl_beginner_age",
     descKey: "kids_lvl_beginner_d",
     mark: "①",
+    teacherIds: ["saraa", "nomin"] as const,
   },
   {
     id: "elementary",
@@ -71,6 +185,7 @@ export const kidsLevels = [
     ageKey: "kids_lvl_elementary_age",
     descKey: "kids_lvl_elementary_d",
     mark: "②",
+    teacherIds: ["bold", "saraa"] as const,
   },
   {
     id: "intermediate",
@@ -78,6 +193,35 @@ export const kidsLevels = [
     ageKey: "kids_lvl_intermediate_age",
     descKey: "kids_lvl_intermediate_d",
     mark: "③",
+    teacherIds: ["tuya", "bold"] as const,
+  },
+] as const;
+
+/** Kids teachers shown on course cards */
+export const kidsTeachers = [
+  {
+    id: "saraa",
+    nameKey: "kids_teacher_saraa",
+    photo:
+      "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=240&h=240&q=80",
+  },
+  {
+    id: "bold",
+    nameKey: "kids_teacher_bold",
+    photo:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=240&h=240&q=80",
+  },
+  {
+    id: "nomin",
+    nameKey: "kids_teacher_nomin",
+    photo:
+      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=240&h=240&q=80",
+  },
+  {
+    id: "tuya",
+    nameKey: "kids_teacher_tuya",
+    photo:
+      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=240&h=240&q=80",
   },
 ] as const;
 
@@ -87,22 +231,73 @@ export const kidsSchedules = [
     id: "wd_afternoon",
     labelKey: "kids_sch_wd_afternoon",
     metaKey: "kids_sch_wd_afternoon_m",
+    dayGroup: "weekday" as const,
+    time: "16:00–17:30",
+    daysKey: "kids_sch_days_wd",
   },
   {
     id: "wd_evening",
     labelKey: "kids_sch_wd_evening",
     metaKey: "kids_sch_wd_evening_m",
+    dayGroup: "weekday" as const,
+    time: "18:00–19:30",
+    daysKey: "kids_sch_days_wd",
   },
   {
     id: "weekend_am",
     labelKey: "kids_sch_weekend_am",
     metaKey: "kids_sch_weekend_am_m",
+    dayGroup: "weekend" as const,
+    time: "10:00–11:30",
+    daysKey: "kids_sch_days_we",
   },
   {
     id: "weekend_pm",
     labelKey: "kids_sch_weekend_pm",
     metaKey: "kids_sch_weekend_pm_m",
+    dayGroup: "weekend" as const,
+    time: "14:00–15:30",
+    daysKey: "kids_sch_days_we",
   },
+] as const;
+
+export type KidsScheduleId = (typeof kidsSchedules)[number]["id"];
+export type KidsDayGroup = (typeof kidsSchedules)[number]["dayGroup"];
+
+/** Concrete kids class slots: level × schedule (for filterable browse) */
+export const kidsClassSlots = kidsLevels.flatMap((level) =>
+  kidsSchedules.map((sch) => ({
+    id: `${level.id}__${sch.id}`,
+    levelId: level.id,
+    scheduleId: sch.id,
+    titleKey: level.labelKey,
+    descKey: level.descKey,
+    ageKey: level.ageKey,
+    mark: level.mark,
+    teacherIds: level.teacherIds,
+    dayGroup: sch.dayGroup,
+    time: sch.time,
+    daysKey: sch.daysKey,
+    scheduleLabelKey: sch.labelKey,
+    scheduleMetaKey: sch.metaKey,
+  })),
+);
+
+export function kidsTeachersByIds(ids: readonly string[]) {
+  return ids
+    .map((id) => kidsTeachers.find((t) => t.id === id))
+    .filter((t): t is (typeof kidsTeachers)[number] => Boolean(t));
+}
+
+export function getKidsClassSlotById(id: string) {
+  return kidsClassSlots.find((slot) => slot.id === id);
+}
+
+export const kidsClassHighlights = [
+  "kids_detail_h1",
+  "kids_detail_h2",
+  "kids_detail_h3",
+  "kids_detail_h4",
 ] as const;
 
 export const travelPackagesMeta = [
@@ -141,11 +336,15 @@ export function getTravelById(id: string) {
 }
 
 export const enrollInterests = [
-  { id: "kids", kind: "course" as const, labelKey: "course_kids_t" },
-  { id: "hsk", kind: "course" as const, labelKey: "course_hsk_t" },
-  { id: "csca", kind: "course" as const, labelKey: "course_csca_t" },
-  { id: "speak", kind: "course" as const, labelKey: "course_speak_t" },
+  { id: "classroom", kind: "course" as const, labelKey: "course_classroom_t" },
+  { id: "online", kind: "course" as const, labelKey: "course_online_t" },
+  { id: "corporate", kind: "course" as const, labelKey: "course_corporate_t" },
+  { id: "short", kind: "course" as const, labelKey: "course_short_t" },
   { id: "year", kind: "course" as const, labelKey: "course_year_t" },
+  { id: "hsk", kind: "course" as const, labelKey: "course_hsk_t" },
+  { id: "speak", kind: "course" as const, labelKey: "course_speak_t" },
+  { id: "english", kind: "course" as const, labelKey: "course_english_t" },
+  { id: "kids", kind: "course" as const, labelKey: "course_kids_t" },
   { id: "travel_china", kind: "travel" as const, labelKey: "travel_china_t" },
   { id: "travel_poland", kind: "travel" as const, labelKey: "travel_poland_t" },
   { id: "consult", kind: "consult" as const, labelKey: "enroll_interest_consult" },
@@ -194,26 +393,14 @@ export const chinaProgramsMeta = [
   },
 ] as const;
 
-/** Why Hanz — copy keys must exist in featureKeys; missing = TODO. */
+/** Why Hanz — from client introduction deck */
 export const whyHanzMeta = [
-  {
-    id: "why1",
-    icon: "汉",
-    titleKey: "why_1_t",
-    descKey: "why_1_d",
-  },
-  {
-    id: "why2",
-    icon: "学",
-    titleKey: "why_2_t",
-    descKey: "why_2_d",
-  },
-  {
-    id: "why3",
-    icon: "校",
-    titleKey: "why_3_t",
-    descKey: "why_3_d",
-  },
+  { id: "why1", icon: "汉", titleKey: "why_1_t", descKey: "why_1_d" },
+  { id: "why2", icon: "书", titleKey: "why_2_t", descKey: "why_2_d" },
+  { id: "why3", icon: "听", titleKey: "why_3_t", descKey: "why_3_d" },
+  { id: "why4", icon: "时", titleKey: "why_4_t", descKey: "why_4_d" },
+  { id: "why5", icon: "试", titleKey: "why_5_t", descKey: "why_5_d" },
+  { id: "why6", icon: "校", titleKey: "why_6_t", descKey: "why_6_d" },
 ] as const;
 
 export const branchesMeta = [

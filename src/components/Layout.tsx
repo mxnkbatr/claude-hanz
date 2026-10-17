@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
+import { LayoutGroup, motion } from "framer-motion";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import { navKeys } from "../i18n/translations";
 import { useI18n } from "../i18n/I18nContext";
@@ -15,32 +15,26 @@ import { useSiteContent } from "../lib/SiteContentContext";
 import { hapticLight } from "../lib/native";
 import { ease } from "../lib/motion";
 
-const EXPLORE_PATHS = new Set([
+/** Mobile menu: 2-column iOS tiles (order matters). */
+const MENU_ORDER = [
   "/courses",
-  "/medee",
-  "/university",
-  "/travel",
   "/shop",
-  "/quiz",
-]);
-const ACCOUNT_PATHS = new Set([
   "/about",
-  "/contact",
+  "/translation",
   "/enroll",
-  "/profile",
   "/auth",
-]);
+  "/profile",
+] as const;
 
 export function Layout() {
   const location = useLocation();
-  const { t, lang, setLang, langs } = useI18n();
+  const { t } = useI18n();
   const { user } = useAuth();
   const { academyLive: academy } = useSiteContent();
-  const [langOpen, setLangOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const langRef = useRef<HTMLDivElement>(null);
   const isHome = location.pathname === "/";
+  const isAuth = location.pathname.startsWith("/auth");
 
   useDocumentMeta();
 
@@ -49,9 +43,8 @@ export function Layout() {
   }, [location.pathname]);
 
   useEffect(() => {
-    setLangOpen(false);
     setMenuOpen(false);
-  }, [location.pathname, lang]);
+  }, [location.pathname]);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 900px)");
@@ -69,27 +62,10 @@ export function Layout() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    if (!langOpen) return;
-    const onPointer = (e: MouseEvent | TouchEvent) => {
-      if (!langRef.current?.contains(e.target as Node)) setLangOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setLangOpen(false);
-    };
-    document.addEventListener("mousedown", onPointer);
-    document.addEventListener("touchstart", onPointer);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onPointer);
-      document.removeEventListener("touchstart", onPointer);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [langOpen]);
-
-  const menuExplore = navKeys.filter((item) => EXPLORE_PATHS.has(item.to));
-  const menuAccount = navKeys.filter((item) => {
-    if (!ACCOUNT_PATHS.has(item.to)) return false;
+  const menuItems = MENU_ORDER.map((to) =>
+    navKeys.find((item) => item.to === to),
+  ).filter((item): item is (typeof navKeys)[number] => {
+    if (!item) return false;
     if (item.to === "/auth" && user) return false;
     if (item.to === "/profile" && !user) return false;
     return true;
@@ -97,7 +73,11 @@ export function Layout() {
   const topItems = navKeys.filter((item) => item.top);
 
   return (
-    <div className={`app-shell liquid-shell${isHome ? " is-home" : ""}`}>
+    <div
+      className={`app-shell liquid-shell${isHome ? " is-home" : ""}${
+        isAuth ? " is-auth" : ""
+      }`}
+    >
       <a className="skip-link" href="#main">
         {t("skip_content")}
       </a>
@@ -174,63 +154,6 @@ export function Layout() {
                 {menuOpen ? <IconClose /> : <IconMenu />}
               </button>
 
-              <div
-                ref={langRef}
-                className={`lang-switch${langOpen ? " is-open" : ""}`}
-              >
-                <button
-                  type="button"
-                  className="lang-btn"
-                  id="lang-btn"
-                  aria-expanded={langOpen}
-                  aria-haspopup="listbox"
-                  aria-controls="lang-menu"
-                  aria-label={t("lang")}
-                  onClick={() => setLangOpen((v) => !v)}
-                >
-                  {langs.find((l) => l.code === lang)?.short}
-                  <motion.span
-                    aria-hidden
-                    animate={{ rotate: langOpen ? 180 : 0 }}
-                    transition={{ duration: 0.25 }}
-                  >
-                    ▾
-                  </motion.span>
-                </button>
-                <AnimatePresence>
-                  {langOpen && (
-                    <motion.ul
-                      id="lang-menu"
-                      className="lang-menu"
-                      role="listbox"
-                      aria-labelledby="lang-btn"
-                      initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                      transition={{ duration: 0.22, ease }}
-                    >
-                      {langs.map((l) => (
-                        <li
-                          key={l.code}
-                          role="option"
-                          aria-selected={l.code === lang}
-                        >
-                          <button
-                            type="button"
-                            className={l.code === lang ? "is-active" : ""}
-                            onClick={() => {
-                              setLang(l.code);
-                              setLangOpen(false);
-                            }}
-                          >
-                            {l.label}
-                          </button>
-                        </li>
-                      ))}
-                    </motion.ul>
-                  )}
-                </AnimatePresence>
-              </div>
               <a className="topbar-cta" href={`tel:${academy.phoneRaw[0]}`}>
                 <span>{t("call")}</span>
               </a>
@@ -254,39 +177,20 @@ export function Layout() {
           variants={{
             hidden: {},
             show: {
-              transition: { staggerChildren: 0.048, delayChildren: 0.1 },
+              transition: { staggerChildren: 0.04, delayChildren: 0.06 },
             },
           }}
         >
-          <motion.p
-            className="site-menu-section"
-            variants={{
-              hidden: { opacity: 0, y: 12 },
-              show: {
-                opacity: 1,
-                y: 0,
-                transition: { duration: 0.3, ease },
-              },
-            }}
-          >
-            {t("menu_explore")}
-          </motion.p>
-          <nav className="site-menu-grid" aria-label={t("menu_explore")}>
-            {menuExplore.map((item) => (
+          <nav className="site-menu-grid" aria-label={t("menu_title")}>
+            {menuItems.map((item) => (
               <motion.div
                 key={item.to}
                 variants={{
-                  hidden: { opacity: 0, y: 18, scale: 0.92 },
+                  hidden: { opacity: 0, y: 10 },
                   show: {
                     opacity: 1,
                     y: 0,
-                    scale: 1,
-                    transition: {
-                      type: "spring",
-                      stiffness: 420,
-                      damping: 26,
-                      mass: 0.7,
-                    },
+                    transition: { duration: 0.28, ease },
                   },
                 }}
               >
@@ -304,65 +208,7 @@ export function Layout() {
                   <span className="site-menu-app-icon" aria-hidden>
                     <NavIcon name={item.icon} />
                   </span>
-                  <span className="site-menu-app-label">
-                    {"tabKey" in item && item.tabKey
-                      ? t(item.tabKey)
-                      : t(item.key)}
-                  </span>
-                </NavLink>
-              </motion.div>
-            ))}
-          </nav>
-
-          <motion.p
-            className="site-menu-section"
-            variants={{
-              hidden: { opacity: 0, y: 12 },
-              show: {
-                opacity: 1,
-                y: 0,
-                transition: { duration: 0.3, ease },
-              },
-            }}
-          >
-            {t("menu_account")}
-          </motion.p>
-          <nav className="site-menu-list" aria-label={t("menu_account")}>
-            {menuAccount.map((item) => (
-              <motion.div
-                key={item.to}
-                variants={{
-                  hidden: { opacity: 0, y: 14, x: -8 },
-                  show: {
-                    opacity: 1,
-                    y: 0,
-                    x: 0,
-                    transition: {
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 28,
-                      mass: 0.72,
-                    },
-                  },
-                }}
-              >
-                <NavLink
-                  to={item.to}
-                  className={({ isActive }) =>
-                    `site-menu-row${isActive ? " is-active" : ""}`
-                  }
-                  onClick={() => {
-                    setMenuOpen(false);
-                    void hapticLight();
-                  }}
-                >
-                  <span className="site-menu-row-icon" aria-hidden>
-                    <NavIcon name={item.icon} />
-                  </span>
-                  <span>{t(item.key)}</span>
-                  <span className="site-menu-row-chevron" aria-hidden>
-                    ›
-                  </span>
+                  <span className="site-menu-app-label">{t(item.key)}</span>
                 </NavLink>
               </motion.div>
             ))}

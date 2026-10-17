@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { matchPath, useLocation } from "react-router-dom";
 import {
+  getCourseById,
   getNewsById,
   getProductById,
   getTravelById,
@@ -35,8 +36,14 @@ export function useDocumentMeta() {
     const shopMatch = matchPath("/shop/:id", pathname);
     const uniMatch = matchPath("/university/:id", pathname);
     const travelMatch = matchPath("/travel/:id", pathname);
+    const courseMatch = matchPath("/courses/:id", pathname);
 
-    if (newsMatch?.params.id) {
+    if (courseMatch?.params.id) {
+      const item = getCourseById(courseMatch.params.id);
+      document.title = item
+        ? `${t(item.titleKey)} · ${BRAND}`
+        : `${t("not_found_title")} · ${BRAND}`;
+    } else if (newsMatch?.params.id) {
       const item = getNewsById(newsMatch.params.id);
       document.title = item
         ? `${t(item.titleKey)} · ${BRAND}`

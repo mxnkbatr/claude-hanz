@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { SafeImage } from "./SafeImage";
 
 type Props = {
@@ -9,22 +8,17 @@ type Props = {
   loading?: "lazy" | "eager";
 };
 
-/** Shared-element media for list → detail morph (layoutId). */
+/** Media wrapper (shared-element morph disabled). */
 export function SharedMedia({
-  id,
+  id: _id,
   src,
   alt = "",
   className = "",
   loading,
 }: Props) {
   return (
-    <motion.div
-      className={`shared-media${className ? ` ${className}` : ""}`}
-      layoutId={`shared-media-${id}`}
-      layout
-      transition={{ type: "spring", stiffness: 380, damping: 36, mass: 0.85 }}
-    >
+    <div className={`shared-media${className ? ` ${className}` : ""}`}>
       <SafeImage src={src} alt={alt} loading={loading} />
-    </motion.div>
+    </div>
   );
 }

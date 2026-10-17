@@ -5,16 +5,19 @@ import { useI18n } from "../i18n/I18nContext";
 type Stat = {
   value: number;
   suffix?: string;
-  labelKey: "stat_branches" | "stat_unis" | "stat_scholarship" | "stat_students";
-  todo?: boolean;
+  labelKey:
+    | "stat_branches"
+    | "stat_unis"
+    | "stat_scholarship"
+    | "stat_students";
 };
 
+/** Client deck (Taniltsuulga): 7300 grads, 1080 scholarships, 300+ unis, 4 branches */
 const STATS: Stat[] = [
+  { value: 7300, suffix: "+", labelKey: "stat_students" },
+  { value: 1080, suffix: "+", labelKey: "stat_scholarship" },
+  { value: 300, suffix: "+", labelKey: "stat_unis" },
   { value: 4, labelKey: "stat_branches" },
-  { value: 4, labelKey: "stat_unis" },
-  { value: 100, suffix: "%", labelKey: "stat_scholarship" },
-  // TODO: replace with real student count when available
-  { value: 0, suffix: "+", labelKey: "stat_students", todo: true },
 ];
 
 function useCountUp(target: number, active: boolean, reduce: boolean | null) {
@@ -51,19 +54,13 @@ function StatItem({
 }) {
   const { t } = useI18n();
   const reduce = useReducedMotion();
-  const n = useCountUp(stat.value, active && !stat.todo, reduce);
+  const n = useCountUp(stat.value, active, reduce);
 
   return (
-    <div className={`stats-item${stat.todo ? " is-todo" : ""}`}>
+    <div className="stats-item">
       <strong className="stats-num">
-        {stat.todo ? (
-          <span title="TODO">{t("stat_todo")}</span>
-        ) : (
-          <>
-            {n}
-            {stat.suffix}
-          </>
-        )}
+        {n}
+        {stat.suffix}
       </strong>
       <span className="stats-label">{t(stat.labelKey)}</span>
     </div>

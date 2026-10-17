@@ -5,6 +5,7 @@ import {
   useReducedMotion,
   type PanInfo,
 } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import { useI18n } from "../i18n/I18nContext";
 import { hapticLight } from "../lib/native";
 import { lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
@@ -43,6 +44,9 @@ function isMobileViewport() {
 export function shouldShowOnboard() {
   if (typeof window === "undefined") return false;
   if (!isMobileViewport()) return false;
+  // Don't block auth / admin flows
+  const path = window.location.pathname;
+  if (path.startsWith("/auth") || path.startsWith("/admin")) return false;
   try {
     return localStorage.getItem(STORAGE_KEY) !== "1";
   } catch {
@@ -60,12 +64,22 @@ function markOnboardSeen() {
 
 export function Onboard() {
   const { t } = useI18n();
+  const location = useLocation();
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(() => shouldShowOnboard());
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(0);
   const last = step >= slides.length - 1;
   const slide = slides[step];
+
+  useEffect(() => {
+    if (
+      location.pathname.startsWith("/auth") ||
+      location.pathname.startsWith("/admin")
+    ) {
+      setOpen(false);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!open) return;

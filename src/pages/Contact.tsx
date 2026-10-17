@@ -57,6 +57,24 @@ export function Contact() {
                 ›
               </span>
             </a>
+            <div className="app-row app-row-static">
+              <span className="app-row-icon" aria-hidden>
+                地
+              </span>
+              <span className="app-row-body">
+                <strong>{t("hours_label")}</strong>
+                <em>{academy.hours}</em>
+              </span>
+            </div>
+            <div className="app-row app-row-static">
+              <span className="app-row-icon" aria-hidden>
+                址
+              </span>
+              <span className="app-row-body">
+                <strong>{t("footer_address")}</strong>
+                <em>{academy.address}</em>
+              </span>
+            </div>
             <Link to="/enroll" className="app-row">
               <span className="app-row-icon" aria-hidden>
                 汉

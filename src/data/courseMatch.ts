@@ -1,25 +1,25 @@
-import { kidsLevels } from "./content";
+import { coursesMeta, kidsLevels } from "./content";
 
 export type CourseFilter =
   | "all"
-  | "kids"
-  | "hsk"
-  | "csca"
-  | "speak"
-  | "year";
+  | "classroom"
+  | "online"
+  | "corporate"
+  | "short"
+  | "kids";
 
 export const courseFilters: CourseFilter[] = [
   "all",
+  "classroom",
+  "online",
+  "corporate",
+  "short",
   "kids",
-  "hsk",
-  "csca",
-  "speak",
-  "year",
 ];
 
 export type MatchAnswer = {
   who: "child" | "adult" | "";
-  goal: "speak" | "hsk" | "csca" | "year" | "kids" | "";
+  goal: "speak" | "hsk" | "year" | "online" | "kids" | "classroom" | "";
   when: "weekday" | "weekend" | "";
   age: "7-8" | "9-11" | "12-14" | "";
 };
@@ -32,48 +32,6 @@ export type MatchResult = {
   descKey: string;
   reasonKey: string;
 };
-
-export const matchQuestions = [
-  {
-    id: "who",
-    promptKey: "cmatch_q_who",
-    options: [
-      { value: "child", labelKey: "cmatch_a_child" },
-      { value: "adult", labelKey: "cmatch_a_adult" },
-    ],
-  },
-  {
-    id: "goal",
-    promptKey: "cmatch_q_goal",
-    optionsFor: {
-      child: [{ value: "kids", labelKey: "cmatch_a_kids_fun" }],
-      adult: [
-        { value: "speak", labelKey: "cmatch_a_speak" },
-        { value: "hsk", labelKey: "cmatch_a_hsk" },
-        { value: "csca", labelKey: "cmatch_a_csca" },
-        { value: "year", labelKey: "cmatch_a_year" },
-      ],
-    },
-  },
-  {
-    id: "when",
-    promptKey: "cmatch_q_when",
-    options: [
-      { value: "weekday", labelKey: "cmatch_a_weekday" },
-      { value: "weekend", labelKey: "cmatch_a_weekend" },
-    ],
-  },
-  {
-    id: "age",
-    promptKey: "cmatch_q_age",
-    onlyWhen: { who: "child" },
-    options: [
-      { value: "7-8", labelKey: "kids_lvl_beginner_age" },
-      { value: "9-11", labelKey: "kids_lvl_elementary_age" },
-      { value: "12-14", labelKey: "kids_lvl_intermediate_age" },
-    ],
-  },
-] as const;
 
 export function resolveMatch(a: MatchAnswer): MatchResult {
   const scheduleHint =
@@ -95,19 +53,19 @@ export function resolveMatch(a: MatchAnswer): MatchResult {
       courseId: "kids",
       kidsLevelId: level.id,
       scheduleHint,
-      titleKey: level.labelKey,
+      titleKey: "course_kids_t",
       descKey: level.descKey,
       reasonKey: "cmatch_reason_kids",
     };
   }
 
-  if (a.goal === "csca") {
+  if (a.goal === "online") {
     return {
-      courseId: "csca",
+      courseId: "online",
       scheduleHint,
-      titleKey: "course_csca_t",
-      descKey: "course_csca_d",
-      reasonKey: "cmatch_reason_csca",
+      titleKey: "course_online_t",
+      descKey: "course_online_d",
+      reasonKey: "cmatch_reason_online",
     };
   }
   if (a.goal === "hsk") {
@@ -128,20 +86,31 @@ export function resolveMatch(a: MatchAnswer): MatchResult {
       reasonKey: "cmatch_reason_year",
     };
   }
+  if (a.goal === "speak") {
+    return {
+      courseId: "speak",
+      scheduleHint,
+      titleKey: "course_speak_t",
+      descKey: "course_speak_d",
+      reasonKey: "cmatch_reason_speak",
+    };
+  }
+
+  const classroom = coursesMeta.find((c) => c.id === "classroom")!;
   return {
-    courseId: "speak",
+    courseId: classroom.id,
     scheduleHint,
-    titleKey: "course_speak_t",
-    descKey: "course_speak_d",
-    reasonKey: "cmatch_reason_speak",
+    titleKey: classroom.titleKey,
+    descKey: classroom.descKey,
+    reasonKey: "cmatch_reason_classroom",
   };
 }
 
 export function filterKeyLabel(f: CourseFilter): string {
   if (f === "all") return "filter_all";
-  if (f === "kids") return "tag_kids";
-  if (f === "hsk") return "cmatch_filter_hsk";
-  if (f === "csca") return "cmatch_filter_csca";
-  if (f === "speak") return "cmatch_filter_speak";
-  return "cmatch_filter_year";
+  if (f === "classroom") return "tag_classroom";
+  if (f === "online") return "tag_online";
+  if (f === "corporate") return "tag_corporate";
+  if (f === "short") return "tag_short";
+  return "tag_kids";
 }

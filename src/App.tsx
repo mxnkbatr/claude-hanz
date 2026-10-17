@@ -3,6 +3,7 @@ import { Layout } from "./components/Layout";
 import { Home } from "./pages/Home";
 import { About } from "./pages/About";
 import { Courses } from "./pages/Courses";
+import { CourseDetail } from "./pages/CourseDetail";
 import { News } from "./pages/News";
 import { NewsDetail } from "./pages/NewsDetail";
 import { University } from "./pages/University";
@@ -40,6 +41,7 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
           <Route path="courses" element={<Courses />} />
+          <Route path="courses/:id" element={<CourseDetail />} />
           <Route path="enroll" element={<Enroll />} />
           <Route path="medee" element={<News />} />
           <Route path="medee/:id" element={<NewsDetail />} />

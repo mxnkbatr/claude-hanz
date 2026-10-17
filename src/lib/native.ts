@@ -45,3 +45,23 @@ export async function hapticLight() {
     /* ignore */
   }
 }
+
+export async function hapticMedium() {
+  if (!Capacitor.isNativePlatform()) return;
+  try {
+    const { Haptics, ImpactStyle } = await import("@capacitor/haptics");
+    await Haptics.impact({ style: ImpactStyle.Medium });
+  } catch {
+    /* ignore */
+  }
+}
+
+export async function hapticSuccess() {
+  if (!Capacitor.isNativePlatform()) return;
+  try {
+    const { Haptics, NotificationType } = await import("@capacitor/haptics");
+    await Haptics.notification({ type: NotificationType.Success });
+  } catch {
+    /* ignore */
+  }
+}
