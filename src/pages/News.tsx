@@ -6,6 +6,7 @@ import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell
 import { SharedMedia } from "../components/SharedMedia";
 import { useI18n } from "../i18n/I18nContext";
 import { useSiteContent } from "../lib/SiteContentContext";
+import { loc } from "../lib/i18nText";
 import { hapticLight } from "../lib/native";
 
 const filters: NewsTag[] = ["all", "tag_study", "tag_course", "tag_academy"];
@@ -15,7 +16,7 @@ function isNew(date: string) {
 }
 
 export function News() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { newsLive } = useSiteContent();
   const [filter, setFilter] = useState<NewsTag>("all");
   const [q, setQ] = useState("");
@@ -44,10 +45,11 @@ export function News() {
     const query = q.trim().toLowerCase();
     if (!query) return base;
     return base.filter((n) => {
-      const hay = `${t(n.titleKey)} ${t(n.excerptKey)} ${t(n.tagKey)}`.toLowerCase();
+      const hay =
+        `${loc(lang, t, n.title, n.titleKey)} ${loc(lang, t, n.excerpt, n.excerptKey)} ${loc(lang, t, n.tag, n.tagKey)}`.toLowerCase();
       return hay.includes(query);
     });
-  }, [filter, q, t, newsLive]);
+  }, [filter, q, t, lang, newsLive]);
 
   const hasQuery = q.trim().length > 0;
   const isFiltered = filter !== "all" || hasQuery;
@@ -110,33 +112,38 @@ export function News() {
           <p className="ios-empty">{t("empty_filter")}</p>
         ) : (
           <Stagger className="ios-feed ios-feed-news">
-            {list.map((item) => (
-              <StaggerItem key={item.id}>
-                <AppLink
-                  to={`/medee/${item.id}`}
-                  className="ios-card"
-                  onClick={() => void hapticLight()}
-                >
-                  <div className="ios-card-media">
-                    <SharedMedia
-                      id={`news-${item.id}`}
-                      src={item.image}
-                      alt={t(item.titleKey)}
-                    />
-                    {isNew(item.date) && (
-                      <em className="ios-badge">{t("badge_new")}</em>
-                    )}
-                  </div>
-                  <div className="ios-card-body">
-                    <span className="ios-meta">
-                      {t(item.tagKey)} · {item.date}
-                    </span>
-                    <h3>{t(item.titleKey)}</h3>
-                    <p className="ios-card-desc">{t(item.excerptKey)}</p>
-                  </div>
-                </AppLink>
-              </StaggerItem>
-            ))}
+            {list.map((item) => {
+              const title = loc(lang, t, item.title, item.titleKey);
+              const excerpt = loc(lang, t, item.excerpt, item.excerptKey);
+              const tag = loc(lang, t, item.tag, item.tagKey);
+              return (
+                <StaggerItem key={item.id}>
+                  <AppLink
+                    to={`/medee/${item.id}`}
+                    className="ios-card"
+                    onClick={() => void hapticLight()}
+                  >
+                    <div className="ios-card-media">
+                      <SharedMedia
+                        id={`news-${item.id}`}
+                        src={item.image}
+                        alt={title}
+                      />
+                      {isNew(item.date) && (
+                        <em className="ios-badge">{t("badge_new")}</em>
+                      )}
+                    </div>
+                    <div className="ios-card-body">
+                      <span className="ios-meta">
+                        {tag} · {item.date}
+                      </span>
+                      <h3>{title}</h3>
+                      <p className="ios-card-desc">{excerpt}</p>
+                    </div>
+                  </AppLink>
+                </StaggerItem>
+              );
+            })}
           </Stagger>
         )}
       </section>

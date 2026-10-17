@@ -13,7 +13,7 @@ export function Logo({ size = "md", showText = true }: LogoProps) {
   return (
     <span className="brand-logo">
       <img
-        src="/images/logo-official.jpg"
+        src="/images/logo-official.webp"
         alt={t("brand")}
         width={px}
         height={px}

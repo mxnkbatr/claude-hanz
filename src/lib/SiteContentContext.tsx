@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { supabase } from "./supabase";
+import { listCms, type CmsRow } from "./cmsApi";
 import {
   emptyBundle,
   mergeAcademy,
@@ -36,17 +37,43 @@ const SiteCtx = createContext<Ctx | null>(null);
 
 export function SiteContentProvider({ children }: { children: ReactNode }) {
   const [bundle, setBundle] = useState<SiteBundle>(emptyBundle);
+  const [cms, setCms] = useState<{
+    news: CmsRow[];
+    products: CmsRow[];
+    courses: CmsRow[];
+    travel: CmsRow[];
+    universities: CmsRow[];
+  }>({
+    news: [],
+    products: [],
+    courses: [],
+    travel: [],
+    universities: [],
+  });
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    const { data, error } = await supabase
-      .from("site_content")
-      .select("data")
-      .eq("id", 1)
-      .maybeSingle();
-    if (!error && data?.data && typeof data.data === "object") {
-      setBundle({ ...emptyBundle(), ...(data.data as SiteBundle) });
+    const [siteRes, news, products, courses, travel, universities] =
+      await Promise.all([
+        supabase.from("site_content").select("data").eq("id", 1).maybeSingle(),
+        listCms("news"),
+        listCms("products"),
+        listCms("courses"),
+        listCms("travel_packages"),
+        listCms("universities"),
+      ]);
+
+    if (!siteRes.error && siteRes.data?.data && typeof siteRes.data.data === "object") {
+      setBundle({ ...emptyBundle(), ...(siteRes.data.data as SiteBundle) });
     }
+
+    setCms({
+      news: news.error ? [] : news.data,
+      products: products.error ? [] : products.data,
+      courses: courses.error ? [] : courses.data,
+      travel: travel.error ? [] : travel.data,
+      universities: universities.error ? [] : universities.data,
+    });
     setLoading(false);
   }, []);
 
@@ -55,13 +82,11 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   const saveBundle = useCallback(async (next: SiteBundle) => {
-    const { error } = await supabase
-      .from("site_content")
-      .upsert({
-        id: 1,
-        data: next,
-        updated_at: new Date().toISOString(),
-      });
+    const { error } = await supabase.from("site_content").upsert({
+      id: 1,
+      data: next,
+      updated_at: new Date().toISOString(),
+    });
     if (error) return { error: error.message };
     setBundle(next);
     return {};
@@ -74,13 +99,13 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
       saveBundle,
       refresh,
       academyLive: mergeAcademy(bundle),
-      newsLive: mergeNews(bundle),
-      productsLive: mergeProducts(bundle),
-      coursesLive: mergeCourses(bundle),
-      travelLive: mergeTravel(bundle),
-      universitiesLive: mergeUniversities(bundle),
+      newsLive: mergeNews(bundle, cms.news),
+      productsLive: mergeProducts(bundle, cms.products),
+      coursesLive: mergeCourses(bundle, cms.courses),
+      travelLive: mergeTravel(bundle, cms.travel),
+      universitiesLive: mergeUniversities(bundle, cms.universities),
     }),
-    [bundle, loading, refresh, saveBundle],
+    [bundle, cms, loading, refresh, saveBundle],
   );
 
   return <SiteCtx.Provider value={value}>{children}</SiteCtx.Provider>;
@@ -88,6 +113,8 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
 
 export function useSiteContent() {
   const ctx = useContext(SiteCtx);
-  if (!ctx) throw new Error("useSiteContent must be used within SiteContentProvider");
+  if (!ctx) {
+    throw new Error("useSiteContent must be used within SiteContentProvider");
+  }
   return ctx;
 }

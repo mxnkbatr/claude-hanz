@@ -17,6 +17,12 @@ const pageMarks: Record<string, string> = {
   enroll: "✓",
 };
 
+function inLastMs(iso: string, ms: number) {
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return false;
+  return Date.now() - t <= ms;
+}
+
 export function AdminDashboard() {
   const { t } = useI18n();
   const [rows, setRows] = useState<EnrollmentRow[]>([]);
@@ -27,7 +33,7 @@ export function AdminDashboard() {
       .from("enrollments")
       .select("*")
       .order("created_at", { ascending: false })
-      .limit(80)
+      .limit(400)
       .then(({ data, error }) => {
         if (error) {
           setErr(error.message);
@@ -38,12 +44,15 @@ export function AdminDashboard() {
   }, []);
 
   const stats = useMemo(() => {
-    const total = rows.length;
+    const day = 86400000;
+    const today = rows.filter((r) => inLastMs(r.created_at, day)).length;
+    const week = rows.filter((r) => inLastMs(r.created_at, day * 7)).length;
+    const month = rows.filter((r) => inLastMs(r.created_at, day * 30)).length;
     const neu = rows.filter((r) => (r.status || "new") === "new").length;
     const course = rows.filter((r) => r.kind === "course").length;
     const travel = rows.filter((r) => r.kind === "travel").length;
     const consult = rows.filter((r) => r.kind === "consult").length;
-    return { total, neu, course, travel, consult };
+    return { today, week, month, neu, course, travel, consult, total: rows.length };
   }, [rows]);
 
   return (
@@ -57,8 +66,16 @@ export function AdminDashboard() {
 
       <div className="admin-stats">
         <article>
-          <em>{t("admin_stat_total")}</em>
-          <strong>{stats.total}</strong>
+          <em>{t("admin_stat_today")}</em>
+          <strong>{stats.today}</strong>
+        </article>
+        <article>
+          <em>{t("admin_stat_week")}</em>
+          <strong>{stats.week}</strong>
+        </article>
+        <article>
+          <em>{t("admin_stat_month")}</em>
+          <strong>{stats.month}</strong>
         </article>
         <article>
           <em>{t("admin_stat_new")}</em>
@@ -80,8 +97,8 @@ export function AdminDashboard() {
 
       <section className="admin-card">
         <div className="admin-card-head">
-          <h2>{t("admin_pages")}</h2>
-          <Link to="/admin/pages">{t("admin_manage")}</Link>
+          <h2>{t("admin_cms")}</h2>
+          <Link to="/admin/news">{t("admin_manage")}</Link>
         </div>
         <div className="admin-page-grid">
           {ADMIN_PAGES.map((p) => (
@@ -94,7 +111,12 @@ export function AdminDashboard() {
                 <Link to={p.adminTo} className="admin-btn is-seal">
                   {t("admin_manage")}
                 </Link>
-                <a className="admin-btn" href={p.to} target="_blank" rel="noreferrer">
+                <a
+                  className="admin-btn"
+                  href={p.to}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {t("admin_preview")}
                 </a>
               </div>

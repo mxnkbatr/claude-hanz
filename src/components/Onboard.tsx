@@ -19,19 +19,19 @@ const slides = [
     key: "welcome",
     title: "onboard_1_title",
     body: "onboard_1_body",
-    image: "/images/hero-wall.jpg",
+    image: "/images/hero-wall.webp",
   },
   {
     key: "learn",
     title: "onboard_2_title",
     body: "onboard_2_body",
-    image: "/images/hero-palace.jpg",
+    image: "/images/hero-palace.webp",
   },
   {
     key: "start",
     title: "onboard_3_title",
     body: "onboard_3_body",
-    image: "/images/hero-hanz.jpg",
+    image: "/images/hero-hanz.webp",
   },
 ] as const;
 

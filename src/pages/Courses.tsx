@@ -14,6 +14,7 @@ import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell
 import { SafeImage } from "../components/SafeImage";
 import { useI18n } from "../i18n/I18nContext";
 import { useSiteContent } from "../lib/SiteContentContext";
+import { loc } from "../lib/i18nText";
 import { hapticLight } from "../lib/native";
 import { ease } from "../lib/motion";
 
@@ -28,7 +29,7 @@ const emptyMatch: MatchAnswer = {
 };
 
 export function Courses() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { coursesLive } = useSiteContent();
 
   const [q, setQ] = useState("");
@@ -56,10 +57,10 @@ export function Courses() {
     if (!query) return base;
     return base.filter((c) => {
       const hay =
-        `${t(c.titleKey)} ${t(c.descKey)} ${t(c.tagKey)} ${t(c.unitKey)}`.toLowerCase();
+        `${loc(lang, t, c.title, c.titleKey)} ${loc(lang, t, c.body, c.descKey)} ${loc(lang, t, c.tag, c.tagKey)} ${c.unitKey ? t(c.unitKey) : ""}`.toLowerCase();
       return hay.includes(query);
     });
-  }, [coursesLive, filter, q, t]);
+  }, [coursesLive, filter, q, t, lang]);
 
   const hasQuery = q.trim().length > 0;
   const isFiltered = filter !== "all" || hasQuery;
@@ -351,14 +352,16 @@ export function Courses() {
                   <div className="course-product-media">
                     <SafeImage
                       src={c.image}
-                      alt={t(c.titleKey)}
+                      alt={loc(lang, t, c.title, c.titleKey)}
                       loading="lazy"
                     />
-                    <span className="course-product-tag">{t(c.tagKey)}</span>
+                    <span className="course-product-tag">
+                      {loc(lang, t, c.tag, c.tagKey)}
+                    </span>
                   </div>
                   <div className="course-product-body">
-                    <h3>{t(c.titleKey)}</h3>
-                    <p>{t(c.unitKey)}</p>
+                    <h3>{loc(lang, t, c.title, c.titleKey)}</h3>
+                    <p>{loc(lang, t, c.body, c.descKey) || t(c.unitKey)}</p>
                     <em>
                       {t("view_detail")} <i aria-hidden>→</i>
                     </em>

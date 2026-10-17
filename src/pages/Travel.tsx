@@ -5,6 +5,7 @@ import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell
 import { SharedMedia } from "../components/SharedMedia";
 import { useI18n } from "../i18n/I18nContext";
 import { useSiteContent } from "../lib/SiteContentContext";
+import { loc } from "../lib/i18nText";
 import { hapticLight } from "../lib/native";
 
 type TravelFilter = "all" | "travel_tag_asia" | "travel_tag_europe";
@@ -16,7 +17,7 @@ const FILTERS: TravelFilter[] = [
 ];
 
 export function Travel() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { travelLive } = useSiteContent();
   const [filter, setFilter] = useState<TravelFilter>("all");
   const [q, setQ] = useState("");
@@ -48,10 +49,10 @@ export function Travel() {
     if (!query) return base;
     return base.filter((p) => {
       const hay =
-        `${t(p.titleKey)} ${t(p.descKey)} ${t(p.tagKey)}`.toLowerCase();
+        `${loc(lang, t, p.title, p.titleKey)} ${loc(lang, t, p.body, p.descKey)} ${loc(lang, t, p.tag, p.tagKey)}`.toLowerCase();
       return hay.includes(query);
     });
-  }, [filter, q, t, travelLive]);
+  }, [filter, q, t, lang, travelLive]);
 
   const hasQuery = q.trim().length > 0;
   const isFiltered = filter !== "all" || hasQuery;
@@ -121,15 +122,17 @@ export function Travel() {
                     <SharedMedia
                       id={`travel-${p.id}`}
                       src={p.image}
-                      alt={t(p.titleKey)}
+                      alt={loc(lang, t, p.title, p.titleKey)}
                     />
                     <span className="ios-badge ios-badge-soft">
-                      {t(p.tagKey)}
+                      {loc(lang, t, p.tag, p.tagKey)}
                     </span>
                   </div>
                   <div className="ios-card-body">
-                    <h3>{t(p.titleKey)}</h3>
-                    <p className="ios-card-desc">{t(p.descKey)}</p>
+                    <h3>{loc(lang, t, p.title, p.titleKey)}</h3>
+                    <p className="ios-card-desc">
+                      {loc(lang, t, p.body, p.descKey)}
+                    </p>
                     <ul className="ios-card-points">
                       {p.highlights.slice(0, 2).map((h) => (
                         <li key={h}>{t(h)}</li>

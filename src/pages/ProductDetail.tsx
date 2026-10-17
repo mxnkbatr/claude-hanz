@@ -7,6 +7,8 @@ import { SafeImage } from "../components/SafeImage";
 import { SharedMedia } from "../components/SharedMedia";
 import { useI18n } from "../i18n/I18nContext";
 import { useSiteContent } from "../lib/SiteContentContext";
+import type { ProductLive } from "../lib/cms";
+import { loc } from "../lib/i18nText";
 import { ease } from "../lib/motion";
 
 export function ProductDetail() {
@@ -14,15 +16,26 @@ export function ProductDetail() {
   const { t, lang } = useI18n();
   const { productsLive } = useSiteContent();
   const reduce = useReducedMotion();
-  const p = productsLive.find((x) => x.id === id) ?? getProductById(id);
+  const p = (productsLive.find((x) => x.id === id) ??
+    getProductById(id)) as ProductLive | undefined;
 
   if (!p) return <Navigate to="/shop" replace />;
 
   const related = productsLive.filter((x) => x.id !== p.id).slice(0, 3);
-  const paragraphs = t(p.bodyKey)
+  const title = loc(lang, t, p.title, p.titleKey);
+  const desc = loc(lang, t, p.body, p.descKey);
+  const bodyText = loc(lang, t, p.body, p.bodyKey || p.descKey);
+  const paragraphs = bodyText
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
+  const specs = p.specs ?? [];
+  const catLabel =
+    p.cat === "books"
+      ? t("cat_books")
+      : p.cat === "porcelain"
+        ? t("cat_porcelain")
+        : loc(lang, t, p.tag, p.tagKey) || t("nav_shop");
 
   return (
     <PageShell className="page-detail page-shop is-app ios-app">
@@ -38,7 +51,7 @@ export function ProductDetail() {
             <SharedMedia
               id={`shop-${p.id}`}
               src={p.image}
-              alt={t(p.titleKey)}
+              alt={title}
               loading="eager"
             />
           </div>
@@ -51,19 +64,23 @@ export function ProductDetail() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.08, duration: 0.35, ease }}
           >
-            {t(p.cat === "porcelain" ? "cat_porcelain" : "cat_books")} ·{" "}
-            {p.inStock ? t("in_stock") : t("out_stock")}
+            {catLabel} · {p.inStock ? t("in_stock") : t("out_stock")}
           </motion.p>
-          <h1 className="h1">{t(p.titleKey)}</h1>
+          <h1 className="h1">{title}</h1>
           <motion.p
             className="app-price"
             initial={reduce ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12, type: "spring", stiffness: 380, damping: 28 }}
+            transition={{
+              delay: 0.12,
+              type: "spring",
+              stiffness: 380,
+              damping: 28,
+            }}
           >
             {formatPrice(p.price, lang)}
           </motion.p>
-          <p className="app-sub">{t(p.descKey)}</p>
+          <p className="app-sub">{desc}</p>
 
           <div className="desk-article-copy">
             {paragraphs.map((para) => (
@@ -71,32 +88,42 @@ export function ProductDetail() {
             ))}
           </div>
 
-          <h2 className="desk-detail-label">{t("detail_specs")}</h2>
-          <ul className="app-chips product-spec-chips">
-            {p.specs.map((s, i) => (
-              <motion.li
-                key={s}
-                initial={reduce ? false : { opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.16 + i * 0.06, duration: 0.3, ease }}
-              >
-                {t(s)}
-              </motion.li>
-            ))}
-          </ul>
+          {specs.length > 0 && (
+            <>
+              <h2 className="desk-detail-label">{t("detail_specs")}</h2>
+              <ul className="app-chips product-spec-chips">
+                {specs.map((s, i) => (
+                  <motion.li
+                    key={s}
+                    initial={reduce ? false : { opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: 0.16 + i * 0.06,
+                      duration: 0.3,
+                      ease,
+                    }}
+                  >
+                    {t(s)}
+                  </motion.li>
+                ))}
+              </ul>
+            </>
+          )}
 
           <div className="app-sticky-actions desk-detail-actions product-cta-row">
-            <motion.a
-              href={p.href}
-              className="btn btn-seal"
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={reduce ? undefined : { y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 420, damping: 28 }}
-            >
-              <span>{t("buy")}</span>
-            </motion.a>
+            {p.href && (
+              <motion.a
+                href={p.href}
+                className="btn btn-seal"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={reduce ? undefined : { y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 420, damping: 28 }}
+              >
+                <span>{t("buy")}</span>
+              </motion.a>
+            )}
             <motion.div
               whileHover={reduce ? undefined : { y: -2 }}
               whileTap={{ scale: 0.98 }}
@@ -124,7 +151,7 @@ export function ProductDetail() {
                     <SafeImage src={item.image} alt="" />
                   </span>
                   <span className="app-row-body">
-                    <strong>{t(item.titleKey)}</strong>
+                    <strong>{loc(lang, t, item.title, item.titleKey)}</strong>
                     <em>{formatPrice(item.price, lang)}</em>
                   </span>
                   <span className="app-row-chevron" aria-hidden>

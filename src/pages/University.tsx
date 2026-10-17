@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { chinaProgramsMeta } from "../data/content";
 import { AppLink } from "../components/AppLink";
 import { ConsultForm } from "../components/ConsultForm";
 import { IosFilterBar } from "../components/IosFilterBar";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
 import { useI18n } from "../i18n/I18nContext";
+import { useSiteContent } from "../lib/SiteContentContext";
+import { loc } from "../lib/i18nText";
 import { hapticLight } from "../lib/native";
 
 type UniCityFilter =
@@ -45,17 +46,19 @@ const compareRows = [
 ] as const;
 
 export function University() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const { universitiesLive } = useSiteContent();
   const [q, setQ] = useState("");
   const [city, setCity] = useState<UniCityFilter>("all");
 
   const counts = useMemo(() => {
-    const map: Record<string, number> = { all: chinaProgramsMeta.length };
-    for (const p of chinaProgramsMeta) {
-      map[p.cityKey] = (map[p.cityKey] || 0) + 1;
+    const map: Record<string, number> = { all: universitiesLive.length };
+    for (const p of universitiesLive) {
+      const key = p.cityKey || "all";
+      map[key] = (map[key] || 0) + 1;
     }
     return map;
-  }, []);
+  }, [universitiesLive]);
 
   const options = useMemo(
     () =>
@@ -70,16 +73,16 @@ export function University() {
   const schools = useMemo(() => {
     const byCity =
       city === "all"
-        ? chinaProgramsMeta
-        : chinaProgramsMeta.filter((p) => p.cityKey === city);
+        ? universitiesLive
+        : universitiesLive.filter((p) => (p.cityKey || "") === city);
     const query = q.trim().toLowerCase();
     if (!query) return byCity;
     return byCity.filter((p) => {
       const hay =
-        `${t(p.titleKey)} ${t(p.nameMnKey)} ${t(p.nameZhKey)} ${t(p.cityKey)} ${t(p.descKey)}`.toLowerCase();
+        `${loc(lang, t, p.title, p.titleKey)} ${loc(lang, t, p.title, p.nameMnKey)} ${loc(lang, t, p.title, p.nameZhKey)} ${loc(lang, t, p.city, p.cityKey)} ${loc(lang, t, p.body, p.descKey)}`.toLowerCase();
       return hay.includes(query);
     });
-  }, [city, q, t]);
+  }, [city, q, t, lang, universitiesLive]);
 
   const hasQuery = q.trim().length > 0;
   const isFiltered = city !== "all" || hasQuery;
@@ -152,13 +155,22 @@ export function University() {
                   onClick={() => void hapticLight()}
                 >
                   <div className="ios-card-media">
-                    <SafeImage src={p.image} alt={t(p.nameMnKey)} />
-                    <span className="ios-badge ios-badge-soft">{t(p.cityKey)}</span>
+                    <SafeImage
+                      src={p.image}
+                      alt={loc(lang, t, p.title, p.nameMnKey || p.titleKey)}
+                    />
+                    <span className="ios-badge ios-badge-soft">
+                      {loc(lang, t, p.city, p.cityKey)}
+                    </span>
                   </div>
                   <div className="ios-card-body">
-                    <h3>{t(p.nameMnKey)}</h3>
-                    <p className="ios-card-sub">{t(p.titleKey)}</p>
-                    <p className="ios-card-desc">{t(p.descKey)}</p>
+                    <h3>{loc(lang, t, p.title, p.nameMnKey || p.titleKey)}</h3>
+                    <p className="ios-card-sub">
+                      {loc(lang, t, p.title, p.titleKey)}
+                    </p>
+                    <p className="ios-card-desc">
+                      {loc(lang, t, p.body, p.descKey)}
+                    </p>
                   </div>
                 </AppLink>
               </StaggerItem>

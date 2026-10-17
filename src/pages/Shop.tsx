@@ -25,7 +25,8 @@ export function Shop() {
   const counts = useMemo(() => {
     const map: Record<string, number> = { all: productsLive.length };
     for (const p of productsLive) {
-      map[p.cat] = (map[p.cat] || 0) + 1;
+      const key = p.cat || "all";
+      map[key] = (map[key] || 0) + 1;
     }
     return map;
   }, [productsLive]);
@@ -34,7 +35,7 @@ export function Shop() {
     () =>
       cat === "all"
         ? productsLive
-        : productsLive.filter((p) => p.cat === cat),
+        : productsLive.filter((p) => (p.cat || "") === cat),
     [cat, productsLive],
   );
 
@@ -53,7 +54,7 @@ export function Shop() {
       <Reveal className="desk-only">
         <div className="shop-banner">
           <div className="shop-banner-media">
-            <SafeImage src="/images/shop-hero.jpg" alt={t("shop_hero_t")} />
+            <SafeImage src="/images/shop-hero.webp" alt={t("shop_hero_t")} />
           </div>
           <div className="shop-banner-copy">
             <p className="eyebrow light">{t("shop_featured")}</p>

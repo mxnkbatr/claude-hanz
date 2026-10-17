@@ -32,7 +32,7 @@ export const coursesMeta = [
     unitKey: "course_classroom_u",
     icon: "堂",
     filter: "classroom" as const,
-    image: "/courses/image12.jpeg",
+    image: "/courses/image12.webp",
     highlights: [
       "course_classroom_h1",
       "course_classroom_h2",
@@ -48,7 +48,7 @@ export const coursesMeta = [
     unitKey: "course_online_u",
     icon: "网",
     filter: "online" as const,
-    image: "/courses/image14.png",
+    image: "/courses/image14.webp",
     highlights: [
       "course_online_h1",
       "course_online_h2",
@@ -64,7 +64,7 @@ export const coursesMeta = [
     unitKey: "course_corporate_u",
     icon: "企",
     filter: "corporate" as const,
-    image: "/courses/image15.jpg",
+    image: "/courses/image15.webp",
     highlights: [
       "course_corporate_h1",
       "course_corporate_h2",
@@ -80,7 +80,7 @@ export const coursesMeta = [
     unitKey: "course_short_u",
     icon: "暑",
     filter: "short" as const,
-    image: "/courses/image16.jpg",
+    image: "/courses/image16.webp",
     highlights: [
       "course_short_h1",
       "course_short_h2",
@@ -96,7 +96,7 @@ export const coursesMeta = [
     unitKey: "course_year_u",
     icon: "年",
     filter: "classroom" as const,
-    image: "/courses/image4.jpg",
+    image: "/courses/image4.webp",
     highlights: ["course_year_h1", "course_year_h2", "course_year_h3"] as const,
   },
   {
@@ -108,7 +108,7 @@ export const coursesMeta = [
     unitKey: "course_hsk_u",
     icon: "汉",
     filter: "classroom" as const,
-    image: "/courses/image8.png",
+    image: "/courses/image8.webp",
     highlights: ["course_hsk_h1", "course_hsk_h2", "course_hsk_h3"] as const,
   },
   {
@@ -120,7 +120,7 @@ export const coursesMeta = [
     unitKey: "course_speak_u",
     icon: "说",
     filter: "classroom" as const,
-    image: "/courses/image11.jpeg",
+    image: "/courses/image11.webp",
     highlights: [
       "course_speak_h1",
       "course_speak_h2",
@@ -136,7 +136,7 @@ export const coursesMeta = [
     unitKey: "course_english_u",
     icon: "英",
     filter: "classroom" as const,
-    image: "/courses/image20.jpg",
+    image: "/courses/image20.webp",
     highlights: [
       "course_english_h1",
       "course_english_h2",
@@ -152,7 +152,7 @@ export const coursesMeta = [
     unitKey: "course_kids_u",
     icon: "童",
     filter: "kids" as const,
-    image: "/courses/image21.jpg",
+    image: "/courses/image21.webp",
     highlights: [
       "kids_detail_h1",
       "kids_detail_h2",
@@ -637,7 +637,7 @@ export const shopProductsMeta = [
     tagKey: "tag_brand",
     cat: "porcelain" as const,
     price: 100000,
-    image: "/images/shop-1.jpg",
+    image: "/images/shop-1.webp",
     href: "https://bumtankhanz.mn",
     descKey: "prod1_d",
     bodyKey: "prod1_b",
@@ -651,7 +651,7 @@ export const shopProductsMeta = [
     tagKey: "tag_best",
     cat: "porcelain" as const,
     price: 350000,
-    image: "/images/shop-2.jpg",
+    image: "/images/shop-2.webp",
     href: "https://bumtankhanz.mn",
     descKey: "prod2_d",
     bodyKey: "prod2_b",

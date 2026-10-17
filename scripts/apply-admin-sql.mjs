@@ -43,7 +43,11 @@ async function main() {
     process.exit(1);
   }
 
-  for (const file of ["supabase/enrollments.sql", "supabase/admin.sql"]) {
+  for (const file of [
+    "supabase/enrollments.sql",
+    "supabase/admin.sql",
+    "supabase/cms.sql",
+  ]) {
     try {
       await client.query(fs.readFileSync(file, "utf8"));
       console.log(file, "OK");

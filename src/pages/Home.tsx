@@ -13,13 +13,14 @@ import { StatsStrip } from "../components/StatsStrip";
 import { MagneticButton } from "../components/MagneticButton";
 import { useI18n } from "../i18n/I18nContext";
 import { useSiteContent } from "../lib/SiteContentContext";
+import { loc } from "../lib/i18nText";
 import { toDateTime } from "../lib/date";
 import { ease } from "../lib/motion";
 
-const HERO_IMG = "/images/hero-wall.jpg";
+const HERO_IMG = "/images/hero-wall.webp";
 
 export function Home() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { academyLive: academy, newsLive, productsLive } = useSiteContent();
   const heroRef = useRef<HTMLElement>(null);
   const [introDone, setIntroDone] = useState(() => !shouldPlayHeroIntro());
@@ -197,14 +198,17 @@ export function Home() {
               <StaggerItem key={item.id}>
                 <Link to={`/medee/${item.id}`} className="news-card">
                   <div className="news-card-media">
-                    <SafeImage src={item.image} alt={t(item.titleKey)} />
+                    <SafeImage
+                      src={item.image}
+                      alt={loc(lang, t, item.title, item.titleKey)}
+                    />
                   </div>
                   <div className="news-card-body">
                     <div className="news-meta">
-                      <span>{t(item.tagKey)}</span>
+                      <span>{loc(lang, t, item.tag, item.tagKey)}</span>
                       <time dateTime={toDateTime(item.date)}>{item.date}</time>
                     </div>
-                    <h3>{t(item.titleKey)}</h3>
+                    <h3>{loc(lang, t, item.title, item.titleKey)}</h3>
                   </div>
                 </Link>
               </StaggerItem>

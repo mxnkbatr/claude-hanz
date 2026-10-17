@@ -11,11 +11,11 @@ const navMain = [
 ] as const;
 
 const navPages = [
-  { to: "/admin/pages/news", key: "nav_news", ico: "新" },
-  { to: "/admin/pages/shop", key: "nav_shop", ico: "店" },
-  { to: "/admin/pages/courses", key: "nav_courses", ico: "汉" },
-  { to: "/admin/pages/travel", key: "nav_travel", ico: "✈" },
-  { to: "/admin/pages/university", key: "nav_uni", ico: "学" },
+  { to: "/admin/news", key: "nav_news", ico: "新" },
+  { to: "/admin/products", key: "nav_shop", ico: "店" },
+  { to: "/admin/courses", key: "nav_courses", ico: "汉" },
+  { to: "/admin/travel", key: "nav_travel", ico: "✈" },
+  { to: "/admin/universities", key: "nav_uni", ico: "学" },
 ] as const;
 
 export function AdminLayout() {
@@ -67,7 +67,7 @@ export function AdminLayout() {
             </NavLink>
           ))}
 
-          <p className="admin-nav-group">{t("admin_pages")}</p>
+          <p className="admin-nav-group">{t("admin_cms")}</p>
           {navPages.map((item) => (
             <NavLink
               key={item.to}

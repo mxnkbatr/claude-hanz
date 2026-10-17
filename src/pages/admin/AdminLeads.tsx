@@ -210,6 +210,16 @@ export function AdminLeads() {
               <a className="admin-btn" href={`tel:${r.phone}`}>
                 {t("call")}
               </a>
+              {(r.status || "new") === "new" && (
+                <button
+                  type="button"
+                  className="admin-btn is-seal"
+                  disabled={busyId === r.id}
+                  onClick={() => void patch(r.id, { status: "contacted" })}
+                >
+                  {t("admin_call_done")}
+                </button>
+              )}
               <button
                 type="button"
                 className="admin-btn is-danger"
