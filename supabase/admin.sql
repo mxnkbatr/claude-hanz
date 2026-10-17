@@ -98,7 +98,13 @@ create policy "admin_insert_site_content"
   on public.site_content for insert to authenticated
   with check (public.is_admin());
 
--- Seed admin (idempotent)
+-- Seed admins (idempotent) — staff from Албан-тушаал
 insert into public.admin_allowlist (email)
-values ('d.munkh2007@gmail.com')
+values
+  ('d.munkh2007@gmail.com'),
+  ('baljaaotgonjargal@gmail.com'),
+  ('munguntuyasarantuya34@gmail.com'),
+  ('2274555053@qq.com'),
+  ('michkabga@gmail.com'),
+  ('tbileg427@gmail.com')
 on conflict (email) do nothing;
