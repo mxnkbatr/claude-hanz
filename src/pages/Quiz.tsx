@@ -226,42 +226,59 @@ export function Quiz() {
           {phase === "pick" && (
             <motion.div
               key="pick"
-              className="quiz-panel quiz-pick"
-              initial={{ opacity: 0, y: 18 }}
+              className="quiz-pick"
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
+              exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.28, ease }}
             >
-              <div className="quiz-brand" aria-hidden>
-                <span>汉</span>
+              <div className="quiz-pick-hero">
+                <div className="quiz-brand" aria-hidden>
+                  <span>汉</span>
+                </div>
+                <div className="quiz-pick-meta">
+                  <span>{t("quiz_xp")} +10</span>
+                  <span>♥ ×{HEARTS_MAX}</span>
+                  <span>{t("quiz_streak")}</span>
+                </div>
               </div>
-              <h2>{t("quiz_pick_t")}</h2>
-              <p>{t("quiz_pick_d")}</p>
 
-              <div className="quiz-levels">
-                {quizLevels.map((lvl, i) => (
-                  <motion.button
-                    key={lvl.id}
-                    type="button"
-                    className={`quiz-level-card quiz-level-${lvl.id}`}
-                    onClick={() => startLevel(lvl.id)}
-                    whileTap={{ scale: 0.97 }}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.06 * i, duration: 0.28, ease }}
-                  >
-                    <span className="quiz-level-glyph" aria-hidden>
-                      {LEVEL_GLYPH[lvl.id]}
-                    </span>
-                    <span className="quiz-level-body">
-                      <span className="quiz-level-badge">{lvl.badge}</span>
-                      <strong>{t(lvl.titleKey)}</strong>
-                      <em>{t(lvl.descKey)}</em>
-                    </span>
-                    <span className="quiz-level-play">{t("quiz_start")}</span>
-                  </motion.button>
-                ))}
-              </div>
+              <section className="quiz-pick-group">
+                <header className="quiz-pick-group-head">
+                  <h2>{t("quiz_pick_t")}</h2>
+                  <p>{t("quiz_pick_d")}</p>
+                </header>
+
+                <div className="quiz-levels">
+                  {quizLevels.map((lvl, i) => (
+                    <motion.button
+                      key={lvl.id}
+                      type="button"
+                      className={`quiz-level-card quiz-level-${lvl.id}`}
+                      onClick={() => startLevel(lvl.id)}
+                      whileTap={{ scale: 0.985 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.05 * i, duration: 0.26, ease }}
+                    >
+                      <span className="quiz-level-glyph" aria-hidden>
+                        {LEVEL_GLYPH[lvl.id]}
+                      </span>
+                      <span className="quiz-level-body">
+                        <span className="quiz-level-badge">{lvl.badge}</span>
+                        <strong>{t(lvl.titleKey)}</strong>
+                        <em>{t(lvl.descKey)}</em>
+                      </span>
+                      <span className="quiz-level-trail">
+                        <span className="quiz-level-play">{t("quiz_start")}</span>
+                        <span className="quiz-level-chevron" aria-hidden>
+                          ›
+                        </span>
+                      </span>
+                    </motion.button>
+                  ))}
+                </div>
+              </section>
             </motion.div>
           )}
 

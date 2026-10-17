@@ -314,6 +314,32 @@ export const travelPackagesMeta = [
     ] as const,
     image:
       "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1400&q=80",
+    enrollWindows: [
+      {
+        id: "now" as const,
+        labelKey: "travel_enroll_now",
+        dateKey: "travel_enroll_china_now_d",
+        status: "open" as UniEnrollStatus,
+      },
+      {
+        id: "spring" as const,
+        labelKey: "travel_enroll_spring",
+        dateKey: "travel_enroll_china_spring_d",
+        status: "closed" as UniEnrollStatus,
+      },
+      {
+        id: "autumn" as const,
+        labelKey: "travel_enroll_autumn",
+        dateKey: "travel_enroll_china_autumn_d",
+        status: "soon" as UniEnrollStatus,
+      },
+      {
+        id: "start" as const,
+        labelKey: "travel_enroll_start",
+        dateKey: "travel_enroll_china_start_d",
+        status: "soon" as UniEnrollStatus,
+      },
+    ],
   },
   {
     id: "poland",
@@ -328,6 +354,32 @@ export const travelPackagesMeta = [
     ] as const,
     image:
       "https://images.unsplash.com/photo-1467269204594-59904b4cbaba?auto=format&fit=crop&w=1400&q=80",
+    enrollWindows: [
+      {
+        id: "now" as const,
+        labelKey: "travel_enroll_now",
+        dateKey: "travel_enroll_poland_now_d",
+        status: "open" as UniEnrollStatus,
+      },
+      {
+        id: "spring" as const,
+        labelKey: "travel_enroll_spring",
+        dateKey: "travel_enroll_poland_spring_d",
+        status: "closed" as UniEnrollStatus,
+      },
+      {
+        id: "autumn" as const,
+        labelKey: "travel_enroll_autumn",
+        dateKey: "travel_enroll_poland_autumn_d",
+        status: "soon" as UniEnrollStatus,
+      },
+      {
+        id: "start" as const,
+        labelKey: "travel_enroll_start",
+        dateKey: "travel_enroll_poland_start_d",
+        status: "soon" as UniEnrollStatus,
+      },
+    ],
   },
 ] as const;
 
@@ -483,6 +535,15 @@ export const newsIds = [
 
 export type NewsTag = (typeof newsIds)[number]["tagKey"] | "all";
 
+export type UniEnrollStatus = "open" | "soon" | "closed";
+
+export type UniEnrollWindow = {
+  id: "now" | "spring" | "autumn" | "start";
+  labelKey: string;
+  dateKey: string;
+  status: UniEnrollStatus;
+};
+
 export const universitiesMeta = [
   {
     id: "china",
@@ -493,6 +554,32 @@ export const universitiesMeta = [
     points: ["p1", "p2", "p3"] as const,
     image:
       "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1400&q=80",
+    enrollWindows: [
+      {
+        id: "now" as const,
+        labelKey: "uni_enroll_now",
+        dateKey: "uni_enroll_now_d",
+        status: "open" as UniEnrollStatus,
+      },
+      {
+        id: "spring" as const,
+        labelKey: "uni_enroll_spring",
+        dateKey: "uni_enroll_spring_d",
+        status: "closed" as UniEnrollStatus,
+      },
+      {
+        id: "autumn" as const,
+        labelKey: "uni_enroll_autumn",
+        dateKey: "uni_enroll_autumn_d",
+        status: "soon" as UniEnrollStatus,
+      },
+      {
+        id: "start" as const,
+        labelKey: "uni_enroll_start",
+        dateKey: "uni_enroll_start_d",
+        status: "soon" as UniEnrollStatus,
+      },
+    ],
   },
   {
     id: "poland",
@@ -503,11 +590,43 @@ export const universitiesMeta = [
     points: ["p4", "p5", "p6"] as const,
     image:
       "https://images.unsplash.com/photo-1467269204594-59904b4cbaba?auto=format&fit=crop&w=1400&q=80",
+    enrollWindows: [
+      {
+        id: "now" as const,
+        labelKey: "uni_enroll_now",
+        dateKey: "uni_enroll_poland_now_d",
+        status: "open" as UniEnrollStatus,
+      },
+      {
+        id: "spring" as const,
+        labelKey: "uni_enroll_spring",
+        dateKey: "uni_enroll_poland_spring_d",
+        status: "closed" as UniEnrollStatus,
+      },
+      {
+        id: "autumn" as const,
+        labelKey: "uni_enroll_autumn",
+        dateKey: "uni_enroll_poland_autumn_d",
+        status: "soon" as UniEnrollStatus,
+      },
+      {
+        id: "start" as const,
+        labelKey: "uni_enroll_start",
+        dateKey: "uni_enroll_poland_start_d",
+        status: "soon" as UniEnrollStatus,
+      },
+    ],
   },
 ];
 
 export function getUniversityById(id: string) {
   return universitiesMeta.find((u) => u.id === id);
+}
+
+export function uniEnrollStatusKey(status: UniEnrollStatus) {
+  if (status === "open") return "uni_status_open";
+  if (status === "soon") return "uni_status_soon";
+  return "uni_status_closed";
 }
 
 export const shopProductsMeta = [

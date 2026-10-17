@@ -20,6 +20,7 @@ export function Auth() {
   );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
@@ -34,6 +35,13 @@ export function Auth() {
 
   if (user) {
     return <Navigate to="/profile" replace />;
+  }
+
+  function switchMode(next: Mode) {
+    setMode(next);
+    setError("");
+    setInfo("");
+    void hapticLight();
   }
 
   async function onSubmit(e: FormEvent) {
@@ -66,35 +74,45 @@ export function Auth() {
     <PageShell className="page-auth is-app ios-app">
       <div className="auth-stage">
         <div className="auth-glow" aria-hidden />
+        <div className="auth-glow auth-glow-b" aria-hidden />
+
+        <Link to="/" className="auth-close" aria-label={t("auth_close")}>
+          ×
+        </Link>
 
         <motion.div
           className="auth-card"
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.28, ease }}
+          transition={{ duration: 0.32, ease }}
         >
-          <div className="auth-brand" aria-hidden>
-            <span>汉</span>
+          <div className="auth-hero">
+            <div className="auth-brand" aria-hidden>
+              <span>汉</span>
+            </div>
+            <p className="auth-wordmark">{t("brand")}</p>
           </div>
 
           <motion.header
             className="auth-card-head"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.06, duration: 0.25, ease }}
+            transition={{ delay: 0.05, duration: 0.25, ease }}
           >
             <AnimatePresence mode="wait">
               <motion.h1
                 key={mode}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.28, ease }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.22, ease }}
               >
                 {mode === "login" ? t("auth_login") : t("auth_signup")}
               </motion.h1>
             </AnimatePresence>
-            <p>{t("auth_lead")}</p>
+            <p>
+              {mode === "login" ? t("auth_lead_login") : t("auth_lead_signup")}
+            </p>
           </motion.header>
 
           <AnimatePresence mode="wait">
@@ -119,10 +137,10 @@ export function Auth() {
             ) : (
               <motion.div
                 key={`auth-body-${mode}`}
-                initial={{ opacity: 0, x: mode === "login" ? -18 : 18 }}
+                initial={{ opacity: 0, x: mode === "login" ? -14 : 14 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: mode === "login" ? 18 : -18 }}
-                transition={{ duration: 0.32, ease }}
+                exit={{ opacity: 0, x: mode === "login" ? 14 : -14 }}
+                transition={{ duration: 0.26, ease }}
               >
                 <LayoutGroup id="auth-mode">
                   <div className="auth-tabs" role="tablist">
@@ -135,12 +153,7 @@ export function Auth() {
                           role="tab"
                           aria-selected={active}
                           className={`auth-tab${active ? " is-active" : ""}`}
-                          onClick={() => {
-                            setMode(m);
-                            setError("");
-                            setInfo("");
-                            void hapticLight();
-                          }}
+                          onClick={() => switchMode(m)}
                         >
                           {active && (
                             <motion.span
@@ -163,31 +176,49 @@ export function Auth() {
                 </LayoutGroup>
 
                 <form className="auth-form" onSubmit={onSubmit}>
-                  <label className="auth-field">
-                    <span>{t("auth_email")}</span>
-                    <input
-                      type="email"
-                      autoComplete="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="name@email.com"
-                      required
-                    />
-                  </label>
-                  <label className="auth-field">
-                    <span>{t("auth_password")}</span>
-                    <input
-                      type="password"
-                      autoComplete={
-                        mode === "login" ? "current-password" : "new-password"
-                      }
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      minLength={6}
-                      required
-                    />
-                  </label>
+                  <div className="auth-fields">
+                    <label className="auth-field">
+                      <span>{t("auth_email")}</span>
+                      <input
+                        type="email"
+                        autoComplete="email"
+                        inputMode="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="name@email.com"
+                        required
+                      />
+                    </label>
+                    <div className="auth-field">
+                      <span id="auth-pass-label">{t("auth_password")}</span>
+                      <div className="auth-pass-row">
+                        <input
+                          type={showPass ? "text" : "password"}
+                          autoComplete={
+                            mode === "login"
+                              ? "current-password"
+                              : "new-password"
+                          }
+                          aria-labelledby="auth-pass-label"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="••••••••"
+                          minLength={6}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="auth-pass-toggle"
+                          onClick={() => {
+                            setShowPass((v) => !v);
+                            void hapticLight();
+                          }}
+                        >
+                          {showPass ? t("auth_hide") : t("auth_show")}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
 
                   <AnimatePresence>
                     {error && (
@@ -214,13 +245,23 @@ export function Auth() {
                         : t("auth_signup")}
                   </button>
                 </form>
+
+                <p className="auth-switch">
+                  {mode === "login"
+                    ? t("auth_switch_to_signup")
+                    : t("auth_switch_to_login")}{" "}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      switchMode(mode === "login" ? "signup" : "login")
+                    }
+                  >
+                    {mode === "login" ? t("auth_signup") : t("auth_login")}
+                  </button>
+                </p>
               </motion.div>
             )}
           </AnimatePresence>
-
-          <p className="auth-foot">
-            <Link to="/">{t("back")}</Link>
-          </p>
         </motion.div>
       </div>
     </PageShell>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutGroup, motion } from "framer-motion";
+import { LayoutGroup, motion, useReducedMotion } from "framer-motion";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import { navKeys } from "../i18n/translations";
 import { useI18n } from "../i18n/I18nContext";
@@ -13,7 +13,7 @@ import { Snowfall } from "./Snowfall";
 import { useAuth } from "../lib/AuthContext";
 import { useSiteContent } from "../lib/SiteContentContext";
 import { hapticLight } from "../lib/native";
-import { ease } from "../lib/motion";
+import { ease, navSpring } from "../lib/motion";
 
 /** Mobile menu: 2-column iOS tiles (order matters). */
 const MENU_ORDER = [
@@ -28,18 +28,21 @@ const MENU_ORDER = [
 
 export function Layout() {
   const location = useLocation();
-  const { t } = useI18n();
+  const { t, lang, setLang, langs } = useI18n();
   const { user } = useAuth();
   const { academyLive: academy } = useSiteContent();
+  const reduceMotion = useReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [routeTick, setRouteTick] = useState(0);
   const isHome = location.pathname === "/";
   const isAuth = location.pathname.startsWith("/auth");
 
   useDocumentMeta();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    setRouteTick((n) => n + 1);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -91,8 +94,35 @@ export function Layout() {
         className={`topbar${isHome ? " is-over-hero" : ""}${scrolled ? " is-scrolled" : ""}`}
       >
         <div className="topbar-stack">
-          <div className="topbar-capsule">
-            <NavLink to="/" className="topbar-brand" aria-label={t("nav_home")}>
+          <motion.div
+            className="topbar-capsule"
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                    y: scrolled ? 0 : 0,
+                    scale: scrolled ? 0.985 : 1,
+                  }
+            }
+            transition={navSpring}
+          >
+            {!reduceMotion && (
+              <motion.span
+                key={routeTick}
+                className="topbar-route-line"
+                aria-hidden
+                initial={{ scaleX: 0, opacity: 0.9 }}
+                animate={{ scaleX: 1, opacity: 0 }}
+                transition={{ duration: 0.55, ease }}
+              />
+            )}
+
+            <NavLink
+              to="/"
+              className="topbar-brand"
+              aria-label={t("nav_home")}
+              onClick={() => void hapticLight()}
+            >
               <Logo size="sm" />
             </NavLink>
 
@@ -106,6 +136,7 @@ export function Layout() {
                     className={({ isActive }) =>
                       `topnav-link${isActive ? " is-active" : ""}`
                     }
+                    onClick={() => void hapticLight()}
                   >
                     {({ isActive }) => (
                       <>
@@ -113,11 +144,7 @@ export function Layout() {
                           <motion.span
                             className="topnav-pill"
                             layoutId="nav-pill"
-                            transition={{
-                              type: "spring",
-                              stiffness: 380,
-                              damping: 32,
-                            }}
+                            transition={navSpring}
                           />
                         )}
                         <span className="topnav-text">{t(item.key)}</span>
@@ -158,7 +185,7 @@ export function Layout() {
                 <span>{t("call")}</span>
               </a>
             </div>
-          </div>
+          </motion.div>
         </div>
       </header>
 
@@ -213,6 +240,55 @@ export function Layout() {
               </motion.div>
             ))}
           </nav>
+
+          <motion.div
+            className="site-menu-lang"
+            variants={{
+              hidden: { opacity: 0, y: 10 },
+              show: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.28, ease },
+              },
+            }}
+          >
+            <p className="site-menu-section">{t("profile_lang")}</p>
+            <LayoutGroup id="menu-lang-seg">
+              <div
+                className="ios26-filter-track site-menu-lang-track"
+                role="tablist"
+                aria-label={t("profile_lang")}
+              >
+                {langs.map((l) => {
+                  const active = lang === l.code;
+                  return (
+                    <button
+                      key={l.code}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      className={`ios26-filter-chip site-menu-lang-chip${
+                        active ? " is-active" : ""
+                      }`}
+                      onClick={() => {
+                        setLang(l.code);
+                        void hapticLight();
+                      }}
+                    >
+                      {active && (
+                        <motion.span
+                          className="ios26-filter-pill"
+                          layoutId="menu-lang-pill"
+                          transition={navSpring}
+                        />
+                      )}
+                      <span className="ios26-filter-label">{l.short}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </LayoutGroup>
+          </motion.div>
         </motion.div>
       </BottomSheet>
 
@@ -280,30 +356,45 @@ export function Layout() {
         </div>
       </footer>
 
-      <nav className="tabbar glass-dock" aria-label={t("nav_mobile")}>
-        {navKeys
-          .filter((item) => item.tab)
-          .map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                `tabbar-item${isActive ? " is-active" : ""}`
-              }
-              onClick={() => void hapticLight()}
-            >
-              <span className="tabbar-icon">
-                <NavIcon name={item.icon} />
-              </span>
-              <span className="tabbar-label">
-                {t(
-                  "tabKey" in item && item.tabKey ? item.tabKey : item.key,
+      <LayoutGroup id="tabnav">
+        <nav className="tabbar glass-dock" aria-label={t("nav_mobile")}>
+          {navKeys
+            .filter((item) => item.tab)
+            .map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === "/"}
+                className={({ isActive }) =>
+                  `tabbar-item${isActive ? " is-active" : ""}`
+                }
+                onClick={() => void hapticLight()}
+              >
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <motion.span
+                        className="tabbar-pill"
+                        layoutId="tab-pill"
+                        transition={navSpring}
+                      />
+                    )}
+                    <span className="tabbar-icon">
+                      <NavIcon name={item.icon} />
+                    </span>
+                    <span className="tabbar-label">
+                      {t(
+                        "tabKey" in item && item.tabKey
+                          ? item.tabKey
+                          : item.key,
+                      )}
+                    </span>
+                  </>
                 )}
-              </span>
-            </NavLink>
-          ))}
-      </nav>
+              </NavLink>
+            ))}
+        </nav>
+      </LayoutGroup>
 
       <Onboard />
     </div>

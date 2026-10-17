@@ -3,29 +3,24 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { SealMark } from "../components/SealMark";
+import { Marquee } from "../components/Marquee";
 import { SafeImage } from "../components/SafeImage";
+import { TiltCard } from "../components/TiltCard";
+import { ProductCard } from "../components/ProductCard";
 import { HeroIntro, shouldPlayHeroIntro } from "../components/HeroIntro";
 import { LearnScroll } from "../components/LearnScroll";
+import { StatsStrip } from "../components/StatsStrip";
 import { MagneticButton } from "../components/MagneticButton";
-import { NavIcon } from "../components/Icons";
 import { useI18n } from "../i18n/I18nContext";
 import { useSiteContent } from "../lib/SiteContentContext";
 import { toDateTime } from "../lib/date";
 import { ease } from "../lib/motion";
-import { hapticLight } from "../lib/native";
 
 const HERO_IMG = "/images/hero-wall.jpg";
 
-const QUICK_LINKS = [
-  { to: "/courses", key: "nav_courses", icon: "courses" as const },
-  { to: "/university", key: "nav_uni_short", icon: "uni" as const },
-  { to: "/medee", key: "nav_news", icon: "news" as const },
-  { to: "/travel", key: "nav_travel", icon: "travel" as const },
-];
-
 export function Home() {
   const { t } = useI18n();
-  const { academyLive: academy, newsLive } = useSiteContent();
+  const { academyLive: academy, newsLive, productsLive } = useSiteContent();
   const heroRef = useRef<HTMLElement>(null);
   const [introDone, setIntroDone] = useState(() => !shouldPlayHeroIntro());
   const playIntro = !introDone;
@@ -44,8 +39,7 @@ export function Home() {
     <PageShell className="page-home">
       {playIntro && <HeroIntro onComplete={() => setIntroDone(true)} />}
 
-      {/* ── Desktop cinema hero ── */}
-      <section className="hero-cinema desk-only" ref={heroRef}>
+      <section className="hero-cinema" ref={heroRef}>
         <div
           className="hero-cinema-media"
           style={{ backgroundImage: `url(${HERO_IMG})` }}
@@ -103,7 +97,7 @@ export function Home() {
                 🇨🇳
               </span>
             </h1>
-            <SealMark className="hero-seal-inline" />
+            <SealMark className="hero-seal-inline desk-only" />
           </motion.div>
 
           <motion.p
@@ -137,105 +131,53 @@ export function Home() {
         </motion.div>
       </section>
 
-      {/* ── Mobile iOS home — 4 sections ── */}
-      <div className="app-mobile home-ios">
-        <section className="home-ios-hero">
-          <div className="home-ios-hero-media">
-            <img
-              src={HERO_IMG}
-              alt=""
-              width={1200}
-              height={1600}
-              fetchPriority="high"
-              decoding="async"
-              loading="eager"
-              draggable={false}
-            />
-            <div className="home-ios-hero-shade" />
-          </div>
-          <div className="home-ios-hero-body">
-            <p className="home-ios-brand">{t("brand")}</p>
-            <h1 className="home-ios-title">
-              {t("hero_headline").replace(/\n/g, " ")}
-            </h1>
-            <p className="home-ios-kicker">{t("hero_chip")}</p>
-            <Link
-              to="/courses"
-              className="btn btn-seal home-ios-cta-main"
-              onClick={() => void hapticLight()}
-            >
-              <span>{t("nav_courses")}</span>
-              <i aria-hidden>→</i>
-            </Link>
-          </div>
-        </section>
+      <div className="home-below">
+        <Reveal>
+          <Marquee />
+        </Reveal>
 
-        <section className="home-ios-section">
-          <nav className="home-ios-list" aria-label={t("nav_main")}>
-            {QUICK_LINKS.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className="home-ios-row-link"
-                onClick={() => void hapticLight()}
-              >
-                <span className="home-ios-row-icon" aria-hidden>
-                  <NavIcon name={item.icon} />
-                </span>
-                <span className="home-ios-row-label">{t(item.key)}</span>
-                <span className="home-ios-row-chevron" aria-hidden>
-                  ›
-                </span>
-              </Link>
-            ))}
-          </nav>
-        </section>
+        <StatsStrip />
 
-        <section className="home-ios-section">
-          <div className="home-ios-row">
-            <h2 className="home-ios-heading">{t("home_news")}</h2>
-            <Link to="/medee" className="home-ios-more">
-              {t("see_all")}
-            </Link>
-          </div>
-          <div className="home-ios-news">
-            {newsLive.slice(0, 3).map((item) => (
-              <Link
-                key={item.id}
-                to={`/medee/${item.id}`}
-                className="home-ios-news-card"
-                onClick={() => void hapticLight()}
-              >
-                <div className="home-ios-news-media">
-                  <SafeImage src={item.image} alt={t(item.titleKey)} />
-                </div>
-                <div className="home-ios-news-body">
-                  <span>{t(item.tagKey)}</span>
-                  <strong>{t(item.titleKey)}</strong>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className="home-ios-section home-ios-section-last">
-          <Link
-            to="/enroll"
-            className="home-ios-banner"
-            onClick={() => void hapticLight()}
-          >
-            <div>
-              <strong>{t("register_cta")}</strong>
-              <em>{t("kids_detail_online")}</em>
-            </div>
-            <span aria-hidden>→</span>
-          </Link>
-        </section>
-      </div>
-
-      {/* ── Desktop below-fold: LearnScroll → News → Enroll ── */}
-      <div className="home-below desk-only">
         <LearnScroll />
+
+        <section className="section">
+          <Stagger className="split-promo">
+            <StaggerItem>
+              <TiltCard>
+                <Link to="/about" className="promo-panel">
+                  <img
+                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80"
+                    alt={t("about_title")}
+                  />
+                  <div>
+                    <p className="eyebrow light">{t("about_title")}</p>
+                    <h3>{t("courses_title")}</h3>
+                    <span>
+                      {t("view")} <i aria-hidden>→</i>
+                    </span>
+                  </div>
+                </Link>
+              </TiltCard>
+            </StaggerItem>
+            <StaggerItem>
+              <TiltCard>
+                <Link to="/university" className="promo-panel">
+                  <img
+                    src="https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1200&q=80"
+                    alt={t("uni_title")}
+                  />
+                  <div>
+                    <p className="eyebrow light">{t("nav_uni")}</p>
+                    <h3>{t("china_home_title")}</h3>
+                    <span>
+                      {t("uni_more")} <i aria-hidden>→</i>
+                    </span>
+                  </div>
+                </Link>
+              </TiltCard>
+            </StaggerItem>
+          </Stagger>
+        </section>
 
         <section className="section">
           <Reveal>
@@ -272,14 +214,24 @@ export function Home() {
 
         <section className="section section-last">
           <Reveal>
-            <Link to="/enroll" className="home-enroll-strip">
+            <div className="section-row">
               <div>
-                <strong>{t("register_cta")}</strong>
-                <em>{t("kids_detail_online")}</em>
+                <p className="eyebrow">{t("nav_shop")}</p>
+                <h2 className="h2">{t("home_shop")}</h2>
               </div>
-              <span aria-hidden>→</span>
-            </Link>
+              <Link to="/shop" className="text-link">
+                {t("shop_link")}
+                <i aria-hidden>→</i>
+              </Link>
+            </div>
           </Reveal>
+          <Stagger className="shop-grid home-shop">
+            {productsLive.slice(0, 2).map((p) => (
+              <StaggerItem key={p.id}>
+                <ProductCard product={p} />
+              </StaggerItem>
+            ))}
+          </Stagger>
         </section>
       </div>
     </PageShell>

@@ -2,6 +2,18 @@ import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 import { pageTransition, ease } from "../lib/motion";
 
+const pageReduce = {
+  initial: { opacity: 0 },
+  animate: {
+    opacity: 1,
+    transition: { duration: 0.2, ease },
+  },
+  exit: {
+    opacity: 0,
+    transition: { duration: 0.12, ease },
+  },
+};
+
 export function PageShell({
   children,
   className = "",
@@ -10,12 +22,13 @@ export function PageShell({
   className?: string;
 }) {
   const reduce = useReducedMotion();
+  const t = reduce ? pageReduce : pageTransition;
   return (
     <motion.div
       className={`page ${className}`}
-      initial={reduce ? false : pageTransition.initial}
-      animate={pageTransition.animate}
-      exit={reduce ? undefined : pageTransition.exit}
+      initial={t.initial}
+      animate={t.animate}
+      exit={t.exit}
       layout={false}
     >
       {children}

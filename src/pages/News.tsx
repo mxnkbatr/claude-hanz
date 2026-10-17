@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
-import { LayoutGroup, motion } from "framer-motion";
 import { type NewsTag } from "../data/content";
 import { AppLink } from "../components/AppLink";
+import { IosFilterBar } from "../components/IosFilterBar";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { SharedMedia } from "../components/SharedMedia";
 import { useI18n } from "../i18n/I18nContext";
@@ -28,6 +28,16 @@ export function News() {
     return map;
   }, [newsLive]);
 
+  const options = useMemo(
+    () =>
+      filters.map((f) => ({
+        id: f,
+        label: f === "all" ? t("filter_all") : t(f),
+        count: counts[f] ?? 0,
+      })),
+    [counts, t],
+  );
+
   const list = useMemo(() => {
     const base =
       filter === "all" ? newsLive : newsLive.filter((n) => n.tagKey === filter);
@@ -46,15 +56,15 @@ export function News() {
     <PageShell className="page-news is-app ios-app">
       <header className="page-head app-head">
         <Reveal>
-          <p className="eyebrow">{t("nav_news")}</p>
+          <p className="eyebrow desk-only">{t("nav_news")}</p>
           <h1 className="h1">{t("news_title")}</h1>
-          <p className="lead">{t("news_lead")}</p>
+          <p className="lead desk-only">{t("news_lead")}</p>
         </Reveal>
       </header>
 
       <Reveal>
-        <div className="news-toolbar">
-          <label className="ios-search news-search">
+        <div className="ios-toolbar">
+          <label className="ios-search">
             <span aria-hidden>⌕</span>
             <input
               type="search"
@@ -66,7 +76,7 @@ export function News() {
             {hasQuery && (
               <button
                 type="button"
-                className="news-search-clear"
+                className="ios-search-clear"
                 onClick={() => setQ("")}
                 aria-label={t("news_clear")}
               >
@@ -75,61 +85,21 @@ export function News() {
             )}
           </label>
 
-          <div className="news-filter-bar">
-            <LayoutGroup id="news-seg">
-              <div
-                className="news-filters"
-                role="tablist"
-                aria-label={t("news_filter_label")}
-              >
-                {filters.map((f) => {
-                  const active = filter === f;
-                  const count = counts[f] ?? 0;
-                  return (
-                    <button
-                      key={f}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      className={`news-chip${active ? " is-active" : ""}`}
-                      onClick={() => {
-                        setFilter(f);
-                        void hapticLight();
-                      }}
-                    >
-                      {active && (
-                        <motion.span
-                          className="news-chip-pill"
-                          layoutId="news-chip-pill"
-                          transition={{ type: "spring", stiffness: 480, damping: 36 }}
-                        />
-                      )}
-                      <span className="news-chip-label">
-                        {f === "all" ? t("filter_all") : t(f)}
-                      </span>
-                      <em>{count}</em>
-                    </button>
-                  );
-                })}
-              </div>
-            </LayoutGroup>
+          <IosFilterBar
+            options={options}
+            value={filter}
+            onChange={(id) => setFilter(id as NewsTag)}
+            ariaLabel={t("news_filter_label")}
+            layoutId="news-filter-pill"
+            showClear={isFiltered}
+            clearLabel={t("news_clear")}
+            onClear={() => {
+              setFilter("all");
+              setQ("");
+            }}
+          />
 
-            {isFiltered && (
-              <button
-                type="button"
-                className="news-reset"
-                onClick={() => {
-                  setFilter("all");
-                  setQ("");
-                  void hapticLight();
-                }}
-              >
-                {t("news_clear")}
-              </button>
-            )}
-          </div>
-
-          <p className="news-result-meta desk-only">
+          <p className="ios-result-meta desk-only">
             {t("results_count")}: <strong>{list.length}</strong>
           </p>
         </div>
@@ -142,7 +112,11 @@ export function News() {
           <Stagger className="ios-feed ios-feed-news">
             {list.map((item) => (
               <StaggerItem key={item.id}>
-                <AppLink to={`/medee/${item.id}`} className="ios-card">
+                <AppLink
+                  to={`/medee/${item.id}`}
+                  className="ios-card"
+                  onClick={() => void hapticLight()}
+                >
                   <div className="ios-card-media">
                     <SharedMedia
                       id={`news-${item.id}`}

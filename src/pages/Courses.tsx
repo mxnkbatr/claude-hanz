@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   courseFilters,
   filterKeyLabel,
@@ -9,6 +9,7 @@ import {
   type MatchAnswer,
   type MatchResult,
 } from "../data/courseMatch";
+import { IosFilterBar } from "../components/IosFilterBar";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
 import { useI18n } from "../i18n/I18nContext";
@@ -62,6 +63,16 @@ export function Courses() {
 
   const hasQuery = q.trim().length > 0;
   const isFiltered = filter !== "all" || hasQuery;
+
+  const filterOptions = useMemo(
+    () =>
+      courseFilters.map((f) => ({
+        id: f,
+        label: t(filterKeyLabel(f)),
+        count: counts[f] ?? 0,
+      })),
+    [counts, t],
+  );
 
   function startMatch() {
     setMatchPhase("ask");
@@ -287,8 +298,8 @@ export function Courses() {
       </Reveal>
 
       <Reveal>
-        <div className="news-toolbar course-toolbar">
-          <label className="ios-search news-search">
+        <div className="ios-toolbar course-toolbar">
+          <label className="ios-search">
             <span aria-hidden>⌕</span>
             <input
               type="search"
@@ -300,7 +311,7 @@ export function Courses() {
             {hasQuery && (
               <button
                 type="button"
-                className="news-search-clear"
+                className="ios-search-clear"
                 onClick={() => setQ("")}
                 aria-label={t("news_clear")}
               >
@@ -309,63 +320,19 @@ export function Courses() {
             )}
           </label>
 
-          <div className="news-filter-bar course-filter-bar">
-            <LayoutGroup id="course-seg">
-              <div
-                className="news-filters"
-                role="tablist"
-                aria-label={t("cmatch_filter_label")}
-              >
-                {courseFilters.map((f) => {
-                  const active = filter === f;
-                  const count = counts[f] ?? 0;
-                  return (
-                    <button
-                      key={f}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      className={`news-chip${active ? " is-active" : ""}`}
-                      onClick={() => {
-                        setFilter(f);
-                        void hapticLight();
-                      }}
-                    >
-                      {active && (
-                        <motion.span
-                          className="news-chip-pill"
-                          layoutId="course-chip-pill"
-                          transition={{
-                            type: "spring",
-                            stiffness: 480,
-                            damping: 36,
-                          }}
-                        />
-                      )}
-                      <span className="news-chip-label">
-                        {t(filterKeyLabel(f))}
-                      </span>
-                      <em>{count}</em>
-                    </button>
-                  );
-                })}
-              </div>
-            </LayoutGroup>
-
-            {isFiltered && (
-              <button
-                type="button"
-                className="news-reset"
-                onClick={() => {
-                  setFilter("all");
-                  setQ("");
-                  void hapticLight();
-                }}
-              >
-                {t("news_clear")}
-              </button>
-            )}
-          </div>
+          <IosFilterBar
+            options={filterOptions}
+            value={filter}
+            onChange={(id) => setFilter(id as CourseFilter)}
+            ariaLabel={t("cmatch_filter_label")}
+            layoutId="course-filter-pill"
+            showClear={isFiltered}
+            clearLabel={t("news_clear")}
+            onClear={() => {
+              setFilter("all");
+              setQ("");
+            }}
+          />
         </div>
       </Reveal>
 

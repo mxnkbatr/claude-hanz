@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   enrollInterests,
   kidsLevels,
@@ -25,20 +25,49 @@ export function Enroll() {
     return kidsSchedules.some((s) => s.id === raw) ? raw : kidsSchedules[0].id;
   }, [params]);
 
+  const interestMeta = enrollInterests.find((i) => i.id === interest);
+  const isKids = interest === "kids";
+  const isTravel = interest.startsWith("travel_");
+  const backTo = isTravel
+    ? `/travel/${interest.replace("travel_", "")}`
+    : interest === "consult" && params.get("uni")
+      ? `/university/${params.get("uni")}`
+      : "/";
+
   return (
-    <PageShell className="page-enroll is-app">
-      <header className="page-head app-head">
+    <PageShell className="page-enroll is-app ios-app">
+      <Reveal>
+        <Link to={backTo} className="text-link back-link">
+          ← {t("back")}
+        </Link>
+      </Reveal>
+
+      <header className="page-head app-head enroll-ios-head">
         <Reveal>
+          <p className="enroll-step-label">{t("enroll_step")}</p>
           <h1 className="h1">
-            {interest === "kids" ? t("kids_enroll_title") : t("enroll_page")}
+            {isKids ? t("kids_enroll_title") : t("enroll_page")}
           </h1>
-          {interest === "kids" && (
-            <p className="lead">{t("kids_enroll_lead")}</p>
-          )}
+          <p className="lead">
+            {isKids
+              ? t("kids_enroll_lead")
+              : isTravel
+                ? t("travel_enroll_form_lead")
+                : t("enroll_ios_lead")}
+          </p>
         </Reveal>
       </header>
 
-      <section className="section tight section-last enroll-wrap">
+      {interestMeta && (
+        <Reveal>
+          <div className="enroll-context">
+            <span>{t("form_interest")}</span>
+            <strong>{t(interestMeta.labelKey)}</strong>
+          </div>
+        </Reveal>
+      )}
+
+      <section className="section tight section-last enroll-wrap enroll-ios-sheet">
         <Reveal>
           <EnrollForm
             defaultInterest={interest}

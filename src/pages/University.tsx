@@ -2,9 +2,26 @@ import { useMemo, useState } from "react";
 import { chinaProgramsMeta } from "../data/content";
 import { AppLink } from "../components/AppLink";
 import { ConsultForm } from "../components/ConsultForm";
+import { IosFilterBar } from "../components/IosFilterBar";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
 import { useI18n } from "../i18n/I18nContext";
+import { hapticLight } from "../lib/native";
+
+type UniCityFilter =
+  | "all"
+  | "map_beijing"
+  | "map_chongqing"
+  | "map_nanjing"
+  | "map_chengdu";
+
+const CITY_FILTERS: UniCityFilter[] = [
+  "all",
+  "map_beijing",
+  "map_chongqing",
+  "map_nanjing",
+  "map_chengdu",
+];
 
 const steps = [
   ["step1", "step1_d"],
@@ -30,16 +47,42 @@ const compareRows = [
 export function University() {
   const { t } = useI18n();
   const [q, setQ] = useState("");
+  const [city, setCity] = useState<UniCityFilter>("all");
+
+  const counts = useMemo(() => {
+    const map: Record<string, number> = { all: chinaProgramsMeta.length };
+    for (const p of chinaProgramsMeta) {
+      map[p.cityKey] = (map[p.cityKey] || 0) + 1;
+    }
+    return map;
+  }, []);
+
+  const options = useMemo(
+    () =>
+      CITY_FILTERS.map((f) => ({
+        id: f,
+        label: f === "all" ? t("filter_all") : t(f),
+        count: counts[f] ?? 0,
+      })),
+    [counts, t],
+  );
 
   const schools = useMemo(() => {
+    const byCity =
+      city === "all"
+        ? chinaProgramsMeta
+        : chinaProgramsMeta.filter((p) => p.cityKey === city);
     const query = q.trim().toLowerCase();
-    if (!query) return chinaProgramsMeta;
-    return chinaProgramsMeta.filter((p) => {
+    if (!query) return byCity;
+    return byCity.filter((p) => {
       const hay =
         `${t(p.titleKey)} ${t(p.nameMnKey)} ${t(p.nameZhKey)} ${t(p.cityKey)} ${t(p.descKey)}`.toLowerCase();
       return hay.includes(query);
     });
-  }, [q, t]);
+  }, [city, q, t]);
+
+  const hasQuery = q.trim().length > 0;
+  const isFiltered = city !== "all" || hasQuery;
 
   return (
     <PageShell className="page-uni is-app ios-app">
@@ -52,16 +95,42 @@ export function University() {
 
       <section className="section tight uni-schools-section">
         <Reveal>
-          <label className="ios-search">
-            <span aria-hidden>⌕</span>
-            <input
-              type="search"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder={t("search_uni")}
-              autoComplete="off"
+          <div className="ios-toolbar">
+            <label className="ios-search">
+              <span aria-hidden>⌕</span>
+              <input
+                type="search"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder={t("search_uni")}
+                autoComplete="off"
+              />
+              {hasQuery && (
+                <button
+                  type="button"
+                  className="ios-search-clear"
+                  onClick={() => setQ("")}
+                  aria-label={t("news_clear")}
+                >
+                  ×
+                </button>
+              )}
+            </label>
+
+            <IosFilterBar
+              options={options}
+              value={city}
+              onChange={(id) => setCity(id as UniCityFilter)}
+              ariaLabel={t("uni_filter_label")}
+              layoutId="uni-filter-pill"
+              showClear={isFiltered}
+              clearLabel={t("news_clear")}
+              onClear={() => {
+                setCity("all");
+                setQ("");
+              }}
             />
-          </label>
+          </div>
         </Reveal>
 
         <Reveal>
@@ -77,7 +146,11 @@ export function University() {
           <Stagger className="ios-feed ios-feed-schools">
             {schools.map((p) => (
               <StaggerItem key={p.id}>
-                <AppLink to="/university/china" className="ios-card">
+                <AppLink
+                  to="/university/china"
+                  className="ios-card"
+                  onClick={() => void hapticLight()}
+                >
                   <div className="ios-card-media">
                     <SafeImage src={p.image} alt={t(p.nameMnKey)} />
                     <span className="ios-badge ios-badge-soft">{t(p.cityKey)}</span>
@@ -94,10 +167,24 @@ export function University() {
         )}
       </section>
 
+      <section className="section tight app-mobile">
+        <Reveal>
+          <AppLink to="/university/china" className="uni-enroll-teaser">
+            <div>
+              <strong>{t("uni_enroll_title")}</strong>
+              <em>
+                {t("uni_enroll_now")} · {t("uni_status_open")}
+              </em>
+            </div>
+            <span aria-hidden>›</span>
+          </AppLink>
+        </Reveal>
+      </section>
+
       <section className="section tight section-last app-mobile">
         <Reveal>
-          <AppLink to="/enroll?interest=consult" className="ios-cta">
-            {t("uni_cta")}
+          <AppLink to="/enroll?interest=consult&uni=china" className="ios-cta">
+            {t("uni_enroll_cta")}
           </AppLink>
         </Reveal>
       </section>
