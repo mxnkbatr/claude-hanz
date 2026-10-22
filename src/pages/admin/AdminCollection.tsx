@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ImageUpload } from "../../components/admin/ImageUpload";
 import { MultiLangField } from "../../components/admin/MultiLangField";
 import {
@@ -144,6 +145,7 @@ export function AdminCollection({
   ) as CollectionKey;
   const table = TABLE[key];
   const { t, lang } = useI18n();
+  const [params, setParams] = useSearchParams();
 
   const [rows, setRows] = useState<CmsRow[]>([]);
   const [err, setErr] = useState("");
@@ -187,6 +189,15 @@ export function AdminCollection({
     if (key === "courses") d.filter_key = "classroom";
     setDraft(d);
   }
+
+  useEffect(() => {
+    if (params.get("new") !== "1") return;
+    openNew();
+    const next = new URLSearchParams(params);
+    next.delete("new");
+    setParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- open once from ?new=1
+  }, [table, params.get("new")]);
 
   async function save() {
     if (!draft) return;

@@ -1,21 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
-import { ADMIN_PAGES, type EnrollmentRow } from "../../lib/cms";
+import { type EnrollmentRow } from "../../lib/cms";
 import { useI18n } from "../../i18n/I18nContext";
-
-const pageMarks: Record<string, string> = {
-  home: "汉",
-  courses: "课",
-  news: "新",
-  university: "学",
-  travel: "✈",
-  shop: "店",
-  quiz: "测",
-  about: "院",
-  contact: "☎",
-  enroll: "✓",
-};
+import { ADMIN_HUB_GROUPS, ADMIN_QUICK_ADD } from "../../lib/adminNav";
 
 function inLastMs(iso: string, ms: number) {
   const t = new Date(iso).getTime();
@@ -49,11 +37,10 @@ export function AdminDashboard() {
     const week = rows.filter((r) => inLastMs(r.created_at, day * 7)).length;
     const month = rows.filter((r) => inLastMs(r.created_at, day * 30)).length;
     const neu = rows.filter((r) => (r.status || "new") === "new").length;
-    const course = rows.filter((r) => r.kind === "course").length;
-    const travel = rows.filter((r) => r.kind === "travel").length;
-    const consult = rows.filter((r) => r.kind === "consult").length;
-    return { today, week, month, neu, course, travel, consult, total: rows.length };
+    return { today, week, month, neu, total: rows.length };
   }, [rows]);
+
+  const recent = rows.slice(0, 6);
 
   return (
     <div className="admin-page">
@@ -77,91 +64,98 @@ export function AdminDashboard() {
           <em>{t("admin_stat_month")}</em>
           <strong>{stats.month}</strong>
         </article>
-        <article>
+        <article className="is-accent">
           <em>{t("admin_stat_new")}</em>
           <strong>{stats.neu}</strong>
         </article>
-        <article>
-          <em>{t("nav_courses")}</em>
-          <strong>{stats.course}</strong>
-        </article>
-        <article>
-          <em>{t("nav_travel")}</em>
-          <strong>{stats.travel}</strong>
-        </article>
-        <article>
-          <em>{t("enroll_interest_consult")}</em>
-          <strong>{stats.consult}</strong>
-        </article>
       </div>
 
-      <section className="admin-card">
-        <div className="admin-card-head">
-          <h2>{t("admin_cms")}</h2>
-          <Link to="/admin/news">{t("admin_manage")}</Link>
+      <section className="admin-section">
+        <div className="admin-section-head">
+          <h2>{t("admin_quick_add")}</h2>
+          <p>{t("admin_quick_add_d")}</p>
         </div>
-        <div className="admin-page-grid">
-          {ADMIN_PAGES.map((p) => (
-            <div key={p.id} className="admin-page-tile">
-              <span className="admin-page-tile-mark" aria-hidden>
-                {pageMarks[p.id] || "·"}
+        <div className="admin-quick-grid">
+          {ADMIN_QUICK_ADD.map((item) => (
+            <Link
+              key={item.id}
+              to={`${item.to}?new=1`}
+              className="admin-quick-card"
+            >
+              <span className="admin-quick-ico" aria-hidden>
+                {item.ico}
               </span>
-              <strong>{t(p.key)}</strong>
-              <div className="admin-page-tile-actions">
-                <Link to={p.adminTo} className="admin-btn is-seal">
-                  {t("admin_manage")}
-                </Link>
-                <a
-                  className="admin-btn"
-                  href={p.to}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t("admin_preview")}
-                </a>
-              </div>
-            </div>
+              <strong>
+                + {t(item.key)}
+              </strong>
+              <em>{t("admin_add")}</em>
+            </Link>
           ))}
         </div>
       </section>
 
-      <section className="admin-card">
-        <div className="admin-card-head">
-          <h2>{t("admin_recent_leads")}</h2>
-          <Link to="/admin/leads">{t("admin_all_leads")}</Link>
+      <section className="admin-section">
+        <div className="admin-section-head row">
+          <div>
+            <h2>{t("admin_recent_leads")}</h2>
+            <p>
+              {stats.neu > 0
+                ? `${stats.neu} ${t("admin_stat_new").toLowerCase()}`
+                : t("admin_empty_leads")}
+            </p>
+          </div>
+          <Link to="/admin/leads" className="admin-btn is-seal">
+            {t("admin_all_leads")}
+          </Link>
         </div>
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>{t("form_name")}</th>
-                <th>{t("form_phone")}</th>
-                <th>{t("form_interest")}</th>
-                <th>{t("admin_status")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.slice(0, 8).map((r) => (
-                <tr key={r.id}>
-                  <td>{r.name}</td>
-                  <td>
-                    <a href={`tel:${r.phone}`}>{r.phone}</a>
-                  </td>
-                  <td>{r.interest}</td>
-                  <td>
-                    <span className={`admin-badge is-${r.status || "new"}`}>
-                      {t(`admin_status_${r.status || "new"}`)}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={4}>{t("admin_empty_leads")}</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+
+        <div className="admin-rn-list admin-dash-leads">
+          {recent.length === 0 ? (
+            <p className="admin-empty">{t("admin_empty_leads")}</p>
+          ) : (
+            recent.map((r) => (
+              <Link
+                key={r.id}
+                to="/admin/leads"
+                className="admin-rn-card admin-dash-lead"
+              >
+                <span className="admin-rn-card-main">
+                  <strong>{r.name}</strong>
+                  <em>
+                    {r.phone} · {r.interest}
+                  </em>
+                </span>
+                <span className={`admin-badge is-${r.status || "new"}`}>
+                  {t(`admin_status_${r.status || "new"}`)}
+                </span>
+              </Link>
+            ))
+          )}
+        </div>
+      </section>
+
+      <section className="admin-section">
+        <div className="admin-section-head">
+          <h2>{t("admin_cms")}</h2>
+          <p>{t("admin_group_content_d")}</p>
+        </div>
+        <div className="admin-map-grid">
+          {ADMIN_HUB_GROUPS.map((g) => (
+            <div key={g.id} className="admin-map-card">
+              <h3>{t(g.titleKey)}</h3>
+              <p>{t(g.hintKey)}</p>
+              <ul>
+                {g.items.map((item) => (
+                  <li key={item.id}>
+                    <Link to={item.to}>
+                      <span aria-hidden>{item.ico}</span>
+                      {t(item.key)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </section>
     </div>

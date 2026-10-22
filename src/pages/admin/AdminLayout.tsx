@@ -2,46 +2,17 @@ import { NavLink, Outlet, Navigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../lib/AuthContext";
 import { useI18n } from "../../i18n/I18nContext";
 import { Logo } from "../../components/Logo";
-
-const navMain = [
-  { to: "/admin", end: true, key: "admin_dash", ico: "▣" },
-  { to: "/admin/leads", key: "admin_leads", ico: "☎" },
-  { to: "/admin/pages", key: "admin_pages", ico: "▦" },
-  { to: "/admin/settings", key: "admin_settings", ico: "⚙" },
-  { to: "/admin/staff", key: "admin_staff", ico: "人" },
-] as const;
-
-const navPages = [
-  { to: "/admin/news", key: "nav_news", ico: "新" },
-  { to: "/admin/products", key: "nav_shop", ico: "店" },
-  { to: "/admin/courses", key: "nav_courses", ico: "汉" },
-  { to: "/admin/travel", key: "nav_travel", ico: "✈" },
-  { to: "/admin/universities", key: "nav_uni", ico: "学" },
-  { to: "/admin/branches", key: "admin_branches", ico: "址" },
-  { to: "/admin/windows", key: "admin_windows", ico: "日" },
-  { to: "/admin/translation", key: "admin_translation", ico: "译" },
-  { to: "/admin/kids", key: "admin_kids", ico: "童" },
-  { to: "/admin/quiz", key: "admin_quiz", ico: "测" },
-  { to: "/admin/media", key: "admin_media", ico: "图" },
-] as const;
-
-/** Bottom tabs — React Native style (phone) */
-const tabBar = [
-  { to: "/admin", end: true, key: "admin_dash", ico: "▣" },
-  { to: "/admin/leads", key: "admin_leads", ico: "☎" },
-  { to: "/admin/pages", key: "admin_cms", ico: "▦" },
-  { to: "/admin/settings", key: "admin_settings", ico: "⚙" },
-] as const;
+import {
+  ADMIN_CMS_SIDE,
+  ADMIN_MAIN,
+  ADMIN_TABBAR,
+  isAdminCmsPath,
+} from "../../lib/adminNav";
 
 function tabActive(pathname: string, to: string, end?: boolean) {
   if (end) return pathname === to || pathname === `${to}/`;
   if (to === "/admin/pages") {
-    return (
-      pathname.startsWith("/admin/pages") ||
-      navPages.some((n) => pathname.startsWith(n.to)) ||
-      pathname.startsWith("/admin/staff") ||
-      pathname.startsWith("/admin/media")
-    );
+    return isAdminCmsPath(pathname) || pathname.startsWith("/admin/media");
   }
   return pathname === to || pathname.startsWith(`${to}/`);
 }
@@ -79,12 +50,12 @@ export function AdminLayout() {
         </div>
 
         <nav className="admin-nav" aria-label={t("admin_title")}>
-          <p className="admin-nav-group">{t("admin_dash")}</p>
-          {navMain.map((item) => (
+          <p className="admin-nav-group">{t("admin_group_main")}</p>
+          {ADMIN_MAIN.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
-              end={"end" in item ? item.end : false}
+              end={item.end}
               className={({ isActive }) =>
                 `admin-nav-link${isActive ? " is-active" : ""}`
               }
@@ -96,8 +67,8 @@ export function AdminLayout() {
             </NavLink>
           ))}
 
-          <p className="admin-nav-group">{t("admin_cms")}</p>
-          {navPages.map((item) => (
+          <p className="admin-nav-group">{t("admin_group_content")}</p>
+          {ADMIN_CMS_SIDE.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -138,17 +109,13 @@ export function AdminLayout() {
       </div>
 
       <nav className="admin-tabbar" aria-label={t("admin_title")}>
-        {tabBar.map((item) => {
-          const active = tabActive(
-            pathname,
-            item.to,
-            "end" in item ? item.end : false,
-          );
+        {ADMIN_TABBAR.map((item) => {
+          const active = tabActive(pathname, item.to, item.end);
           return (
             <NavLink
               key={item.to}
               to={item.to}
-              end={"end" in item ? item.end : false}
+              end={item.end}
               className={`admin-tab${active ? " is-active" : ""}`}
             >
               <span className="admin-tab-ico" aria-hidden>
