@@ -1,15 +1,16 @@
 import { Link } from "react-router-dom";
 import { ConsultForm } from "../components/ConsultForm";
-import { PageShell, Reveal } from "../components/PageShell";
+import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { useI18n } from "../i18n/I18nContext";
 import { useSiteContent } from "../lib/SiteContentContext";
+import { loc } from "../lib/i18nText";
 
 const MAP_SRC =
   "https://maps.google.com/maps?q=Union%20Building%20Ulaanbaatar&t=&z=15&ie=UTF8&iwloc=&output=embed";
 
 export function Contact() {
-  const { t } = useI18n();
-  const { academyLive: academy } = useSiteContent();
+  const { t, lang } = useI18n();
+  const { academyLive: academy, branchesLive } = useSiteContent();
 
   return (
     <PageShell className="page-contact is-app">
@@ -90,6 +91,33 @@ export function Contact() {
             </Link>
           </div>
         </Reveal>
+      </section>
+
+      <section className="section tight">
+        <Reveal>
+          <h2 className="app-section-title">{t("branches_title")}</h2>
+        </Reveal>
+        <Stagger className="app-list">
+          {branchesLive.map((b) => (
+            <StaggerItem key={b.id}>
+              <a href={`tel:${b.phones[0]}`} className="app-row">
+                <span className="app-row-icon" aria-hidden>
+                  址
+                </span>
+                <span className="app-row-body">
+                  <strong>{loc(lang, t, b.title, b.titleKey)}</strong>
+                  <em>
+                    {loc(lang, t, b.address, b.addrKey) ||
+                      b.phoneDisplay.join(" · ")}
+                  </em>
+                </span>
+                <span className="app-row-chevron" aria-hidden>
+                  ›
+                </span>
+              </a>
+            </StaggerItem>
+          ))}
+        </Stagger>
       </section>
 
       <section className="section tight">

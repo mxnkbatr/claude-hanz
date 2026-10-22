@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useInView, useReducedMotion } from "framer-motion";
 import { useI18n } from "../i18n/I18nContext";
+import { useSiteContent } from "../lib/SiteContentContext";
 
 type Stat = {
   value: number;
@@ -12,13 +13,15 @@ type Stat = {
     | "stat_students";
 };
 
-/** Client deck (Taniltsuulga): 7300 grads, 1080 scholarships, 300+ unis, 4 branches */
-const STATS: Stat[] = [
-  { value: 7300, suffix: "+", labelKey: "stat_students" },
-  { value: 1080, suffix: "+", labelKey: "stat_scholarship" },
-  { value: 300, suffix: "+", labelKey: "stat_unis" },
-  { value: 4, labelKey: "stat_branches" },
-];
+function parseStat(
+  raw: string | undefined,
+  fallback: string,
+): { value: number; suffix?: string } {
+  const s = (raw || fallback).trim();
+  const m = s.match(/^(\d+)(.*)$/);
+  if (!m) return { value: 0 };
+  return { value: Number(m[1]), suffix: m[2] || undefined };
+}
 
 function useCountUp(target: number, active: boolean, reduce: boolean | null) {
   const [n, setN] = useState(0);
@@ -69,13 +72,27 @@ function StatItem({
 
 export function StatsStrip() {
   const { t } = useI18n();
+  const { academyLive: a } = useSiteContent();
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.4 });
+
+  const stats: Stat[] = useMemo(() => {
+    const students = parseStat(a.graduates, "7300+");
+    const scholarship = parseStat(a.scholarshipStudents, "1080+");
+    const unis = parseStat(a.partnerUniversities, "300+");
+    const branches = parseStat(a.branchCount, "4");
+    return [
+      { ...students, labelKey: "stat_students" },
+      { ...scholarship, labelKey: "stat_scholarship" },
+      { ...unis, labelKey: "stat_unis" },
+      { ...branches, labelKey: "stat_branches" },
+    ];
+  }, [a]);
 
   return (
     <section className="stats-strip section" ref={ref} aria-label={t("stats_title")}>
       <div className="stats-strip-inner">
-        {STATS.map((s) => (
+        {stats.map((s) => (
           <StatItem key={s.labelKey} stat={s} active={inView} />
         ))}
       </div>

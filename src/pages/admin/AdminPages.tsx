@@ -12,6 +12,7 @@ const marks: Record<string, string> = {
   quiz: "测",
   about: "院",
   contact: "☎",
+  translation: "译",
   enroll: "✓",
 };
 

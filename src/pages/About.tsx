@@ -1,16 +1,17 @@
 import { Link } from "react-router-dom";
 import {
-  academy,
-  branchesMeta,
   chinaProgramsMeta,
   coursesMeta,
   whyHanzMeta,
 } from "../data/content";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { useI18n } from "../i18n/I18nContext";
+import { useSiteContent } from "../lib/SiteContentContext";
+import { loc } from "../lib/i18nText";
 
 export function About() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const { academyLive: academy, branchesLive } = useSiteContent();
 
   return (
     <PageShell className="page-about is-app">
@@ -83,14 +84,14 @@ export function About() {
           </div>
         </Reveal>
         <Stagger className="app-list">
-          {branchesMeta.map((b) => (
+          {branchesLive.map((b) => (
             <StaggerItem key={b.id}>
               <a href={`tel:${b.phones[0]}`} className="app-row">
                 <span className="app-row-icon" aria-hidden>
                   地
                 </span>
                 <span className="app-row-body">
-                  <strong>{t(b.titleKey)}</strong>
+                  <strong>{loc(lang, t, b.title, b.titleKey)}</strong>
                   <em>{b.phoneDisplay.join(" · ")}</em>
                 </span>
                 <span className="app-row-chevron" aria-hidden>
@@ -233,11 +234,11 @@ export function About() {
           </div>
         </Reveal>
         <Stagger className="home-branch-grid">
-          {branchesMeta.map((b) => (
+          {branchesLive.map((b) => (
             <StaggerItem key={b.id}>
               <article className="home-branch-card">
-                <h3>{t(b.titleKey)}</h3>
-                <p>{t(b.addrKey)}</p>
+                <h3>{loc(lang, t, b.title, b.titleKey)}</h3>
+                <p>{loc(lang, t, b.address, b.addrKey)}</p>
                 <div className="home-branch-phones">
                   {b.phoneDisplay.map((display, i) => (
                     <a key={display} href={`tel:${b.phones[i]}`}>

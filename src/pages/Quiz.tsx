@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   optionLabel,
-  questionsForLevel,
   quizLevels,
   shuffleIndices,
   type QuizLevel,
@@ -11,6 +10,7 @@ import {
 } from "../data/quiz";
 import { PageShell, Reveal } from "../components/PageShell";
 import { useI18n } from "../i18n/I18nContext";
+import { useSiteContent } from "../lib/SiteContentContext";
 import { hapticLight, hapticMedium, hapticSuccess } from "../lib/native";
 import { ease } from "../lib/motion";
 
@@ -41,8 +41,8 @@ const LEVEL_GLYPH: Record<QuizLevel, string> = {
   hsk3: "三",
 };
 
-function buildPlay(level: QuizLevel): PlayState {
-  const pool = questionsForLevel(level);
+function buildPlay(level: QuizLevel, all: QuizQuestion[]): PlayState {
+  const pool = all.filter((q) => q.level === level);
   const order = shuffleIndices(pool.length);
   const first = pool[order[0]];
   return {
@@ -56,13 +56,14 @@ function buildPlay(level: QuizLevel): PlayState {
     bestStreak: 0,
     picked: null,
     locked: false,
-    optionOrder: shuffleIndices(first.options.length),
+    optionOrder: shuffleIndices(first?.options.length ?? 0),
     endedByHearts: false,
   };
 }
 
 export function Quiz() {
   const { t, lang } = useI18n();
+  const { quizQuestionsLive } = useSiteContent();
   const [phase, setPhase] = useState<Phase>("pick");
   const [level, setLevel] = useState<QuizLevel | null>(null);
   const [play, setPlay] = useState<PlayState | null>(null);
@@ -86,8 +87,10 @@ export function Quiz() {
       : false;
 
   function startLevel(next: QuizLevel) {
+    const pool = quizQuestionsLive as QuizQuestion[];
+    if (!pool.some((q) => q.level === next)) return;
     setLevel(next);
-    setPlay(buildPlay(next));
+    setPlay(buildPlay(next, pool));
     setPhase("play");
     void hapticLight();
   }

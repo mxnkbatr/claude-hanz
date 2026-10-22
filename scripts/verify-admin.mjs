@@ -21,20 +21,16 @@ function ok(name, pass, detail = "") {
 }
 
 async function main() {
-  // 1) Public can insert lead
+  // 1) Public can insert lead (no .select — anon has no SELECT policy)
   const phone = `99${Date.now().toString().slice(-6)}`;
-  const { data: inserted, error: insErr } = await sb
-    .from("enrollments")
-    .insert({
-      name: "Admin Verify",
-      phone,
-      kind: "consult",
-      interest: "consult",
-      message: "verify-admin script",
-    })
-    .select("id,status")
-    .maybeSingle();
-  ok("lead insert (anon)", !insErr && !!inserted?.id, insErr?.message || inserted?.status);
+  const { error: insErr } = await sb.from("enrollments").insert({
+    name: "Admin Verify",
+    phone,
+    kind: "consult",
+    interest: "consult",
+    message: "verify-admin script",
+  });
+  ok("lead insert (anon, no select)", !insErr, insErr?.message);
 
   // 2) Anon cannot list leads (RLS)
   const { data: leak, error: leakErr } = await sb
@@ -55,12 +51,19 @@ async function main() {
     .maybeSingle();
   ok("site_content public read", !siteErr && site?.id === 1, siteErr?.message);
 
-  // 4) anon cannot update site_content
-  const { error: updErr } = await sb
+  // 4) anon cannot update site_content (RLS may return no error + 0 rows)
+  const before = await sb.from("site_content").select("data").eq("id", 1).maybeSingle();
+  const { data: updData, error: updErr } = await sb
     .from("site_content")
-    .update({ data: { hacked: true } })
-    .eq("id", 1);
-  ok("site_content blocked for anon", !!updErr, updErr?.message || "unexpectedly allowed");
+    .update({ data: { ...(before.data?.data || {}), __hack: true } })
+    .eq("id", 1)
+    .select("data");
+  const hacked = Boolean(updData?.[0]?.data?.__hack);
+  ok(
+    "site_content blocked for anon",
+    !hacked,
+    updErr?.message || (hacked ? "writable" : "0 rows / blocked"),
+  );
 
   // 5) admin allowlist not publicly listable (except own email when authed)
   const { data: allow, error: allowErr } = await sb

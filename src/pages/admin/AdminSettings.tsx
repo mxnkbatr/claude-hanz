@@ -29,11 +29,19 @@ export function AdminSettings() {
         phoneRaw: [phoneRaw0, phoneRaw1].filter(Boolean),
         email: String(fd.get("email") || "").trim(),
         address: String(fd.get("address") || "").trim(),
+        hours: String(fd.get("hours") || "").trim(),
+        registerUrl: String(fd.get("registerUrl") || "").trim(),
         facebook: String(fd.get("facebook") || "").trim(),
         instagram: String(fd.get("instagram") || "").trim(),
         messenger: String(fd.get("messenger") || "").trim(),
         shopUrl: String(fd.get("shopUrl") || "").trim(),
         whatsapp: String(fd.get("whatsapp") || "").trim(),
+        graduates: String(fd.get("graduates") || "").trim(),
+        scholarshipStudents: String(fd.get("scholarshipStudents") || "").trim(),
+        partnerUniversities: String(
+          fd.get("partnerUniversities") || "",
+        ).trim(),
+        branchCount: String(fd.get("branchCount") || "").trim(),
       },
     };
     const res = await saveBundle(next);
@@ -52,6 +60,7 @@ export function AdminSettings() {
       </header>
 
       <form className="admin-form admin-card" onSubmit={onSubmit}>
+        <h3 className="admin-form-section">{t("admin_settings_contact")}</h3>
         <label>
           <span>{t("form_phone")} 1</span>
           <input name="phone0" defaultValue={a.phone[0] || academy.phone[0]} />
@@ -68,6 +77,19 @@ export function AdminSettings() {
           <span>{t("footer_address")}</span>
           <textarea name="address" rows={3} defaultValue={a.address} />
         </label>
+        <label>
+          <span>{t("hours_label")}</span>
+          <input name="hours" defaultValue={a.hours || academy.hours} />
+        </label>
+        <label>
+          <span>{t("admin_register_url")}</span>
+          <input
+            name="registerUrl"
+            defaultValue={a.registerUrl || academy.registerUrl}
+          />
+        </label>
+
+        <h3 className="admin-form-section">{t("admin_settings_social")}</h3>
         <label>
           <span>Facebook</span>
           <input name="facebook" defaultValue={a.facebook} />
@@ -87,6 +109,40 @@ export function AdminSettings() {
         <label>
           <span>Shop URL</span>
           <input name="shopUrl" defaultValue={a.shopUrl} />
+        </label>
+
+        <h3 className="admin-form-section">{t("admin_settings_stats")}</h3>
+        <label>
+          <span>{t("stat_students")}</span>
+          <input
+            name="graduates"
+            defaultValue={a.graduates || academy.graduates}
+          />
+        </label>
+        <label>
+          <span>{t("stat_scholarship")}</span>
+          <input
+            name="scholarshipStudents"
+            defaultValue={
+              a.scholarshipStudents || academy.scholarshipStudents
+            }
+          />
+        </label>
+        <label>
+          <span>{t("stat_unis")}</span>
+          <input
+            name="partnerUniversities"
+            defaultValue={
+              a.partnerUniversities || academy.partnerUniversities
+            }
+          />
+        </label>
+        <label>
+          <span>{t("stat_branches")}</span>
+          <input
+            name="branchCount"
+            defaultValue={a.branchCount || "4"}
+          />
         </label>
 
         {err && <p className="admin-err">{err}</p>}

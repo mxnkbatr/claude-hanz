@@ -8,6 +8,7 @@ const navMain = [
   { to: "/admin/leads", key: "admin_leads", ico: "☎" },
   { to: "/admin/pages", key: "admin_pages", ico: "▦" },
   { to: "/admin/settings", key: "admin_settings", ico: "⚙" },
+  { to: "/admin/staff", key: "admin_staff", ico: "人" },
 ] as const;
 
 const navPages = [
@@ -16,6 +17,12 @@ const navPages = [
   { to: "/admin/courses", key: "nav_courses", ico: "汉" },
   { to: "/admin/travel", key: "nav_travel", ico: "✈" },
   { to: "/admin/universities", key: "nav_uni", ico: "学" },
+  { to: "/admin/branches", key: "admin_branches", ico: "址" },
+  { to: "/admin/windows", key: "admin_windows", ico: "日" },
+  { to: "/admin/translation", key: "admin_translation", ico: "译" },
+  { to: "/admin/kids", key: "admin_kids", ico: "童" },
+  { to: "/admin/quiz", key: "admin_quiz", ico: "测" },
+  { to: "/admin/media", key: "admin_media", ico: "图" },
 ] as const;
 
 export function AdminLayout() {

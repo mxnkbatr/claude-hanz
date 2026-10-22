@@ -43,11 +43,32 @@ type Draft = {
   filter_key: string;
   image_url: string;
   price: string;
+  href: string;
+  highlights: string;
   in_stock: boolean;
   hidden: boolean;
   sort_order: number;
   published_at: string;
 };
+
+const COURSE_FILTERS = [
+  "classroom",
+  "online",
+  "corporate",
+  "short",
+  "kids",
+  "year",
+  "hsk",
+  "speak",
+  "english",
+] as const;
+
+const CITY_KEYS = [
+  "map_beijing",
+  "map_chongqing",
+  "map_nanjing",
+  "map_chengdu",
+] as const;
 
 function blankDraft(): Draft {
   return {
@@ -61,6 +82,8 @@ function blankDraft(): Draft {
     filter_key: "tag_academy",
     image_url: "",
     price: "0",
+    href: "",
+    highlights: "",
     in_stock: true,
     hidden: false,
     sort_order: 0,
@@ -69,12 +92,19 @@ function blankDraft(): Draft {
 }
 
 function rowToDraft(r: CmsRow, collection: CollectionKey = "news"): Draft {
+  const meta = (r.meta || {}) as {
+    href?: string;
+    highlights?: string[];
+    cityKey?: string;
+  };
   const fallbackFilter =
     collection === "products"
       ? "porcelain"
       : collection === "courses"
         ? "classroom"
-        : "tag_academy";
+        : collection === "universities"
+          ? meta.cityKey || r.city?.mn || ""
+          : "tag_academy";
   return {
     id: r.id,
     slug: r.slug,
@@ -87,6 +117,12 @@ function rowToDraft(r: CmsRow, collection: CollectionKey = "news"): Draft {
     filter_key: r.filter_key || fallbackFilter,
     image_url: r.image_url || "",
     price: String(r.price ?? 0),
+    href: String((r.meta as { href?: string } | undefined)?.href || ""),
+    highlights: Array.isArray(r.highlights)
+      ? (r.highlights as string[]).join("\n")
+      : Array.isArray((r.meta as { highlights?: string[] } | undefined)?.highlights)
+        ? ((r.meta as { highlights: string[] }).highlights || []).join("\n")
+        : "",
     in_stock: r.in_stock ?? true,
     hidden: r.hidden,
     sort_order: r.sort_order ?? 0,
@@ -113,6 +149,7 @@ export function AdminCollection({
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [draft, setDraft] = useState<Draft | null>(null);
+  const [q, setQ] = useState("");
 
   const load = async () => {
     const { data, error } = await listCms(table, { includeHidden: true });
@@ -128,10 +165,20 @@ export function AdminCollection({
     void load();
   }, [table]);
 
-  const sorted = useMemo(
-    () => [...rows].sort((a, b) => a.sort_order - b.sort_order),
-    [rows],
-  );
+  const sorted = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return [...rows]
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .filter((r) => {
+        if (!needle) return true;
+        const title =
+          r.title?.[lang] || r.title?.mn || r.title?.en || r.title?.zh || "";
+        return (
+          title.toLowerCase().includes(needle) ||
+          r.slug.toLowerCase().includes(needle)
+        );
+      });
+  }, [rows, q, lang]);
 
   function openNew() {
     const d = blankDraft();
@@ -172,12 +219,19 @@ export function AdminCollection({
         filter_key: draft.filter_key || "porcelain",
         price: Number(draft.price) || 0,
         in_stock: draft.in_stock,
+        meta: { href: draft.href.trim() || undefined },
       });
     }
     if (key === "courses") {
       Object.assign(base, {
         tag: draft.tag,
         filter_key: draft.filter_key || "classroom",
+        meta: {
+          highlights: draft.highlights
+            .split("\n")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        },
       });
     }
     if (key === "travel") {
@@ -185,11 +239,19 @@ export function AdminCollection({
         tag: draft.tag,
         duration: draft.duration,
         price: draft.price === "" ? null : Number(draft.price) || 0,
+        highlights: draft.highlights
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean),
       });
     }
     if (key === "universities") {
+      const cityKey = draft.filter_key || "";
       Object.assign(base, {
-        city: draft.city,
+        city: cityKey
+          ? { mn: cityKey, en: cityKey, zh: cityKey }
+          : draft.city,
+        meta: { cityKey: cityKey || undefined },
       });
     }
 
@@ -223,6 +285,23 @@ export function AdminCollection({
     else await load();
   }
 
+  async function moveRow(row: CmsRow, dir: -1 | 1) {
+    const ordered = [...rows].sort((a, b) => a.sort_order - b.sort_order);
+    const idx = ordered.findIndex((r) => r.id === row.id);
+    const swap = ordered[idx + dir];
+    if (idx < 0 || !swap) return;
+    setBusy(true);
+    const a = row.sort_order;
+    const b = swap.sort_order;
+    const [r1, r2] = await Promise.all([
+      updateCms(table, row.id, { sort_order: b }),
+      updateCms(table, swap.id, { sort_order: a }),
+    ]);
+    setBusy(false);
+    if (r1.error || r2.error) setErr(r1.error || r2.error || "");
+    else await load();
+  }
+
   return (
     <div className="admin-page">
       <header className="admin-head">
@@ -232,6 +311,15 @@ export function AdminCollection({
           + {t("admin_add")}
         </button>
       </header>
+
+      <label className="admin-search">
+        <span className="sr-only">{t("admin_search_cms")}</span>
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={t("admin_search_cms")}
+        />
+      </label>
 
       {err && <p className="admin-err">{err}</p>}
 
@@ -277,13 +365,6 @@ export function AdminCollection({
               multiline
               rows={6}
             />
-            {key === "universities" && (
-              <MultiLangField
-                label={t("uni_filter_label")}
-                value={draft.city}
-                onChange={(city) => setDraft({ ...draft, city })}
-              />
-            )}
             {key === "travel" && (
               <MultiLangField
                 label={t("admin_duration_field")}
@@ -356,21 +437,97 @@ export function AdminCollection({
             )}
 
             {key === "products" && (
+              <>
+                <label className="admin-field">
+                  <span>{t("shop_filter_label")}</span>
+                  <select
+                    value={draft.filter_key || "porcelain"}
+                    onChange={(e) =>
+                      setDraft({ ...draft, filter_key: e.target.value })
+                    }
+                  >
+                    <option value="porcelain">{t("cat_porcelain")}</option>
+                    <option value="books">{t("cat_books")}</option>
+                  </select>
+                </label>
+                <label className="admin-field">
+                  <span>{t("admin_product_href")}</span>
+                  <input
+                    value={draft.href}
+                    onChange={(e) =>
+                      setDraft({ ...draft, href: e.target.value })
+                    }
+                    placeholder="https://"
+                  />
+                </label>
+              </>
+            )}
+
+            {key === "courses" && (
+              <>
+                <label className="admin-field">
+                  <span>{t("admin_filter_key")}</span>
+                  <select
+                    value={draft.filter_key || "classroom"}
+                    onChange={(e) =>
+                      setDraft({ ...draft, filter_key: e.target.value })
+                    }
+                  >
+                    {COURSE_FILTERS.map((f) => (
+                      <option key={f} value={f}>
+                        {f}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="admin-field">
+                  <span>{t("admin_highlights")}</span>
+                  <textarea
+                    rows={3}
+                    value={draft.highlights}
+                    onChange={(e) =>
+                      setDraft({ ...draft, highlights: e.target.value })
+                    }
+                    placeholder="course_xxx_h1&#10;course_xxx_h2"
+                  />
+                </label>
+              </>
+            )}
+
+            {key === "travel" && (
               <label className="admin-field">
-                <span>{t("shop_filter_label")}</span>
+                <span>{t("admin_highlights")}</span>
+                <textarea
+                  rows={3}
+                  value={draft.highlights}
+                  onChange={(e) =>
+                    setDraft({ ...draft, highlights: e.target.value })
+                  }
+                  placeholder="travel_china_h1&#10;travel_china_h2"
+                />
+              </label>
+            )}
+
+            {key === "universities" && (
+              <label className="admin-field">
+                <span>{t("uni_filter_label")}</span>
                 <select
-                  value={draft.filter_key || "porcelain"}
+                  value={draft.filter_key || ""}
                   onChange={(e) =>
                     setDraft({ ...draft, filter_key: e.target.value })
                   }
                 >
-                  <option value="porcelain">{t("cat_porcelain")}</option>
-                  <option value="books">{t("cat_books")}</option>
+                  <option value="">—</option>
+                  {CITY_KEYS.map((c) => (
+                    <option key={c} value={c}>
+                      {t(c)}
+                    </option>
+                  ))}
                 </select>
               </label>
             )}
 
-            {(key === "news" || key === "courses") && (
+            {key === "news" && (
               <label className="admin-field">
                 <span>{t("admin_filter_key")}</span>
                 <input
@@ -438,6 +595,24 @@ export function AdminCollection({
                     </td>
                     <td>{r.hidden ? t("admin_hide") : t("admin_visible")}</td>
                     <td className="admin-row-actions">
+                      <button
+                        type="button"
+                        className="admin-btn"
+                        disabled={busy}
+                        onClick={() => void moveRow(r, -1)}
+                        title={t("admin_move_up")}
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-btn"
+                        disabled={busy}
+                        onClick={() => void moveRow(r, 1)}
+                        title={t("admin_move_down")}
+                      >
+                        ↓
+                      </button>
                       <button
                         type="button"
                         className="admin-btn"

@@ -733,3 +733,35 @@
 .admin-row-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .admin-btn.is-danger { color: var(--seal); border-color: rgba(225,29,56,0.25); }
 .admin-muted { color: rgba(18,17,15,0.4); font-weight: 500; font-style: normal; }
+.admin-form-section {
+  margin: 1.25rem 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  color: rgba(18, 17, 15, 0.55);
+}
+.admin-search {
+  display: block;
+  margin: 0 0 1rem;
+}
+.admin-search input,
+.admin-toolbar input {
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid rgba(18, 17, 15, 0.1);
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
+  font: inherit;
+  background: #fff;
+}
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.admin-toolbar input {
+  flex: 1;
+  min-width: 180px;
+}

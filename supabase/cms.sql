@@ -46,9 +46,11 @@ create table if not exists public.products (
   updated_at timestamptz not null default now()
 );
 
--- Existing DBs created before filter_key existed
+-- Existing DBs created before filter_key / meta existed
 alter table public.products
   add column if not exists filter_key text not null default 'porcelain';
+alter table public.products
+  add column if not exists meta jsonb not null default '{}'::jsonb;
 
 -- ─── Courses ─────────────────────────────────────────────────
 create table if not exists public.courses (

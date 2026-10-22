@@ -26,6 +26,13 @@ import { AdminPages } from "./pages/admin/AdminPages";
 import { AdminPageSection } from "./pages/admin/AdminPageSection";
 import { AdminSettings } from "./pages/admin/AdminSettings";
 import { AdminCollection } from "./pages/admin/AdminCollection";
+import { AdminBranches } from "./pages/admin/AdminBranches";
+import { AdminWindows } from "./pages/admin/AdminWindows";
+import { AdminTranslationCms } from "./pages/admin/AdminTranslationCms";
+import { AdminKids } from "./pages/admin/AdminKids";
+import { AdminQuizCms } from "./pages/admin/AdminQuizCms";
+import { AdminStaff } from "./pages/admin/AdminStaff";
+import { AdminMedia } from "./pages/admin/AdminMedia";
 
 export default function App() {
   return (
@@ -74,6 +81,13 @@ export default function App() {
           />
           <Route path="pages/:section" element={<AdminPageSection />} />
           <Route path="settings" element={<AdminSettings />} />
+          <Route path="branches" element={<AdminBranches />} />
+          <Route path="windows" element={<AdminWindows />} />
+          <Route path="translation" element={<AdminTranslationCms />} />
+          <Route path="kids" element={<AdminKids />} />
+          <Route path="quiz" element={<AdminQuizCms />} />
+          <Route path="staff" element={<AdminStaff />} />
+          <Route path="media" element={<AdminMedia />} />
         </Route>
 
         <Route element={<Layout />}>

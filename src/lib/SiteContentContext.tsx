@@ -12,9 +12,15 @@ import { listCms, type CmsRow } from "./cmsApi";
 import {
   emptyBundle,
   mergeAcademy,
+  mergeBranches,
   mergeCourses,
+  mergeKidsLevels,
+  mergeKidsSchedules,
+  mergeKidsTeachers,
   mergeNews,
   mergeProducts,
+  mergeQuizQuestions,
+  mergeTranslationFeatures,
   mergeTravel,
   mergeUniversities,
   type SiteBundle,
@@ -31,6 +37,12 @@ type Ctx = {
   coursesLive: ReturnType<typeof mergeCourses>;
   travelLive: ReturnType<typeof mergeTravel>;
   universitiesLive: ReturnType<typeof mergeUniversities>;
+  branchesLive: ReturnType<typeof mergeBranches>;
+  translationFeaturesLive: ReturnType<typeof mergeTranslationFeatures>;
+  kidsTeachersLive: ReturnType<typeof mergeKidsTeachers>;
+  kidsLevelsLive: ReturnType<typeof mergeKidsLevels>;
+  kidsSchedulesLive: ReturnType<typeof mergeKidsSchedules>;
+  quizQuestionsLive: ReturnType<typeof mergeQuizQuestions>;
 };
 
 const SiteCtx = createContext<Ctx | null>(null);
@@ -63,7 +75,11 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
         listCms("universities"),
       ]);
 
-    if (!siteRes.error && siteRes.data?.data && typeof siteRes.data.data === "object") {
+    if (
+      !siteRes.error &&
+      siteRes.data?.data &&
+      typeof siteRes.data.data === "object"
+    ) {
       setBundle({ ...emptyBundle(), ...(siteRes.data.data as SiteBundle) });
     }
 
@@ -104,6 +120,12 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
       coursesLive: mergeCourses(bundle, cms.courses),
       travelLive: mergeTravel(bundle, cms.travel),
       universitiesLive: mergeUniversities(bundle, cms.universities),
+      branchesLive: mergeBranches(bundle),
+      translationFeaturesLive: mergeTranslationFeatures(bundle),
+      kidsTeachersLive: mergeKidsTeachers(bundle),
+      kidsLevelsLive: mergeKidsLevels(bundle),
+      kidsSchedulesLive: mergeKidsSchedules(bundle),
+      quizQuestionsLive: mergeQuizQuestions(bundle),
     }),
     [bundle, cms, loading, refresh, saveBundle],
   );

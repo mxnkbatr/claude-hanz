@@ -5,6 +5,7 @@ import { useI18n } from "../../i18n/I18nContext";
 import { hapticLight } from "../../lib/native";
 
 const statuses: LeadStatus[] = ["new", "contacted", "done", "spam"];
+const PAGE = 50;
 
 export function AdminLeads() {
   const { t } = useI18n();
@@ -14,6 +15,9 @@ export function AdminLeads() {
     "all",
   );
   const [q, setQ] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [page, setPage] = useState(0);
   const [err, setErr] = useState("");
   const [busyId, setBusyId] = useState("");
 
@@ -22,7 +26,7 @@ export function AdminLeads() {
       .from("enrollments")
       .select("*")
       .order("created_at", { ascending: false })
-      .limit(300);
+      .limit(1000);
     if (error) {
       setErr(error.message);
       return;
@@ -37,15 +41,24 @@ export function AdminLeads() {
 
   const list = useMemo(() => {
     const query = q.trim().toLowerCase();
+    const fromTs = from ? new Date(from).getTime() : null;
+    const toTs = to ? new Date(to).getTime() + 86400000 - 1 : null;
     return rows.filter((r) => {
       if (filter !== "all" && (r.status || "new") !== filter) return false;
       if (kind !== "all" && r.kind !== kind) return false;
+      const created = new Date(r.created_at).getTime();
+      if (fromTs != null && created < fromTs) return false;
+      if (toTs != null && created > toTs) return false;
       if (!query) return true;
-      return `${r.name} ${r.phone} ${r.interest} ${r.message || ""}`
+      return `${r.name} ${r.phone} ${r.interest} ${r.message || ""} ${r.child_age || ""}`
         .toLowerCase()
         .includes(query);
     });
-  }, [rows, filter, kind, q]);
+  }, [rows, filter, kind, q, from, to]);
+
+  const pageCount = Math.max(1, Math.ceil(list.length / PAGE));
+  const pageSafe = Math.min(page, pageCount - 1);
+  const pageRows = list.slice(pageSafe * PAGE, pageSafe * PAGE + PAGE);
 
   async function patch(
     id: string,
@@ -86,6 +99,7 @@ export function AdminLeads() {
       "phone",
       "kind",
       "interest",
+      "child_age",
       "status",
       "message",
       "admin_note",
@@ -99,6 +113,7 @@ export function AdminLeads() {
           r.phone,
           r.kind,
           r.interest,
+          r.child_age || "",
           r.status || "new",
           (r.message || "").replace(/"/g, "'"),
           (r.admin_note || "").replace(/"/g, "'"),
@@ -129,12 +144,18 @@ export function AdminLeads() {
         <input
           type="search"
           value={q}
-          onChange={(e) => setQ(e.target.value)}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setPage(0);
+          }}
           placeholder={t("admin_search_leads")}
         />
         <select
           value={filter}
-          onChange={(e) => setFilter(e.target.value as typeof filter)}
+          onChange={(e) => {
+            setFilter(e.target.value as typeof filter);
+            setPage(0);
+          }}
         >
           <option value="all">{t("filter_all")}</option>
           {statuses.map((s) => (
@@ -145,13 +166,34 @@ export function AdminLeads() {
         </select>
         <select
           value={kind}
-          onChange={(e) => setKind(e.target.value as typeof kind)}
+          onChange={(e) => {
+            setKind(e.target.value as typeof kind);
+            setPage(0);
+          }}
         >
           <option value="all">{t("filter_all")}</option>
           <option value="course">{t("nav_courses")}</option>
           <option value="travel">{t("nav_travel")}</option>
           <option value="consult">{t("enroll_interest_consult")}</option>
         </select>
+        <input
+          type="date"
+          value={from}
+          onChange={(e) => {
+            setFrom(e.target.value);
+            setPage(0);
+          }}
+          aria-label={t("admin_date_from")}
+        />
+        <input
+          type="date"
+          value={to}
+          onChange={(e) => {
+            setTo(e.target.value);
+            setPage(0);
+          }}
+          aria-label={t("admin_date_to")}
+        />
         <button type="button" className="admin-btn" onClick={() => void load()}>
           {t("admin_refresh")}
         </button>
@@ -161,9 +203,12 @@ export function AdminLeads() {
       </div>
 
       {err && <p className="admin-err">{err}</p>}
+      <p className="admin-muted">
+        {list.length} · {t("admin_page")} {pageSafe + 1}/{pageCount}
+      </p>
 
       <div className="admin-leads">
-        {list.map((r) => (
+        {pageRows.map((r) => (
           <article key={r.id} className="admin-lead-card">
             <div className="admin-lead-top">
               <div>
@@ -190,7 +235,12 @@ export function AdminLeads() {
               <a href={`tel:${r.phone}`}>{r.phone}</a>
               {" · "}
               {r.interest}
-              {r.child_age ? ` · ${r.child_age}` : ""}
+              {r.child_age ? (
+                <>
+                  {" · "}
+                  {t("form_child_age")}: {r.child_age}
+                </>
+              ) : null}
             </p>
             {r.message && <p className="admin-lead-msg">{r.message}</p>}
             <label className="admin-note">
@@ -231,8 +281,31 @@ export function AdminLeads() {
             </div>
           </article>
         ))}
-        {list.length === 0 && <p className="admin-empty">{t("admin_empty_leads")}</p>}
+        {list.length === 0 && (
+          <p className="admin-empty">{t("admin_empty_leads")}</p>
+        )}
       </div>
+
+      {pageCount > 1 && (
+        <div className="admin-toolbar">
+          <button
+            type="button"
+            className="admin-btn"
+            disabled={pageSafe <= 0}
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            className="admin-btn"
+            disabled={pageSafe >= pageCount - 1}
+            onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+          >
+            →
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,18 +2,13 @@ import { Link } from "react-router-dom";
 import { ConsultForm } from "../components/ConsultForm";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { useI18n } from "../i18n/I18nContext";
+import { DEFAULT_TRANS_FEATURE_KEYS } from "../lib/cms";
 import { useSiteContent } from "../lib/SiteContentContext";
-
-const FEATS = [
-  { t: "trans_feat_1_t", d: "trans_feat_1_d", ico: "文" },
-  { t: "trans_feat_2_t", d: "trans_feat_2_d", ico: "言" },
-  { t: "trans_feat_3_t", d: "trans_feat_3_d", ico: "书" },
-  { t: "trans_feat_4_t", d: "trans_feat_4_d", ico: "✓" },
-] as const;
+import { loc } from "../lib/i18nText";
 
 export function Translation() {
-  const { t } = useI18n();
-  const { academyLive: academy } = useSiteContent();
+  const { t, lang } = useI18n();
+  const { academyLive: academy, translationFeaturesLive } = useSiteContent();
 
   return (
     <PageShell className="page-translation is-app ios-app">
@@ -31,19 +26,25 @@ export function Translation() {
           <h2 className="h2 desk-only">{t("trans_services_lead")}</h2>
         </Reveal>
         <Stagger className="app-list">
-          {FEATS.map((f) => (
-            <StaggerItem key={f.t}>
-              <div className="app-row app-row-static">
-                <span className="app-row-icon" aria-hidden>
-                  {f.ico}
-                </span>
-                <span className="app-row-body">
-                  <strong>{t(f.t)}</strong>
-                  <em>{t(f.d)}</em>
-                </span>
-              </div>
-            </StaggerItem>
-          ))}
+          {translationFeaturesLive.map((f, i) => {
+            const def =
+              DEFAULT_TRANS_FEATURE_KEYS.find((d) => d.id === f.id) ??
+              DEFAULT_TRANS_FEATURE_KEYS[i] ??
+              DEFAULT_TRANS_FEATURE_KEYS[0];
+            return (
+              <StaggerItem key={f.id}>
+                <div className="app-row app-row-static">
+                  <span className="app-row-icon" aria-hidden>
+                    {f.ico || def.ico}
+                  </span>
+                  <span className="app-row-body">
+                    <strong>{loc(lang, t, f.title, def.t)}</strong>
+                    <em>{loc(lang, t, f.body, def.d)}</em>
+                  </span>
+                </div>
+              </StaggerItem>
+            );
+          })}
         </Stagger>
       </section>
 

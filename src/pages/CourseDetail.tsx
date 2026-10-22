@@ -1,12 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import {
-  getCourseById,
-  kidsLevels,
-  kidsSchedules,
-  kidsTeachersByIds,
-  type KidsScheduleId,
-} from "../data/content";
+import { getCourseById } from "../data/content";
 import {
   addCourseComment,
   getCourseComments,
@@ -26,18 +20,23 @@ import { hapticLight } from "../lib/native";
 export function CourseDetail() {
   const { id = "" } = useParams();
   const { t, lang } = useI18n();
-  const { coursesLive } = useSiteContent();
+  const {
+    coursesLive,
+    kidsLevelsLive,
+    kidsSchedulesLive,
+    kidsTeachersLive,
+  } = useSiteContent();
   const course = (coursesLive.find((c) => c.id === id) ??
     getCourseById(id)) as CourseLive | undefined;
 
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">(
     "idle",
   );
-  const [level, setLevel] = useState<(typeof kidsLevels)[number]["id"]>(
-    kidsLevels[0].id,
+  const [level, setLevel] = useState(
+    () => kidsLevelsLive[0]?.id || "beginner",
   );
-  const [schedule, setSchedule] = useState<KidsScheduleId>(
-    kidsSchedules[0].id,
+  const [schedule, setSchedule] = useState(
+    () => kidsSchedulesLive[0]?.id || "wd_afternoon",
   );
   const [comments, setComments] = useState<CourseComment[]>(() =>
     id ? getCourseComments(id) : [],
@@ -45,11 +44,13 @@ export function CourseDetail() {
   const [commentStatus, setCommentStatus] = useState<"idle" | "ok">("idle");
 
   const isKids = course?.id === "kids";
-  const levelMeta = kidsLevels.find((l) => l.id === level);
-  const teachers = useMemo(
-    () => (levelMeta ? kidsTeachersByIds(levelMeta.teacherIds) : []),
-    [levelMeta],
-  );
+  const levelMeta = kidsLevelsLive.find((l) => l.id === level);
+  const teachers = useMemo(() => {
+    if (!levelMeta) return [];
+    return kidsTeachersLive.filter((teacher) =>
+      levelMeta.teacherIds.includes(teacher.id),
+    );
+  }, [levelMeta, kidsTeachersLive]);
 
   if (!course) {
     // legacy slot urls → kids program
@@ -80,13 +81,19 @@ export function CourseDetail() {
     if (isKids && (!childName || !level || !schedule)) return;
 
     setStatus("sending");
-    const schMeta = kidsSchedules.find((s) => s.id === schedule);
+    const schMeta = kidsSchedulesLive.find((s) => s.id === schedule);
     const courseTitle = loc(lang, t, course.title, course.titleKey);
     const message = isKids
       ? [
           `${t("kids_form_child")}: ${childName}`,
-          `${t("kids_form_level")}: ${levelMeta ? t(levelMeta.labelKey) : level}`,
-          `${t("kids_form_schedule")}: ${schMeta ? t(schMeta.metaKey) : schedule}`,
+          `${t("kids_form_level")}: ${
+            levelMeta
+              ? loc(lang, t, levelMeta.label, levelMeta.labelKey)
+              : level
+          }`,
+          `${t("kids_form_schedule")}: ${
+            schMeta ? loc(lang, t, schMeta.meta, schMeta.metaKey) : schedule
+          }`,
           note,
         ]
           .filter(Boolean)
@@ -205,7 +212,7 @@ export function CourseDetail() {
               <section className="course-detail-block">
                 <h2 className="ios-label">{t("kids_form_level")}</h2>
                 <div className="course-detail-slots">
-                  {kidsLevels.map((l) => (
+                  {kidsLevelsLive.map((l) => (
                     <button
                       key={l.id}
                       type="button"
@@ -217,8 +224,8 @@ export function CourseDetail() {
                         void hapticLight();
                       }}
                     >
-                      <strong>{t(l.labelKey)}</strong>
-                      <em>{t(l.ageKey)}</em>
+                      <strong>{loc(lang, t, l.label, l.labelKey)}</strong>
+                      <em>{loc(lang, t, l.age, l.ageKey)}</em>
                     </button>
                   ))}
                 </div>
@@ -229,16 +236,19 @@ export function CourseDetail() {
               <section className="course-detail-block">
                 <h2 className="ios-label">{t("kids_teachers_label")}</h2>
                 <ul className="course-detail-teachers">
-                  {teachers.map((teacher) => (
-                    <li key={teacher.id}>
-                      <SafeImage
-                        src={teacher.photo}
-                        alt={t(teacher.nameKey)}
-                        className="course-detail-teacher-photo"
-                      />
-                      <span>{t(teacher.nameKey)}</span>
-                    </li>
-                  ))}
+                  {teachers.map((teacher) => {
+                    const name = loc(lang, t, teacher.name, teacher.nameKey);
+                    return (
+                      <li key={teacher.id}>
+                        <SafeImage
+                          src={teacher.photo}
+                          alt={name}
+                          className="course-detail-teacher-photo"
+                        />
+                        <span>{name}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </section>
             </Reveal>
@@ -247,7 +257,7 @@ export function CourseDetail() {
               <section className="course-detail-block">
                 <h2 className="ios-label">{t("kids_pick_schedule")}</h2>
                 <div className="course-detail-slots">
-                  {kidsSchedules.map((s) => (
+                  {kidsSchedulesLive.map((s) => (
                     <button
                       key={s.id}
                       type="button"
@@ -260,7 +270,7 @@ export function CourseDetail() {
                       }}
                     >
                       <strong>{s.time}</strong>
-                      <em>{t(s.daysKey)}</em>
+                      <em>{loc(lang, t, s.days, s.daysKey)}</em>
                     </button>
                   ))}
                 </div>

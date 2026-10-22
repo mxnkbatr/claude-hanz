@@ -8,13 +8,14 @@ import { EnrollDock } from "../components/EnrollDock";
 import { PageShell, Reveal } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
 import { useI18n } from "../i18n/I18nContext";
+import { mergeEnrollWindows } from "../lib/cms";
 import { useSiteContent } from "../lib/SiteContentContext";
 import { loc } from "../lib/i18nText";
 
 export function UniversityDetail() {
   const { id = "" } = useParams();
   const { t, lang } = useI18n();
-  const { universitiesLive } = useSiteContent();
+  const { universitiesLive, bundle } = useSiteContent();
 
   const track = getUniversityById(id);
   const school = universitiesLive.find((x) => x.id === id);
@@ -24,7 +25,10 @@ export function UniversityDetail() {
   /* ── Country track (china / poland) ── */
   if (track) {
     const other = universitiesMeta.find((x) => x.id !== track.id);
-    const hasOpen = track.enrollWindows.some((w) => w.status === "open");
+    const windows =
+      mergeEnrollWindows(bundle, "university", track.id) ??
+      track.enrollWindows;
+    const hasOpen = windows.some((w) => w.status === "open");
     const enrollTo = `/enroll?interest=consult&uni=${track.id}`;
     const bodyParas = t(track.bodyKey)
       .split("\n")
@@ -84,7 +88,7 @@ export function UniversityDetail() {
                 </div>
 
                 <ul className="uni-enroll-list">
-                  {track.enrollWindows.map((w) => (
+                  {windows.map((w) => (
                     <li
                       key={w.id}
                       className={`uni-enroll-row is-${w.status}`}

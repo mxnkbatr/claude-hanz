@@ -22,7 +22,24 @@ create policy "admins_read_allowlist"
   on public.admin_allowlist
   for select
   to authenticated
-  using (lower(email) = lower(coalesce(auth.jwt() ->> 'email', '')));
+  using (
+    public.is_admin()
+    or lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+  );
+
+drop policy if exists "admins_insert_allowlist" on public.admin_allowlist;
+create policy "admins_insert_allowlist"
+  on public.admin_allowlist
+  for insert
+  to authenticated
+  with check (public.is_admin());
+
+drop policy if exists "admins_delete_allowlist" on public.admin_allowlist;
+create policy "admins_delete_allowlist"
+  on public.admin_allowlist
+  for delete
+  to authenticated
+  using (public.is_admin());
 
 create or replace function public.is_admin()
 returns boolean
