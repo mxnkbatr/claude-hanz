@@ -324,12 +324,27 @@ export function AdminCollection({
       {err && <p className="admin-err">{err}</p>}
 
       {draft && (
-        <section className="admin-card admin-cms-form">
-          <div className="admin-card-head">
+        <section className="admin-card admin-cms-form admin-sheet">
+          <div className="admin-card-head admin-sheet-head">
+            <button
+              type="button"
+              className="admin-sheet-back"
+              onClick={() => setDraft(null)}
+            >
+              ← {t("admin_cancel")}
+            </button>
             <h2>{draft.id ? t("admin_edit") : t("admin_add")}</h2>
             <button
               type="button"
-              className="admin-ghost-btn"
+              className="admin-btn is-seal admin-sheet-save"
+              disabled={busy}
+              onClick={() => void save()}
+            >
+              {t("admin_save")}
+            </button>
+            <button
+              type="button"
+              className="admin-ghost-btn admin-desk-cancel"
               onClick={() => setDraft(null)}
             >
               {t("admin_cancel")}
@@ -551,7 +566,7 @@ export function AdminCollection({
             </label>
           </div>
 
-          <div className="admin-form-actions">
+          <div className="admin-form-actions admin-sticky-save">
             <button
               type="button"
               className="admin-btn is-seal"
@@ -564,7 +579,73 @@ export function AdminCollection({
         </section>
       )}
 
-      <section className="admin-card">
+      {/* Phone: card list */}
+      <section className="admin-rn-list" aria-label={t(TITLE_KEY[key])}>
+        {sorted.length === 0 ? (
+          <p className="admin-empty">{t("admin_cms_empty")}</p>
+        ) : (
+          sorted.map((r) => {
+            const title =
+              r.title?.[lang] || r.title?.mn || r.title?.en || r.slug;
+            return (
+              <article key={r.id} className="admin-rn-card">
+                <button
+                  type="button"
+                  className="admin-rn-card-main"
+                  onClick={() => setDraft(rowToDraft(r, key))}
+                >
+                  <strong>{title}</strong>
+                  <em>
+                    {r.slug}
+                    {r.hidden ? ` · ${t("admin_hide")}` : ""}
+                  </em>
+                </button>
+                <div className="admin-rn-card-actions">
+                  <button
+                    type="button"
+                    className="admin-icon-btn"
+                    disabled={busy}
+                    onClick={() => void moveRow(r, -1)}
+                    aria-label={t("admin_move_up")}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-icon-btn"
+                    disabled={busy}
+                    onClick={() => void moveRow(r, 1)}
+                    aria-label={t("admin_move_down")}
+                  >
+                    ↓
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-icon-btn"
+                    disabled={busy}
+                    onClick={() => void toggleHidden(r)}
+                    aria-label={r.hidden ? t("admin_show") : t("admin_hide")}
+                  >
+                    {r.hidden ? "○" : "●"}
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-icon-btn is-danger"
+                    disabled={busy}
+                    onClick={() => void del(r)}
+                    aria-label={t("admin_delete")}
+                  >
+                    ×
+                  </button>
+                </div>
+              </article>
+            );
+          })
+        )}
+      </section>
+
+      {/* Desktop: table */}
+      <section className="admin-card admin-desk-table">
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
@@ -644,6 +725,17 @@ export function AdminCollection({
           </table>
         </div>
       </section>
+
+      {!draft && (
+        <button
+          type="button"
+          className="admin-fab"
+          onClick={openNew}
+          aria-label={t("admin_add")}
+        >
+          +
+        </button>
+      )}
     </div>
   );
 }

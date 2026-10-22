@@ -1,4 +1,4 @@
-import { NavLink, Outlet, Navigate, Link } from "react-router-dom";
+import { NavLink, Outlet, Navigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../lib/AuthContext";
 import { useI18n } from "../../i18n/I18nContext";
 import { Logo } from "../../components/Logo";
@@ -25,13 +25,35 @@ const navPages = [
   { to: "/admin/media", key: "admin_media", ico: "图" },
 ] as const;
 
+/** Bottom tabs — React Native style (phone) */
+const tabBar = [
+  { to: "/admin", end: true, key: "admin_dash", ico: "▣" },
+  { to: "/admin/leads", key: "admin_leads", ico: "☎" },
+  { to: "/admin/pages", key: "admin_cms", ico: "▦" },
+  { to: "/admin/settings", key: "admin_settings", ico: "⚙" },
+] as const;
+
+function tabActive(pathname: string, to: string, end?: boolean) {
+  if (end) return pathname === to || pathname === `${to}/`;
+  if (to === "/admin/pages") {
+    return (
+      pathname.startsWith("/admin/pages") ||
+      navPages.some((n) => pathname.startsWith(n.to)) ||
+      pathname.startsWith("/admin/staff") ||
+      pathname.startsWith("/admin/media")
+    );
+  }
+  return pathname === to || pathname.startsWith(`${to}/`);
+}
+
 export function AdminLayout() {
   const { t } = useI18n();
   const { user, loading, isAdmin, adminChecked } = useAuth();
+  const { pathname } = useLocation();
 
   if (loading || !adminChecked) {
     return (
-      <div className="admin-shell">
+      <div className="admin-shell admin-shell-native">
         <p className="admin-loading">{t("auth_busy")}</p>
       </div>
     );
@@ -46,8 +68,8 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="admin-shell">
-      <aside className="admin-side">
+    <div className="admin-shell admin-shell-native">
+      <aside className="admin-side admin-side-desk">
         <div className="admin-side-brand">
           <Logo size="sm" />
           <div>
@@ -98,9 +120,45 @@ export function AdminLayout() {
         </div>
       </aside>
 
+      <header className="admin-topbar">
+        <div className="admin-topbar-brand">
+          <Logo size="sm" />
+          <div>
+            <strong>{t("admin_title")}</strong>
+            <em>{user.email}</em>
+          </div>
+        </div>
+        <Link to="/" className="admin-topbar-link">
+          {t("admin_view_site")}
+        </Link>
+      </header>
+
       <div className="admin-main">
         <Outlet />
       </div>
+
+      <nav className="admin-tabbar" aria-label={t("admin_title")}>
+        {tabBar.map((item) => {
+          const active = tabActive(
+            pathname,
+            item.to,
+            "end" in item ? item.end : false,
+          );
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={"end" in item ? item.end : false}
+              className={`admin-tab${active ? " is-active" : ""}`}
+            >
+              <span className="admin-tab-ico" aria-hidden>
+                {item.ico}
+              </span>
+              <span className="admin-tab-label">{t(item.key)}</span>
+            </NavLink>
+          );
+        })}
+      </nav>
     </div>
   );
 }

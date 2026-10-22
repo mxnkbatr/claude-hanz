@@ -148,9 +148,11 @@ export function AdminSettings() {
         {err && <p className="admin-err">{err}</p>}
         {msg && <p className="admin-ok">{msg}</p>}
 
-        <button type="submit" className="admin-btn is-seal" disabled={busy}>
-          {busy ? t("form_sending") : t("admin_save")}
-        </button>
+        <div className="admin-sticky-save">
+          <button type="submit" className="admin-btn is-seal" disabled={busy}>
+            {busy ? t("form_sending") : t("admin_save")}
+          </button>
+        </div>
       </form>
     </div>
   );
