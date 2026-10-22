@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import { academy } from "../data/content";
 import { ConsultForm } from "../components/ConsultForm";
 import { PageShell, Reveal, Stagger, StaggerItem } from "../components/PageShell";
 import { useI18n } from "../i18n/I18nContext";
+import { useSiteContent } from "../lib/SiteContentContext";
 
 const FEATS = [
   { t: "trans_feat_1_t", d: "trans_feat_1_d", ico: "文" },
@@ -13,6 +13,7 @@ const FEATS = [
 
 export function Translation() {
   const { t } = useI18n();
+  const { academyLive: academy } = useSiteContent();
 
   return (
     <PageShell className="page-translation is-app ios-app">

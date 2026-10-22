@@ -5,26 +5,36 @@ import { PageShell, Reveal } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
 import { useI18n } from "../i18n/I18nContext";
 import { useSiteContent } from "../lib/SiteContentContext";
+import type { TravelLive } from "../lib/cms";
+import { loc } from "../lib/i18nText";
 
 export function TravelDetail() {
   const { id = "" } = useParams();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { travelLive } = useSiteContent();
-  const pack = travelLive.find((x) => x.id === id) ?? getTravelById(id);
+  const pack = (travelLive.find((x) => x.id === id) ??
+    getTravelById(id)) as TravelLive | undefined;
 
   if (!pack) return <Navigate to="/travel" replace />;
 
   const meta = getTravelById(pack.id);
-  const windows = meta?.enrollWindows ?? [];
+  const windows = pack.enrollWindows ?? meta?.enrollWindows ?? [];
   const other = travelLive.find((x) => x.id !== pack.id);
   const interest = pack.id === "china" ? "travel_china" : "travel_poland";
   const enrollTo = `/enroll?interest=${interest}`;
   const hasOpen = windows.some((w) => w.status === "open");
 
-  const paragraphs = t(pack.bodyKey)
+  const title = loc(lang, t, pack.title, pack.titleKey);
+  const tag = loc(lang, t, pack.tag, pack.tagKey);
+  const lead = loc(lang, t, pack.duration, pack.descKey);
+  const bodyText = loc(lang, t, pack.body, pack.bodyKey);
+  const paragraphs = bodyText
     .split("\n")
     .map((p) => p.trim())
     .filter(Boolean);
+  const otherTitle = other
+    ? loc(lang, t, other.title, other.titleKey)
+    : "";
 
   return (
     <PageShell className="page-detail page-travel is-app ios-app has-enroll-dock">
@@ -37,18 +47,14 @@ export function TravelDetail() {
       <article className="app-detail">
         <Reveal>
           <div className="app-detail-hero">
-            <SafeImage
-              src={pack.image}
-              alt={t(pack.titleKey)}
-              loading="eager"
-            />
+            <SafeImage src={pack.image} alt={title} loading="eager" />
           </div>
         </Reveal>
 
         <Reveal delay={0.05}>
           <div className="app-detail-body">
             <div className="app-detail-topline">
-              <p className="app-pill">{t(pack.tagKey)}</p>
+              <p className="app-pill">{tag}</p>
               {hasOpen && (
                 <span className="uni-enroll-status is-open">
                   {t("uni_status_open")}
@@ -56,8 +62,8 @@ export function TravelDetail() {
               )}
             </div>
 
-            <h1 className="h1">{t(pack.titleKey)}</h1>
-            <p className="app-sub">{t(pack.descKey)}</p>
+            <h1 className="h1">{title}</h1>
+            {lead && <p className="app-sub">{lead}</p>}
 
             <div className="uni-detail-copy">
               {paragraphs.map((p) => (
@@ -65,16 +71,18 @@ export function TravelDetail() {
               ))}
             </div>
 
-            <section className="uni-enroll app-ios-group">
-              <div className="uni-enroll-head">
-                <h2>{t("detail_more")}</h2>
-              </div>
-              <ul className="app-ios-points">
-                {pack.highlights.map((h) => (
-                  <li key={h}>{t(h)}</li>
-                ))}
-              </ul>
-            </section>
+            {pack.highlights?.length > 0 && (
+              <section className="uni-enroll app-ios-group">
+                <div className="uni-enroll-head">
+                  <h2>{t("detail_more")}</h2>
+                </div>
+                <ul className="app-ios-points">
+                  {pack.highlights.map((h) => (
+                    <li key={h}>{t(h)}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
             {windows.length > 0 && (
               <section
@@ -117,7 +125,7 @@ export function TravelDetail() {
               <SafeImage src={other.image} alt="" />
             </span>
             <span className="app-row-body">
-              <strong>{t(other.titleKey)}</strong>
+              <strong>{otherTitle}</strong>
               <em>{t("related")}</em>
             </span>
             <span className="app-row-chevron" aria-hidden>

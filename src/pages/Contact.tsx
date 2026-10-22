@@ -1,14 +1,15 @@
 import { Link } from "react-router-dom";
-import { academy } from "../data/content";
 import { ConsultForm } from "../components/ConsultForm";
 import { PageShell, Reveal } from "../components/PageShell";
 import { useI18n } from "../i18n/I18nContext";
+import { useSiteContent } from "../lib/SiteContentContext";
 
 const MAP_SRC =
   "https://maps.google.com/maps?q=Union%20Building%20Ulaanbaatar&t=&z=15&ie=UTF8&iwloc=&output=embed";
 
 export function Contact() {
   const { t } = useI18n();
+  const { academyLive: academy } = useSiteContent();
 
   return (
     <PageShell className="page-contact is-app">

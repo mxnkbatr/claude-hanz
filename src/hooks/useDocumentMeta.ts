@@ -8,6 +8,14 @@ import {
   getUniversityById,
 } from "../data/content";
 import { useI18n } from "../i18n/I18nContext";
+import { useSiteContent } from "../lib/SiteContentContext";
+import type {
+  CourseLive,
+  NewsLive,
+  ProductLive,
+  TravelLive,
+} from "../lib/cms";
+import { loc } from "../lib/i18nText";
 
 const routeMetaKey: Record<string, string> = {
   "/": "meta_home",
@@ -22,6 +30,7 @@ const routeMetaKey: Record<string, string> = {
   "/profile": "meta_profile",
   "/auth": "meta_auth",
   "/quiz": "meta_quiz",
+  "/translation": "nav_translation",
 };
 
 const BRAND = "Ханз Академи";
@@ -29,6 +38,13 @@ const BRAND = "Ханз Академи";
 export function useDocumentMeta() {
   const { pathname } = useLocation();
   const { t, lang } = useI18n();
+  const {
+    coursesLive,
+    newsLive,
+    productsLive,
+    travelLive,
+    universitiesLive,
+  } = useSiteContent();
 
   useEffect(() => {
     const siteTitle = t("meta_title");
@@ -39,29 +55,43 @@ export function useDocumentMeta() {
     const courseMatch = matchPath("/courses/:id", pathname);
 
     if (courseMatch?.params.id) {
-      const item = getCourseById(courseMatch.params.id);
+      const id = courseMatch.params.id;
+      const item = (coursesLive.find((c) => c.id === id) ??
+        getCourseById(id)) as CourseLive | undefined;
       document.title = item
-        ? `${t(item.titleKey)} · ${BRAND}`
+        ? `${loc(lang, t, item.title, item.titleKey)} · ${BRAND}`
         : `${t("not_found_title")} · ${BRAND}`;
     } else if (newsMatch?.params.id) {
-      const item = getNewsById(newsMatch.params.id);
+      const id = newsMatch.params.id;
+      const item = (newsLive.find((n) => n.id === id) ??
+        getNewsById(id)) as NewsLive | undefined;
       document.title = item
-        ? `${t(item.titleKey)} · ${BRAND}`
+        ? `${loc(lang, t, item.title, item.titleKey)} · ${BRAND}`
         : `${t("not_found_title")} · ${BRAND}`;
     } else if (shopMatch?.params.id) {
-      const item = getProductById(shopMatch.params.id);
+      const id = shopMatch.params.id;
+      const item = (productsLive.find((p) => p.id === id) ??
+        getProductById(id)) as ProductLive | undefined;
       document.title = item
-        ? `${t(item.titleKey)} · ${BRAND}`
+        ? `${loc(lang, t, item.title, item.titleKey)} · ${BRAND}`
         : `${t("not_found_title")} · ${BRAND}`;
     } else if (uniMatch?.params.id) {
-      const item = getUniversityById(uniMatch.params.id);
-      document.title = item
-        ? `${t(item.titleKey)} · ${BRAND}`
-        : `${t("not_found_title")} · ${BRAND}`;
+      const id = uniMatch.params.id;
+      const track = getUniversityById(id);
+      const school = universitiesLive.find((u) => u.id === id);
+      if (track) {
+        document.title = `${t(track.titleKey)} · ${BRAND}`;
+      } else if (school) {
+        document.title = `${loc(lang, t, school.title, school.nameMnKey || school.titleKey)} · ${BRAND}`;
+      } else {
+        document.title = `${t("not_found_title")} · ${BRAND}`;
+      }
     } else if (travelMatch?.params.id) {
-      const item = getTravelById(travelMatch.params.id);
+      const id = travelMatch.params.id;
+      const item = (travelLive.find((p) => p.id === id) ??
+        getTravelById(id)) as TravelLive | undefined;
       document.title = item
-        ? `${t(item.titleKey)} · ${BRAND}`
+        ? `${loc(lang, t, item.title, item.titleKey)} · ${BRAND}`
         : `${t("not_found_title")} · ${BRAND}`;
     } else {
       const known = routeMetaKey[pathname];
@@ -85,5 +115,14 @@ export function useDocumentMeta() {
     desc.setAttribute("content", t("meta_desc"));
 
     document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
-  }, [pathname, lang, t]);
+  }, [
+    pathname,
+    lang,
+    t,
+    coursesLive,
+    newsLive,
+    productsLive,
+    travelLive,
+    universitiesLive,
+  ]);
 }

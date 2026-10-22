@@ -114,6 +114,7 @@ export type CourseLive = {
   unitKey: string;
   filter: string;
   image: string;
+  highlights?: readonly string[];
   title?: I18nText;
   body?: I18nText;
   tag?: I18nText;
@@ -211,6 +212,8 @@ export function mergeProducts(
           price: Number(r.price ?? 0),
           inStock: r.in_stock ?? true,
           image: r.image_url || base?.image || "",
+          href: base?.href,
+          specs: base?.specs,
           titleKey: base?.titleKey,
           descKey: base?.descKey,
           bodyKey: base?.bodyKey,
@@ -302,14 +305,29 @@ export function mergeUniversities(
     return dbRows
       .filter((r) => !r.hidden)
       .sort((a, b) => a.sort_order - b.sort_order)
-      .map((r) => ({
-        id: r.slug || r.id,
-        title: r.title,
-        body: r.body,
-        city: r.city,
-        image: r.image_url || "",
-        fromDb: true,
-      }));
+      .map((r) => {
+        const base = chinaProgramsMeta.find((u) => u.id === r.slug);
+        const cityFromDb =
+          typeof r.city === "object" && r.city
+            ? (r.city.mn || r.city.en || r.city.zh || "").trim()
+            : "";
+        const cityKey =
+          base?.cityKey ||
+          (cityFromDb.startsWith("map_") ? cityFromDb : undefined);
+        return {
+          id: r.slug || r.id,
+          title: r.title,
+          body: r.body,
+          city: r.city,
+          cityKey,
+          titleKey: base?.titleKey,
+          descKey: base?.descKey,
+          nameMnKey: base?.nameMnKey,
+          nameZhKey: base?.nameZhKey,
+          image: r.image_url || base?.image || "",
+          fromDb: true,
+        };
+      });
   }
   const hidden = new Set(bundle.hiddenUniversity ?? []);
   return chinaProgramsMeta

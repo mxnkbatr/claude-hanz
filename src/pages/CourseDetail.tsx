@@ -17,13 +17,18 @@ import { SafeImage } from "../components/SafeImage";
 import { StickyCta } from "../components/StickyCta";
 import { SuccessBurst } from "../components/SuccessBurst";
 import { useI18n } from "../i18n/I18nContext";
+import { useSiteContent } from "../lib/SiteContentContext";
+import type { CourseLive } from "../lib/cms";
+import { loc } from "../lib/i18nText";
 import { supabase } from "../lib/supabase";
 import { hapticLight } from "../lib/native";
 
 export function CourseDetail() {
   const { id = "" } = useParams();
   const { t, lang } = useI18n();
-  const course = getCourseById(id);
+  const { coursesLive } = useSiteContent();
+  const course = (coursesLive.find((c) => c.id === id) ??
+    getCourseById(id)) as CourseLive | undefined;
 
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">(
     "idle",
@@ -52,10 +57,15 @@ export function CourseDetail() {
     return <Navigate to="/courses" replace />;
   }
 
-  const paragraphs = t(course.bodyKey)
+  const title = loc(lang, t, course.title, course.titleKey);
+  const tag = loc(lang, t, course.tag, course.tagKey);
+  const unit = course.unitKey ? t(course.unitKey) : "";
+  const bodyText = loc(lang, t, course.body, course.descKey);
+  const paragraphs = bodyText
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
+  const highlights = course.highlights ?? [];
 
   async function onEnroll(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -71,6 +81,7 @@ export function CourseDetail() {
 
     setStatus("sending");
     const schMeta = kidsSchedules.find((s) => s.id === schedule);
+    const courseTitle = loc(lang, t, course.title, course.titleKey);
     const message = isKids
       ? [
           `${t("kids_form_child")}: ${childName}`,
@@ -80,7 +91,7 @@ export function CourseDetail() {
         ]
           .filter(Boolean)
           .join("\n")
-      : [note, `${t("nav_courses")}: ${t(course.titleKey)}`]
+      : [note, `${t("nav_courses")}: ${courseTitle}`]
           .filter(Boolean)
           .join("\n");
 
@@ -151,7 +162,7 @@ export function CourseDetail() {
           <div className="course-detail-hero-media">
             <SafeImage
               src={course.image}
-              alt={t(course.titleKey)}
+              alt={title}
               loading="eager"
             />
           </div>
@@ -160,11 +171,13 @@ export function CourseDetail() {
         <Reveal>
           <header className="course-detail-hero">
             <div className="course-detail-hero-top">
-              <span className="course-detail-pill">{t(course.tagKey)}</span>
-              <span className="course-card-age">{t("kids_detail_online")}</span>
+              <span className="course-detail-pill">{tag}</span>
+              {isKids && (
+                <span className="course-card-age">{t("kids_detail_online")}</span>
+              )}
             </div>
-            <h1 className="h1">{t(course.titleKey)}</h1>
-            <p className="course-detail-lead">{t(course.unitKey)}</p>
+            <h1 className="h1">{title}</h1>
+            {unit && <p className="course-detail-lead">{unit}</p>}
           </header>
         </Reveal>
 
@@ -176,11 +189,13 @@ export function CourseDetail() {
                 <p key={p.slice(0, 24)}>{p}</p>
               ))}
             </div>
-            <ul className="course-detail-points">
-              {course.highlights.map((key) => (
-                <li key={key}>{t(key)}</li>
-              ))}
-            </ul>
+            {highlights.length > 0 && (
+              <ul className="course-detail-points">
+                {highlights.map((key) => (
+                  <li key={key}>{t(key)}</li>
+                ))}
+              </ul>
+            )}
           </section>
         </Reveal>
 

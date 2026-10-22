@@ -150,7 +150,7 @@ export function University() {
             {schools.map((p) => (
               <StaggerItem key={p.id}>
                 <AppLink
-                  to="/university/china"
+                  to={`/university/${p.id}`}
                   className="ios-card"
                   onClick={() => void hapticLight()}
                 >
