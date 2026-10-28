@@ -413,7 +413,7 @@ export const chinaProgramsMeta = [
     nameMnKey: "prog_cq_mn",
     nameZhKey: "prog_cq_zh",
     cityKey: "map_chongqing" as const,
-    image: "/courses/image4.webp",
+    image: "/images/hero-wall.webp",
   },
   {
     id: "nuaa",

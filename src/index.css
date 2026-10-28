@@ -18,10 +18,10 @@
   --radius-sm: 18px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-card: 250ms ease;
-  --font-d: "Noto Sans", "Noto Sans SC", system-ui, sans-serif;
-  --font-s: "Noto Serif", "Noto Serif SC", Georgia, serif;
-  --font-b: "Noto Sans", "Noto Sans SC", system-ui, sans-serif;
-  --font-ui: "Outfit", "Noto Sans", "Noto Sans SC", system-ui, sans-serif;
+  --font-d: "Onest", "Noto Sans SC", system-ui, sans-serif;
+  --font-s: "Cormorant Garamond", "Noto Serif SC", Georgia, serif;
+  --font-b: "Onest", "Noto Sans SC", system-ui, sans-serif;
+  --font-ui: "Onest", "Noto Sans SC", system-ui, sans-serif;
   --space: 64px;
   --pad-x: 16px;
   --top: 118px;
@@ -3806,10 +3806,10 @@
 
   .ios-app.is-app .app-head .h1,
   .ios-app .app-head .h1 {
-    font-size: clamp(2.4rem, 4.2vw, 3.6rem) !important;
+    font-size: clamp(2.8rem, 5vw, 4.4rem) !important;
     margin-bottom: 1rem;
     max-width: none;
-    line-height: 1.05;
+    line-height: 1;
   }
 
   .ios-app .app-head .lead {

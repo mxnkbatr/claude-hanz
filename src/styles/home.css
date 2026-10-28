@@ -3,22 +3,21 @@
    One orchestrated moment (hero load); everything else moves only on hover/tap. */
 
 .hz-home {
-  --hz-seal: #d8142e;
+  --hz-seal: var(--red);
   --hz-lacquer: #8a0c1f;
-  --hz-paper: #f4f5f7;
-  --hz-ink: #15151b;
-  --hz-mist: #6b6e78;
-  --hz-gold: #e9b44c;
-  --hz-rule: rgba(21, 21, 27, 0.1);
-  --hz-display: "Unbounded", "Noto Sans", "Noto Sans SC", system-ui, sans-serif;
-  --hz-text: "Onest", "Noto Sans", "Noto Sans SC", system-ui, sans-serif;
-  --hz-brush: "Ma Shan Zheng", "Noto Serif SC", "Songti SC", serif;
+  --hz-paper: var(--paper);
+  --hz-ink: var(--ink-deep);
+  --hz-mist: var(--ink-muted);
+  --hz-gold: var(--gold);
+  --hz-rule: var(--rule);
+  --hz-display: var(--font-display);
+  --hz-text: var(--font-b);
+  --hz-brush: var(--font-brush);
   --hz-gutter: clamp(16px, 4vw, 56px);
   --hz-max: 1240px;
 
   font-family: var(--hz-text);
   color: var(--hz-ink);
-  background: var(--hz-paper);
 }
 
 :where(.hz-home) a {
@@ -85,12 +84,12 @@
 }
 
 .hz-btn-seal {
-  background: var(--hz-seal);
+  background: var(--hz-ink);
   color: #fff;
 }
 
 .hz-btn-seal:hover {
-  background: var(--hz-lacquer);
+  background: var(--hz-seal);
 }
 
 /* ─── Hero ─── */
@@ -191,7 +190,8 @@
 
 .hz-glyph-caption strong {
   font-family: var(--hz-display);
-  font-size: 1.35rem;
+  font-size: 1.7rem;
+  font-style: italic;
   font-weight: 600;
   color: #fff;
 }
@@ -239,9 +239,9 @@
 .hz-hero-title {
   margin: 0;
   font-family: var(--hz-display);
-  font-weight: 700;
-  font-size: clamp(2.6rem, 7.4vw, 6.6rem);
-  line-height: 1;
+  font-weight: 600;
+  font-size: clamp(3.4rem, 9vw, 8.2rem);
+  line-height: 0.92;
   letter-spacing: -0.035em;
   color: #fff;
 }
@@ -306,7 +306,6 @@
 .hz-paper {
   position: relative;
   z-index: 1;
-  background: var(--hz-paper);
 }
 
 .hz-section {
@@ -327,9 +326,9 @@
   margin: 0;
   max-width: 18ch;
   font-family: var(--hz-display);
-  font-weight: 650;
-  font-size: clamp(1.7rem, 3.6vw, 3rem);
-  line-height: 1.08;
+  font-weight: 600;
+  font-size: clamp(2.2rem, 4.4vw, 3.8rem);
+  line-height: 1;
   letter-spacing: -0.03em;
   color: var(--hz-ink);
 }
@@ -370,16 +369,17 @@
   margin: 0;
   font-family: var(--hz-display);
   font-weight: 500;
-  font-size: clamp(1.45rem, 3vw, 2.6rem);
-  line-height: 1.25;
-  letter-spacing: -0.03em;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
   color: var(--hz-ink);
 }
 
 .hz-num {
   color: var(--hz-seal);
+  font-style: italic;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   white-space: nowrap;
 }
 
@@ -429,7 +429,7 @@
 .hz-index-text strong {
   font-family: var(--hz-display);
   font-weight: 600;
-  font-size: clamp(1.1rem, 2vw, 1.55rem);
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
@@ -616,7 +616,7 @@
 .hz-news-lead h3 {
   font-family: var(--hz-display);
   font-weight: 600;
-  font-size: clamp(1.3rem, 2.3vw, 1.85rem);
+  font-size: clamp(1.7rem, 2.8vw, 2.4rem);
   letter-spacing: -0.02em;
   line-height: 1.2;
   max-width: 26ch;
@@ -665,8 +665,9 @@
   padding: clamp(4.5rem, 10vw, 8rem) 0;
   color: #fff;
   background:
-    radial-gradient(80% 120% at 100% 0%, #e8213b, transparent 60%),
-    var(--hz-seal);
+    radial-gradient(70% 120% at 100% 0%, rgba(200, 16, 46, 0.55), transparent 60%),
+    radial-gradient(60% 90% at 0% 100%, rgba(232, 184, 109, 0.16), transparent 60%),
+    var(--lacquer);
 }
 
 .hz-final-glyph {
@@ -677,8 +678,8 @@
   font-family: var(--hz-brush);
   font-size: clamp(16rem, 38vw, 34rem);
   line-height: 1;
-  color: var(--hz-lacquer);
-  opacity: 0.55;
+  color: var(--hz-seal);
+  opacity: 0.35;
   pointer-events: none;
   user-select: none;
 }
@@ -692,9 +693,9 @@
   max-width: 14ch;
   margin: 0;
   font-family: var(--hz-display);
-  font-weight: 700;
-  font-size: clamp(2rem, 5.4vw, 4.6rem);
-  line-height: 1.02;
+  font-weight: 600;
+  font-size: clamp(2.6rem, 6.4vw, 5.6rem);
+  line-height: 0.95;
   letter-spacing: -0.035em;
   color: #fff;
 }

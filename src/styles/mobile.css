@@ -1,69 +1,36 @@
 /* ─── Phone app style ───
-   Same structure as the Elite Travel phone app (soft tinted page, ink text,
-   dark dock, gold highlights), with Hanz seal red in place of its teal.
+   Same structure as the Elite Travel phone app (dark dock, flat cards,
+   start screen), on the shared brand tokens from brand.css.
    Applies below 900px, where the site runs as the phone app. */
 
 @media (max-width: 899px) {
   :root {
-    --m-bg: #f7f0ef;
-    --m-bg-soft: #fdf9f8;
-    --m-ink: #2a0b10;
-    --m-ink-soft: #5a3439;
-    --m-muted: #82625f;
-    --m-line: rgba(42, 11, 16, 0.1);
-    --m-accent: #c8102e;
-    --m-accent-mist: #fbe1e4;
-    --m-gold: #e8b86d;
-    --m-gold-soft: #f3e0c2;
-    --m-dark: #2b0a10;
-    --m-shadow: 0 18px 48px rgba(42, 11, 16, 0.08);
-    --m-display: "Cormorant Garamond", "Noto Serif", "Noto Serif SC", Georgia, serif;
+    --m-bg: var(--paper);
+    --m-bg-soft: var(--paper-soft);
+    --m-ink: var(--ink-deep);
+    --m-ink-soft: var(--ink-mid);
+    --m-muted: var(--ink-muted);
+    --m-line: var(--rule);
+    --m-accent: var(--red);
+    --m-accent-mist: var(--red-mist);
+    --m-gold: var(--gold);
+    --m-gold-soft: var(--gold-soft);
+    --m-dark: var(--lacquer);
+    --m-display: var(--font-display);
 
-    /* Flatten the liquid-glass surfaces to solid cards, as the reference does */
-    --bg: var(--m-bg);
-    --bg-elev: var(--m-bg-soft);
-    --surface: var(--m-bg-soft);
-    --line: var(--m-line);
-    --ink: var(--m-ink);
-    --muted: var(--m-muted);
-    --seal: var(--m-accent);
-    --glass-bg: var(--m-bg-soft);
-    --glass-bg-strong: var(--m-bg-soft);
-    --glass-border: var(--m-line);
-    --glass-border-soft: var(--m-line);
+    /* Flatten the liquid-glass surfaces to solid cards */
+    --glass-bg: var(--paper-soft);
+    --glass-bg-strong: var(--paper-soft);
+    --glass-border: var(--rule);
+    --glass-border-soft: var(--rule);
     --glass-blur: none;
     --glass-inset: none;
     --glass-glow: none;
-    --ios-surface: var(--m-bg-soft);
-    --ios-stroke: var(--m-line);
+    --ios-surface: var(--paper-soft);
+    --ios-stroke: var(--rule);
     --ios-blur: none;
     --ios-shine: none;
     --shadow: none;
-  }
-
-  html,
-  body {
-    background:
-      radial-gradient(ellipse 80% 50% at 8% -8%, rgba(232, 184, 109, 0.16), transparent 50%),
-      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(200, 16, 46, 0.1), transparent 45%),
-      radial-gradient(ellipse 50% 35% at 50% 100%, rgba(232, 184, 109, 0.08), transparent 50%),
-      var(--m-bg);
-    color: var(--m-ink);
-  }
-
-  .liquid-shell .ambient {
-    display: none;
-  }
-
-  /* Header: solid capsule */
-  .app-shell .topbar .topbar-capsule,
-  .app-shell .topbar.is-over-hero:not(.is-scrolled) .topbar-capsule,
-  .app-shell .topbar.is-scrolled .topbar-capsule {
-    background: rgba(253, 249, 248, 0.95);
-    border: 1px solid var(--m-line);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 10px 40px rgba(42, 11, 16, 0.1);
   }
 
   .app-shell .topbar-icon-btn {
