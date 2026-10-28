@@ -10,7 +10,7 @@ type Props = {
 export function SafeImage({ src, alt, className, loading = "lazy" }: Props) {
   const [failed, setFailed] = useState(false);
 
-  if (failed) {
+  if (failed || !src) {
     return (
       <div
         className={`img-fallback img-fallback-han${className ? ` ${className}` : ""}`}

@@ -202,26 +202,22 @@ export const kidsTeachers = [
   {
     id: "saraa",
     nameKey: "kids_teacher_saraa",
-    photo:
-      "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=240&h=240&q=80",
+    photo: "",
   },
   {
     id: "bold",
     nameKey: "kids_teacher_bold",
-    photo:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=240&h=240&q=80",
+    photo: "",
   },
   {
     id: "nomin",
     nameKey: "kids_teacher_nomin",
-    photo:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=240&h=240&q=80",
+    photo: "",
   },
   {
     id: "tuya",
     nameKey: "kids_teacher_tuya",
-    photo:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=240&h=240&q=80",
+    photo: "",
   },
 ] as const;
 
@@ -312,8 +308,7 @@ export const travelPackagesMeta = [
       "travel_china_h2",
       "travel_china_h3",
     ] as const,
-    image:
-      "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1400&q=80",
+    image: "/images/hero-wall.webp",
     enrollWindows: [
       {
         id: "now" as const,
@@ -352,8 +347,7 @@ export const travelPackagesMeta = [
       "travel_poland_h2",
       "travel_poland_h3",
     ] as const,
-    image:
-      "https://images.unsplash.com/photo-1467269204594-59904b4cbaba?auto=format&fit=crop&w=1400&q=80",
+    image: "/courses/image11.webp",
     enrollWindows: [
       {
         id: "now" as const,
@@ -410,8 +404,7 @@ export const chinaProgramsMeta = [
     nameMnKey: "prog_bjfu_mn",
     nameZhKey: "prog_bjfu_zh",
     cityKey: "map_beijing" as const,
-    image:
-      "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/hero-palace.webp",
   },
   {
     id: "cq",
@@ -420,8 +413,7 @@ export const chinaProgramsMeta = [
     nameMnKey: "prog_cq_mn",
     nameZhKey: "prog_cq_zh",
     cityKey: "map_chongqing" as const,
-    image:
-      "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1200&q=80",
+    image: "/courses/image4.webp",
   },
   {
     id: "nuaa",
@@ -430,8 +422,7 @@ export const chinaProgramsMeta = [
     nameMnKey: "prog_nuaa_mn",
     nameZhKey: "prog_nuaa_zh",
     cityKey: "map_nanjing" as const,
-    image:
-      "https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?auto=format&fit=crop&w=1200&q=80",
+    image: "/courses/image12.webp",
   },
   {
     id: "sc",
@@ -440,8 +431,7 @@ export const chinaProgramsMeta = [
     nameMnKey: "prog_sc_mn",
     nameZhKey: "prog_sc_zh",
     cityKey: "map_chengdu" as const,
-    image:
-      "https://images.unsplash.com/photo-1537531383496-f4749b8032eb?auto=format&fit=crop&w=1200&q=80",
+    image: "/courses/image16.webp",
   },
 ] as const;
 
@@ -494,8 +484,7 @@ export const newsIds = [
     titleKey: "news1_t",
     excerptKey: "news1_e",
     bodyKey: "news1_b",
-    image:
-      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1400&q=80",
+    image: "/courses/image14.webp",
     href: "https://www.instagram.com/khanzacademy/",
   },
   {
@@ -505,8 +494,7 @@ export const newsIds = [
     titleKey: "news2_t",
     excerptKey: "news2_e",
     bodyKey: "news2_b",
-    image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1400&q=80",
+    image: "/courses/image12.webp",
     href: "https://www.instagram.com/khanzacademy/",
   },
   {
@@ -516,8 +504,7 @@ export const newsIds = [
     titleKey: "news3_t",
     excerptKey: "news3_e",
     bodyKey: "news3_b",
-    image:
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1400&q=80",
+    image: "/courses/image8.webp",
     href: "https://www.instagram.com/khanzacademy/",
   },
   {
@@ -527,8 +514,7 @@ export const newsIds = [
     titleKey: "news4_t",
     excerptKey: "news4_e",
     bodyKey: "news4_b",
-    image:
-      "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1400&q=80",
+    image: "/courses/image15.webp",
     href: "https://www.instagram.com/khanzacademy/",
   },
 ];
@@ -552,8 +538,7 @@ export const universitiesMeta = [
     descKey: "china_desc",
     bodyKey: "china_b",
     points: ["p1", "p2", "p3"] as const,
-    image:
-      "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1400&q=80",
+    image: "/images/hero-wall.webp",
     enrollWindows: [
       {
         id: "now" as const,
@@ -588,8 +573,7 @@ export const universitiesMeta = [
     descKey: "poland_desc",
     bodyKey: "poland_b",
     points: ["p4", "p5", "p6"] as const,
-    image:
-      "https://images.unsplash.com/photo-1467269204594-59904b4cbaba?auto=format&fit=crop&w=1400&q=80",
+    image: "/courses/image11.webp",
     enrollWindows: [
       {
         id: "now" as const,
@@ -665,8 +649,7 @@ export const shopProductsMeta = [
     tagKey: "tag_course",
     cat: "books" as const,
     price: 45000,
-    image:
-      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80",
+    image: "/images/hanzi-placeholder.svg",
     href: "https://www.facebook.com/HanzAcademy",
     descKey: "prod3_d",
     bodyKey: "prod3_b",
