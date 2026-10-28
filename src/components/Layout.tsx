@@ -16,6 +16,8 @@ import { hapticLight } from "../lib/native";
 import { ease, navSpring } from "../lib/motion";
 
 /** Mobile menu: 2-column iOS tiles (order matters). */
+const YEAR = new Date().getFullYear();
+
 const MENU_ORDER = [
   "/courses",
   "/shop",
@@ -353,6 +355,9 @@ export function Layout() {
               </a>
             </div>
           </div>
+        </div>
+        <div className="site-footer-bottom">
+          © {YEAR} {t("brand")} · Hanz Academy Mongolia
         </div>
       </footer>
 

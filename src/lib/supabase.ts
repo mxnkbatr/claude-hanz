@@ -9,4 +9,9 @@ if (!url || !anonKey) {
   );
 }
 
-export const supabase = createClient(url ?? "", anonKey ?? "");
+// createClient throws on an empty URL, which blanks the whole site. Fall back to
+// a dead placeholder so requests fail softly and CMS fallbacks render instead.
+export const supabase = createClient(
+  url || "https://placeholder.supabase.co",
+  anonKey || "missing-anon-key",
+);

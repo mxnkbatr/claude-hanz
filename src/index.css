@@ -11449,3 +11449,50 @@ body > .course-detail-sticky {
     transform: none;
   }
 }
+
+/* Layout polish — placed last so it wins over the stacked overrides above */
+.promo-panel > .img-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 0;
+}
+
+.site-footer-bottom {
+  width: var(--page-w);
+  margin: 1.75rem auto 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 599px) {
+  /* The flag can't share a line with the headline on phones; drop it rather than orphan it */
+  .hero-flag {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .home-shop {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: none;
+  }
+
+  .site-footer-inner {
+    grid-template-columns: 1.3fr 1fr;
+    gap: 3rem;
+  }
+
+  .site-footer-cols {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1000px) {
+  .news-grid.home-news {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

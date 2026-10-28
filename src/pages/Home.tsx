@@ -145,13 +145,10 @@ export function Home() {
           <Stagger className="split-promo">
             <StaggerItem>
               <TiltCard>
-                <Link to="/about" className="promo-panel">
-                  <img
-                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80"
-                    alt={t("about_title")}
-                  />
+                <Link to="/courses" className="promo-panel">
+                  <SafeImage src="/courses/image4.webp" alt={t("courses_title")} />
                   <div>
-                    <p className="eyebrow light">{t("about_title")}</p>
+                    <p className="eyebrow light">{t("nav_courses")}</p>
                     <h3>{t("courses_title")}</h3>
                     <span>
                       {t("view")} <i aria-hidden>→</i>
@@ -163,10 +160,7 @@ export function Home() {
             <StaggerItem>
               <TiltCard>
                 <Link to="/university" className="promo-panel">
-                  <img
-                    src="https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1200&q=80"
-                    alt={t("uni_title")}
-                  />
+                  <SafeImage src="/courses/image12.webp" alt={t("uni_title")} />
                   <div>
                     <p className="eyebrow light">{t("nav_uni")}</p>
                     <h3>{t("china_home_title")}</h3>
@@ -230,7 +224,7 @@ export function Home() {
             </div>
           </Reveal>
           <Stagger className="shop-grid home-shop">
-            {productsLive.slice(0, 2).map((p) => (
+            {productsLive.slice(0, 4).map((p) => (
               <StaggerItem key={p.id}>
                 <ProductCard product={p} />
               </StaggerItem>
