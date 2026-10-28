@@ -3806,10 +3806,10 @@
 
   .ios-app.is-app .app-head .h1,
   .ios-app .app-head .h1 {
-    font-size: clamp(2rem, 3.2vw, 2.65rem) !important;
-    margin-bottom: 0.55rem;
+    font-size: clamp(2.4rem, 4.2vw, 3.6rem) !important;
+    margin-bottom: 1rem;
     max-width: none;
-    line-height: 1.12;
+    line-height: 1.05;
   }
 
   .ios-app .app-head .lead {

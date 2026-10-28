@@ -656,6 +656,25 @@ export const featureKeys = {
       "Хичээл, их сургууль, аялал — зорилгодоо тохирсон зөвлөгөө.",
     onboard_3_title: "Бэлэн үү?",
     onboard_3_body: "Профайл үүсгээд элсэлт, мэдээ, quiz-ээ эхлүүлээрэй.",
+    // Home redesign
+    home_hero_lead:
+      "2014 оноос хойш Улаанбаатарт хятад хэл зааж, оюутнуудаа Хятадын их сургуульд тэтгэлэгтэй илгээж байна.",
+    home_cta_quiz: "Түвшнээ шалгах",
+    home_char_han: "хятад, хань",
+    home_char_xue: "суралцах",
+    home_char_meng: "мөрөөдөл",
+    home_ledger:
+      "{since} оноос хойш {grads} төгсөгч бэлтгэж, {sch} оюутныг тэтгэлэгтэй сургаж, {unis} их сургуультай хамтран ажиллаж байна.",
+    home_programs_title: "Өөрт тохирох ангиа сонго",
+    home_programs_all: "Бүх сургалт",
+    home_china_title: "Хятадад тэтгэлэгтэй сур",
+    home_china_body:
+      "Хэлний бэлтгэлээс бакалавр, магистр, доктор хүртэл. Сургууль сонгохоос виз авах хүртэл бид хамт явна.",
+    home_china_cta: "Сургуулиудыг үзэх",
+    home_final_title: "Хятад хэлээ өнөөдөр эхлүүл",
+    home_final_body:
+      "Анхан шатнаас HSK 6 хүртэл. Үнэгүй зөвлөгөө аваад өөрт тохирох ангиа сонго.",
+    home_seal: "2014 оноос",
   },
   en: {
     hero_cta_consult: "Get advice",
@@ -1304,6 +1323,25 @@ export const featureKeys = {
       "Classes, universities, and travel — advice matched to your goals.",
     onboard_3_title: "Ready to begin?",
     onboard_3_body: "Create a profile and start enrollment, news, and quiz.",
+    // Home redesign
+    home_hero_lead:
+      "Teaching Chinese in Ulaanbaatar since 2014, and sending our students to Chinese universities on scholarships.",
+    home_cta_quiz: "Check your level",
+    home_char_han: "Chinese, Han",
+    home_char_xue: "to learn",
+    home_char_meng: "dream",
+    home_ledger:
+      "Since {since} we have taught {grads} graduates, placed {sch} students on scholarships and partnered with {unis} universities.",
+    home_programs_title: "Find the class that fits you",
+    home_programs_all: "All courses",
+    home_china_title: "Study in China on a scholarship",
+    home_china_body:
+      "From language prep to bachelor's, master's and PhD. We stay with you from choosing a school to getting your visa.",
+    home_china_cta: "Browse universities",
+    home_final_title: "Start your Chinese today",
+    home_final_body:
+      "From beginner to HSK 6. Get a free consultation and pick the class that fits you.",
+    home_seal: "Since 2014",
   },
   zh: {
     hero_cta_consult: "预约咨询",
@@ -1921,5 +1959,21 @@ export const featureKeys = {
     onboard_2_body: "课程、大学与旅行 — 按目标提供建议。",
     onboard_3_title: "准备好了吗？",
     onboard_3_body: "创建资料后开始报名、资讯与测验。",
+    // Home redesign
+    home_hero_lead: "自 2014 年起在乌兰巴托教授汉语，并帮助学生获得奖学金赴中国高校留学。",
+    home_cta_quiz: "测测你的水平",
+    home_char_han: "汉语，汉族",
+    home_char_xue: "学习",
+    home_char_meng: "梦想",
+    home_ledger:
+      "自 {since} 年以来，我们培养了 {grads} 名学员，帮助 {sch} 名学生获得奖学金，并与 {unis} 所高校合作。",
+    home_programs_title: "选择适合你的课程",
+    home_programs_all: "全部课程",
+    home_china_title: "拿奖学金去中国留学",
+    home_china_body: "从语言预科到本科、硕士、博士。从选校到签证，我们全程陪伴。",
+    home_china_cta: "浏览高校",
+    home_final_title: "今天就开始学汉语",
+    home_final_body: "从零基础到 HSK 6。免费咨询，选择适合你的班级。",
+    home_seal: "始于 2014",
   },
 } as const;

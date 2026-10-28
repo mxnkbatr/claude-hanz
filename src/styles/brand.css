@@ -1,0 +1,69 @@
+/* ─── Brand layer ───
+   Loaded after index.css. Sets the site-wide type system (Onest for reading,
+   Unbounded for page and section titles) and calms the desktop header. */
+
+:root {
+  --font-d: "Onest", "Noto Sans", "Noto Sans SC", system-ui, sans-serif;
+  --font-b: "Onest", "Noto Sans", "Noto Sans SC", system-ui, sans-serif;
+  --font-ui: "Onest", "Noto Sans", "Noto Sans SC", system-ui, sans-serif;
+  --font-display: "Unbounded", "Noto Sans", "Noto Sans SC", system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-b);
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--seal);
+  color: #fff;
+}
+
+.h1,
+.h2 {
+  font-family: var(--font-display);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+/* Header: one capsule, no box nested inside it */
+.topnav {
+  background: transparent;
+  border: 0;
+}
+
+.topnav-link {
+  font-weight: 600;
+}
+
+.topnav-link.is-active {
+  color: var(--seal);
+}
+
+.topnav-pill {
+  background: var(--seal-soft);
+  box-shadow: none;
+}
+
+@media (min-width: 900px) {
+  /* Doubled scope to outrank the stacked .ios-app/.is-app head rules in index.css */
+  .app-shell .main .page-head {
+    padding: 2.75rem 0 1.25rem;
+  }
+
+  .app-shell .main .page-head .h1 {
+    font-size: clamp(2.4rem, 4.2vw, 3.6rem);
+    line-height: 1.05;
+    margin-bottom: 1rem;
+  }
+
+  .app-shell .main .page-head .lead {
+    max-width: 40rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+
+  .h2 {
+    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+  }
+}

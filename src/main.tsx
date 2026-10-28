@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import "./admin.css";
+import "./styles/brand.css";
 import App from "./App.tsx";
 import { AuthProvider } from "./lib/AuthContext.tsx";
 import { SiteContentProvider } from "./lib/SiteContentContext.tsx";
