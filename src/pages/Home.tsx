@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { PageShell } from "../components/PageShell";
 import { SafeImage } from "../components/SafeImage";
 import { ProductCard } from "../components/ProductCard";
+import { MobileHome } from "../components/MobileHome";
 import { useI18n } from "../i18n/I18nContext";
 import { useSiteContent } from "../lib/SiteContentContext";
 import { loc } from "../lib/i18nText";
@@ -454,6 +455,7 @@ export function Home() {
 
   return (
     <PageShell className="page-home hz-home">
+      <MobileHome />
       <HomeHero />
 
       <div className="hz-paper">
