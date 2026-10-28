@@ -58,7 +58,7 @@ body {
 }
 
 :focus-visible {
-  outline: 3px solid var(--gold);
+  outline: 3px solid var(--red);
   outline-offset: 3px;
 }
 
@@ -246,5 +246,33 @@ body {
     font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1.15;
+  }
+}
+
+/* ─── Colour roles ───
+   red    — the primary action and brand marks (links, numbers, hanzi)
+   ink    — secondary actions, active chips, header call button
+   gold   — highlights on dark surfaces only (1.6:1 on paper, so never as text there)
+   muted  — supporting text (4.8:1 on paper) */
+
+.topnav-link {
+  color: var(--ink-mid);
+}
+
+/* A missing photo reads as a quiet placeholder, not a loud red block */
+.img-fallback {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(232, 184, 109, 0.25), transparent 55%),
+    var(--red-mist);
+  color: var(--red);
+  font-family: var(--font-brush);
+  font-weight: 400;
+}
+
+@media (min-width: 900px) {
+  :root {
+    --shadow: 0 4px 18px rgba(42, 11, 16, 0.06);
+    --shadow-hover: 0 12px 32px rgba(42, 11, 16, 0.1);
+    --shadow-lg: 0 16px 40px rgba(42, 11, 16, 0.1);
   }
 }

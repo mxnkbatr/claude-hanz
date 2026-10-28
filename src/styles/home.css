@@ -26,7 +26,7 @@
 }
 
 .hz-home :focus-visible {
-  outline: 3px solid var(--hz-gold);
+  outline: 3px solid var(--hz-seal);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -63,187 +63,102 @@
   transform: scale(0.97);
 }
 
-.hz-btn-light {
-  background: #fff;
-  color: var(--hz-seal);
-  box-shadow: 0 12px 30px rgba(70, 0, 12, 0.28);
-}
-
-.hz-btn-light:hover {
-  box-shadow: 0 16px 40px rgba(70, 0, 12, 0.38);
-}
-
-.hz-btn-ghost {
+/* Colour roles: red = the one primary action (register), ink = secondary,
+   outline = quiet alternative; ghost is the outline for dark surfaces */
+.hz-btn-red {
+  background: var(--hz-seal);
   color: #fff;
-  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.55);
+  box-shadow: 0 12px 30px rgba(200, 16, 46, 0.25);
 }
 
-.hz-btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: inset 0 0 0 1.5px #fff;
+.hz-btn-red:hover {
+  background: #a90d26;
+  box-shadow: 0 16px 40px rgba(200, 16, 46, 0.32);
 }
 
-.hz-btn-seal {
+.hz-btn-ink {
   background: var(--hz-ink);
   color: #fff;
 }
 
-.hz-btn-seal:hover {
-  background: var(--hz-seal);
+.hz-btn-ink:hover {
+  background: #4a1219;
 }
 
-/* ─── Hero ─── */
+.hz-btn-outline {
+  color: var(--hz-ink);
+  box-shadow: inset 0 0 0 1.5px var(--hz-rule);
+}
+
+.hz-btn-outline:hover {
+  box-shadow: inset 0 0 0 1.5px var(--hz-ink);
+}
+
+.hz-btn-ghost {
+  color: #fff;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.4);
+}
+
+.hz-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1.5px #fff;
+}
+
+/* ─── Hero: the video banner runs edge to edge at its own 1920×656 ratio
+   (no crop, so the seal in the clip stays whole); copy sits on paper below ─── */
 .hz-hero {
   position: relative;
-  min-height: 100svh;
-  display: flex;
-  align-items: flex-end;
-  overflow: hidden;
-  isolation: isolate;
-  color: #fff;
-  background:
-    radial-gradient(120% 90% at 85% 20%, #e8213b 0%, transparent 60%),
-    radial-gradient(90% 80% at 0% 100%, var(--hz-lacquer) 0%, transparent 65%),
-    var(--hz-seal);
+  padding-bottom: clamp(1rem, 3vw, 2.5rem);
 }
 
-.hz-hero-grain {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.22;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 0 0 0 0 0 .05 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-.hz-hero-glyph {
-  position: absolute;
-  z-index: 0;
-  top: 50%;
-  right: max(var(--hz-gutter), calc((100vw - var(--hz-max)) / 2));
-  translate: 0 -54%;
-  display: grid;
-  justify-items: center;
-  gap: 1.25rem;
-}
-
-.hz-grid {
+.hz-hero-banner {
   position: relative;
-  width: min(44vw, 74svh, 600px);
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
+  aspect-ratio: 1920 / 656;
+  overflow: hidden;
+  background: #f4e6e6 url("/images/hero-banner-poster.webp") center / cover;
 }
 
-.hz-grid svg {
-  position: absolute;
-  inset: 0;
+.hz-hero-banner video {
+  display: block;
   width: 100%;
   height: 100%;
-  overflow: visible;
+  object-fit: cover;
 }
 
-.hz-grid rect,
-.hz-grid line {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.28);
-  stroke-width: 0.35;
-  vector-effect: non-scaling-stroke;
-}
-
-.hz-grid rect {
-  stroke: rgba(255, 255, 255, 0.45);
-  stroke-width: 1.5;
-}
-
-.hz-grid line {
-  stroke-dasharray: 6 7;
-}
-
-.hz-glyph {
-  position: relative;
-  font-family: var(--hz-brush);
-  font-size: calc(min(44vw, 74svh, 600px) * 0.86);
-  line-height: 1;
-  color: #fff;
-  text-shadow: 0 30px 80px rgba(70, 0, 12, 0.45);
-  translate: 0 -2%;
-  user-select: none;
-}
-
-.hz-glyph-caption {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  min-height: 2.5rem;
-}
-
-.hz-glyph-caption p {
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  margin: 0;
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.hz-glyph-caption strong {
-  font-family: var(--hz-display);
-  font-size: 1.7rem;
-  font-style: italic;
-  font-weight: 600;
-  color: #fff;
-}
-
-.hz-glyph-dots {
-  display: flex;
-  gap: 0.35rem;
-}
-
-.hz-glyph-dots button {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-}
-
-.hz-glyph-dots button::before {
+/* Soft fade into the paper so the banner doesn't end on a hard edge */
+.hz-hero-banner::after {
   content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.4);
-  transition:
-    width 0.35s var(--ease),
-    background-color 0.35s var(--ease);
+  position: absolute;
+  inset: auto 0 0;
+  height: 18%;
+  background: linear-gradient(transparent, var(--hz-paper));
+  pointer-events: none;
 }
 
-.hz-glyph-dots button.is-active::before {
-  width: 22px;
-  background: #fff;
-}
-
-.hz-hero-copy {
+.hz-intro {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: end;
+  gap: clamp(2rem, 5vw, 5rem);
+  width: min(var(--hz-max), calc(100% - var(--hz-gutter) * 2));
+  margin: clamp(-2.5rem, -3vw, -1rem) auto 0;
   position: relative;
   z-index: 1;
-  width: min(var(--hz-max), calc(100% - var(--hz-gutter) * 2));
-  margin: 0 auto;
-  padding: 8rem 0 clamp(3.5rem, 9vh, 6.5rem);
 }
 
 .hz-hero-title {
   margin: 0;
   font-family: var(--hz-display);
   font-weight: 600;
-  font-size: clamp(3.4rem, 9vw, 8.2rem);
-  line-height: 0.92;
+  font-size: clamp(3.6rem, 8vw, 7.6rem);
+  line-height: 0.9;
   letter-spacing: -0.035em;
-  color: #fff;
+  color: var(--hz-ink);
+}
+
+.hz-hero-title .hz-line:last-child {
+  font-style: italic;
+  color: var(--hz-seal);
 }
 
 .hz-line {
@@ -256,50 +171,23 @@
   display: inline-block;
 }
 
+.hz-intro-side {
+  padding-bottom: 0.75rem;
+}
+
 .hz-hero-lead {
   max-width: 30rem;
-  margin: 1.6rem 0 0;
-  font-size: clamp(1rem, 1.3vw, 1.18rem);
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.88);
+  margin: 0;
+  font-size: clamp(1.02rem, 1.25vw, 1.15rem);
+  line-height: 1.65;
+  color: var(--hz-mist);
 }
 
 .hz-hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-top: 2.25rem;
-}
-
-/* The seal: a stamp that lands once the headline is in */
-.hz-seal {
-  position: absolute;
-  z-index: 2;
-  right: max(var(--hz-gutter), calc((100vw - var(--hz-max)) / 2));
-  bottom: clamp(2.5rem, 8vh, 5.5rem);
-  width: 104px;
-  height: 104px;
-  display: grid;
-  place-content: center;
-  gap: 0.2rem;
-  text-align: center;
-  border: 3px solid var(--hz-gold);
-  border-radius: 14px;
-  color: var(--hz-gold);
-  background: rgba(138, 12, 31, 0.35);
-  box-shadow: inset 0 0 0 4px rgba(233, 180, 76, 0.25);
-}
-
-.hz-seal-han {
-  font-family: var(--hz-brush);
-  font-size: 2.3rem;
-  line-height: 1;
-}
-
-.hz-seal-year {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  margin-top: 1.75rem;
 }
 
 /* ─── Paper sections ─── */
@@ -657,6 +545,10 @@
 }
 
 /* ─── Closing band ─── */
+.hz-final :focus-visible {
+  outline-color: var(--hz-gold);
+}
+
 .hz-final {
   position: relative;
   overflow: hidden;
@@ -726,64 +618,6 @@
 
 /* ─── Phone ─── */
 @media (max-width: 899px) {
-  .hz-hero {
-    align-items: stretch;
-    flex-direction: column;
-    justify-content: flex-end;
-    min-height: 100svh;
-  }
-
-  .hz-hero-glyph {
-    position: relative;
-    top: auto;
-    right: auto;
-    translate: none;
-    margin: calc(var(--top) + 0.5rem) auto 0;
-  }
-
-  .hz-grid {
-    width: min(68vw, 40svh);
-  }
-
-  .hz-glyph {
-    font-size: calc(min(68vw, 40svh) * 0.86);
-  }
-
-  .hz-hero-copy {
-    padding: 1.5rem 0 calc(var(--tab) + 1.5rem);
-  }
-
-  .hz-hero-title {
-    font-size: clamp(2.3rem, 11vw, 3.4rem);
-  }
-
-  .hz-hero-lead {
-    margin-top: 1rem;
-  }
-
-  .hz-hero-actions {
-    margin-top: 1.5rem;
-  }
-
-  .hz-hero-actions .hz-btn {
-    flex: 1 1 auto;
-  }
-
-  .hz-seal {
-    top: calc(var(--top) + 0.75rem);
-    bottom: auto;
-    width: 76px;
-    height: 76px;
-  }
-
-  .hz-seal-han {
-    font-size: 1.7rem;
-  }
-
-  .hz-seal-year {
-    font-size: 0.58rem;
-  }
-
   .hz-head {
     align-items: flex-start;
     flex-direction: column;

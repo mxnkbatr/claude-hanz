@@ -22,14 +22,6 @@ import { ease, easeOut } from "../lib/motion";
 import { coursesMeta } from "../data/content";
 import "../styles/home.css";
 
-const HERO_CHARS = [
-  { char: "汉", pinyin: "hàn", meaningKey: "home_char_han" },
-  { char: "学", pinyin: "xué", meaningKey: "home_char_xue" },
-  { char: "梦", pinyin: "mèng", meaningKey: "home_char_meng" },
-] as const;
-
-const CHAR_INTERVAL = 4600;
-
 function ArrowIcon() {
   return (
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden>
@@ -45,124 +37,58 @@ function ArrowIcon() {
   );
 }
 
-/* ─── Hero: seal-red field, brushed hanzi on a 米字格 practice grid ─── */
+/* ─── Hero: full-width video banner, headline and actions on paper below ─── */
 
 function HomeHero() {
   const { t } = useI18n();
   const { academyLive: academy } = useSiteContent();
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
-  const [index, setIndex] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Respect reduced motion: keep the poster frame instead of looping the clip
   useEffect(() => {
-    if (reduce) return;
-    const id = window.setInterval(
-      () => setIndex((i) => (i + 1) % HERO_CHARS.length),
-      CHAR_INTERVAL,
-    );
-    return () => window.clearInterval(id);
+    const v = videoRef.current;
+    if (!v) return;
+    if (reduce) v.pause();
+    else void v.play().catch(() => {});
   }, [reduce]);
-
-  const px = useMotionValue(0);
-  const py = useMotionValue(0);
-  const sx = useSpring(px, { stiffness: 80, damping: 20 });
-  const sy = useSpring(py, { stiffness: 80, damping: 20 });
-
-  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
-    if (reduce || e.pointerType !== "mouse") return;
-    const r = e.currentTarget.getBoundingClientRect();
-    px.set(((e.clientX - r.left) / r.width - 0.5) * 24);
-    py.set(((e.clientY - r.top) / r.height - 0.5) * 18);
-  };
 
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
   });
-  const glyphY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
-  const copyY = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const videoScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
 
   const lines = t("hero_headline").split("\n");
-  const current = HERO_CHARS[index];
 
   return (
-    <section
-      className="hz-hero"
-      ref={ref}
-      onPointerMove={onPointerMove}
-      aria-labelledby="hz-hero-title"
-    >
-      <div className="hz-hero-grain" aria-hidden />
-
-      <motion.div className="hz-hero-glyph" style={{ y: glyphY }} aria-hidden>
-        <motion.div className="hz-grid" style={{ x: sx, y: sy }}>
-          <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-            <rect x="0.5" y="0.5" width="99" height="99" />
-            <line x1="50" y1="0" x2="50" y2="100" />
-            <line x1="0" y1="50" x2="100" y2="50" />
-            <line x1="0" y1="0" x2="100" y2="100" />
-            <line x1="100" y1="0" x2="0" y2="100" />
-          </svg>
-          <AnimatePresence mode="wait" initial={!reduce}>
-            <motion.span
-                key={current.char}
-                className="hz-glyph"
-                initial={
-                  reduce
-                    ? { opacity: 0 }
-                    : { clipPath: "inset(0 0 100% 0)", filter: "blur(8px)", opacity: 1 }
-                }
-                animate={
-                  reduce
-                    ? { opacity: 1 }
-                    : { clipPath: "inset(0 0 0% 0)", filter: "blur(0px)", opacity: 1 }
-                }
-                exit={
-                  reduce
-                    ? { opacity: 0 }
-                    : { opacity: 0, scale: 0.96, filter: "blur(6px)" }
-                }
-                transition={{ duration: reduce ? 0.2 : 1.1, ease: easeOut }}
-              >
-              {current.char}
-            </motion.span>
-          </AnimatePresence>
-        </motion.div>
-
-        <div className="hz-glyph-caption">
-          <AnimatePresence mode="wait">
-            <motion.p
-                key={current.char}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0, transition: { delay: 0.5, duration: 0.5, ease } }}
-                exit={{ opacity: 0, y: -6, transition: { duration: 0.2 } }}
-              >
-                <strong lang="zh-Latn">{current.pinyin}</strong>
-                <span>{t(current.meaningKey)}</span>
-            </motion.p>
-          </AnimatePresence>
-          <div className="hz-glyph-dots" role="tablist" aria-label="汉字">
-            {HERO_CHARS.map((c, i) => (
-              <button
-                key={c.char}
-                type="button"
-                role="tab"
-                aria-selected={i === index}
-                aria-label={c.char}
-                className={i === index ? "is-active" : undefined}
-                onClick={() => setIndex(i)}
-              />
-            ))}
-          </div>
-        </div>
+    <section className="hz-hero" ref={ref} aria-labelledby="hz-hero-title">
+      <motion.div
+        className="hz-hero-banner"
+        initial={reduce ? false : { clipPath: "inset(0% 0% 14% 0%)", opacity: 0 }}
+        animate={{ clipPath: "inset(0% 0% 0% 0%)", opacity: 1 }}
+        transition={{ duration: 1.2, ease: easeOut }}
+      >
+        <motion.video
+          ref={videoRef}
+          src="/videos/hero-banner.mp4"
+          poster="/images/hero-banner-poster.webp"
+          autoPlay={!reduce}
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden
+          style={{ scale: reduce ? 1 : videoScale }}
+        />
       </motion.div>
 
       <motion.div
-        className="hz-hero-copy"
-        style={{ y: copyY }}
+        className="hz-intro"
         initial="hidden"
         animate="show"
-        variants={{ show: { transition: { staggerChildren: 0.09, delayChildren: 0.35 } } }}
+        variants={{ show: { transition: { staggerChildren: 0.09, delayChildren: 0.45 } } }}
       >
         <h1 id="hz-hero-title" className="hz-hero-title">
           {lines.map((line) => (
@@ -179,47 +105,29 @@ function HomeHero() {
           ))}
         </h1>
 
-        <motion.p
-          className="hz-hero-lead"
-          variants={{
-            hidden: { opacity: 0, y: 18 },
-            show: { opacity: 1, y: 0, transition: { duration: 0.7, ease } },
-          }}
-        >
-          {t("home_hero_lead")}
-        </motion.p>
-
         <motion.div
-          className="hz-hero-actions"
+          className="hz-intro-side"
           variants={{
             hidden: { opacity: 0, y: 18 },
             show: { opacity: 1, y: 0, transition: { duration: 0.7, ease } },
           }}
         >
-          <a
-            href={academy.registerUrl}
-            className="hz-btn hz-btn-light"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span>{t("register_cta")}</span>
-            <ArrowIcon />
-          </a>
-          <Link to="/quiz" className="hz-btn hz-btn-ghost">
-            {t("home_cta_quiz")}
-          </Link>
+          <p className="hz-hero-lead">{t("home_hero_lead")}</p>
+          <div className="hz-hero-actions">
+            <a
+              href={academy.registerUrl}
+              className="hz-btn hz-btn-red"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>{t("register_cta")}</span>
+              <ArrowIcon />
+            </a>
+            <Link to="/quiz" className="hz-btn hz-btn-outline">
+              {t("home_cta_quiz")}
+            </Link>
+          </div>
         </motion.div>
-      </motion.div>
-
-      <motion.div
-        className="hz-seal"
-        aria-hidden
-        initial={{ opacity: 0, scale: 1.8, rotate: -18 }}
-        animate={{ opacity: 1, scale: 1, rotate: -8 }}
-        transition={{ delay: 1.15, type: "spring", stiffness: 420, damping: 18 }}
-      >
-        <span className="hz-seal-han">汉兹</span>
-        <span className="hz-seal-year">{t("home_seal")}</span>
       </motion.div>
     </section>
   );
@@ -437,7 +345,7 @@ function StudyChina() {
           </ul>
         )}
 
-        <Link to="/university" className="hz-btn hz-btn-seal">
+        <Link to="/university" className="hz-btn hz-btn-ink">
           <span>{t("home_china_cta")}</span>
           <ArrowIcon />
         </Link>
@@ -539,7 +447,7 @@ export function Home() {
           <div className="hz-hero-actions">
             <a
               href={academy.registerUrl}
-              className="hz-btn hz-btn-light"
+              className="hz-btn hz-btn-red"
               target="_blank"
               rel="noopener noreferrer"
             >
